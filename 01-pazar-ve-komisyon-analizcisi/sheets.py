@@ -13,6 +13,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
 import re
 import time
 import urllib.error
@@ -330,3 +331,80 @@ class Istemci:
 
 def tabloya_yaz(tablo: str, anahtar_yolu: str | Path, sayfalar: list[Sayfa], http=_http) -> dict:
     return Istemci(anahtar_oku(anahtar_yolu), http).yaz(tablo, sayfalar)
+
+
+# ---------------------------------------------------------------- kayıtlı bağlantı
+
+KURULMAMIS = "Google Sheets bağlantısı kurulmamış."
+
+
+def ayar_klasoru() -> Path:
+    """Bağlantı ayarları proje klasörünün DIŞINDA, kullanıcının ana klasöründe tutulur."""
+    return Path(os.environ.get("PAZAR_KOMISYON_AYAR") or Path.home() / ".pazar-komisyon")
+
+
+def kayitli_ayar() -> dict:
+    try:
+        ayar = json.loads((ayar_klasoru() / "ayarlar.json").read_text(encoding="utf-8"))
+        return ayar if isinstance(ayar, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def kayitli_istemci(http=_http) -> Istemci:
+    try:
+        anahtar = json.loads((ayar_klasoru() / "hizmet-hesabi.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise SheetsHatasi(KURULMAMIS) from None
+    return Istemci(anahtar, http)
+
+
+def baglanti_durumu(http=_http) -> dict:
+    """Bağlantı kurulu mu? Anahtarın kendisi bu bilgide yer almaz."""
+    ayar = kayitli_ayar()
+    try:
+        hesap = kayitli_istemci(http).hesap
+    except SheetsHatasi:
+        hesap = None
+    return {"ayarli": bool(ayar.get("tablo") and hesap), "hesap": hesap, "tablo": ayar.get("tablo"),
+            "tablo_adi": ayar.get("tablo_adi")}
+
+
+def baglanti_kur(tablo: str, anahtar_icerik: str | None = None, http=_http) -> dict:
+    """Anahtarı (verildiyse) saklar, tabloya erişimi dener ve başarılıysa bağlantıyı kaydeder."""
+    kimlik = tablo_kimligi(tablo)
+    klasor = ayar_klasoru()
+    if anahtar_icerik:
+        try:
+            anahtar = json.loads(anahtar_icerik)
+            if not isinstance(anahtar, dict) or anahtar.get("type") != "service_account" or not anahtar.get("client_email"):
+                raise ValueError
+            rsa_anahtari_coz(str(anahtar.get("private_key") or ""))
+        except (ValueError, SheetsHatasi):
+            raise SheetsHatasi("Seçtiğiniz dosya bir hizmet hesabı anahtarı değil. Google Cloud'da hizmet hesabı için "
+                               "indirdiğiniz JSON dosyasını seçin.") from None
+        klasor.mkdir(parents=True, exist_ok=True)
+        yol = klasor / "hizmet-hesabi.json"
+        yol.write_text(json.dumps(anahtar), encoding="utf-8")
+        try:
+            yol.chmod(0o600)  # yalnızca bu kullanıcı okuyabilsin
+        except OSError:
+            pass
+    bilgi = kayitli_istemci(http)._cagir("GET", f"{kimlik}?fields=properties.title")
+    klasor.mkdir(parents=True, exist_ok=True)
+    (klasor / "ayarlar.json").write_text(json.dumps(
+        {"tablo": f"https://docs.google.com/spreadsheets/d/{kimlik}/edit", "tablo_adi": (bilgi.get("properties") or {}).get("title") or ""},
+        ensure_ascii=False), encoding="utf-8")
+    return baglanti_durumu(http)
+
+
+def baglanti_kaldir() -> None:
+    for ad in ("hizmet-hesabi.json", "ayarlar.json"):
+        (ayar_klasoru() / ad).unlink(missing_ok=True)
+
+
+def kayitli_tabloya_yaz(sayfalar: list[Sayfa], http=_http) -> dict:
+    tablo = kayitli_ayar().get("tablo")
+    if not tablo:
+        raise SheetsHatasi(KURULMAMIS)
+    return kayitli_istemci(http).yaz(tablo, sayfalar)

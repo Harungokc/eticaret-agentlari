@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import base64
 import json
-import os
 import sys
 import tempfile
 import threading
@@ -25,7 +24,8 @@ from komisyon import Satir, analiz_et, kesin_mi, veri_yukle
 from okuyucu import OkumaHatasi, oku
 from pazar import PazarRaporu
 from pazar import analiz_et as pazar_analiz_et
-from sheets import Istemci, SheetsHatasi, rsa_anahtari_coz, tablo_kimligi
+import sheets
+from sheets import SheetsHatasi, ayar_klasoru
 
 VERI = veri_yukle()
 EN_BUYUK_ISTEK = 15 * 1024 * 1024  # kaydedilmiş bir arama sayfası birkaç MB olabilir
@@ -33,10 +33,6 @@ IZINLI_UZANTILAR = (".csv", ".json", ".html", ".htm")
 IZINLI_ADRESLER = ("127.0.0.1", "localhost")
 SHEETS_HTTP = None  # testlerde sahte ağ katmanı buraya konur
 
-
-def ayar_klasoru() -> Path:
-    """Google Sheets ayarları proje klasörünün DIŞINDA, kullanıcının ana klasöründe tutulur."""
-    return Path(os.environ.get("PAZAR_KOMISYON_AYAR") or Path.home() / ".pazar-komisyon")
 
 
 class GirdiHatasi(Exception):
@@ -187,84 +183,39 @@ def pazar_html(r: PazarRaporu) -> str:
 
 # ---------------------------------------------------------------- işlemler
 
-def _istemci() -> Istemci:
-    yol = ayar_klasoru() / "hizmet-hesabi.json"
-    try:
-        anahtar = json.loads(yol.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        raise GirdiHatasi("Google Sheets bağlantısı kurulmamış. Sayfanın altındaki “Google Sheets bağlantısı” bölümünden kurun.") from None
-    return Istemci(anahtar, SHEETS_HTTP) if SHEETS_HTTP else Istemci(anahtar)
+KUR_IPUCU = " Sayfanın altındaki “Google Sheets bağlantısı” bölümünden kurun."
 
 
-def _ayar() -> dict:
+def _http():
+    return SHEETS_HTTP or sheets._http
+
+
+def _sheets(islev, *args):
     try:
-        ayar = json.loads((ayar_klasoru() / "ayarlar.json").read_text(encoding="utf-8"))
-        return ayar if isinstance(ayar, dict) else {}
-    except (OSError, ValueError):
-        return {}
+        return islev(*args, http=_http())
+    except SheetsHatasi as hata:
+        mesaj = str(hata)
+        raise GirdiHatasi(mesaj + KUR_IPUCU if mesaj == sheets.KURULMAMIS else mesaj) from None
 
 
 def islem_sheets_durum(_: dict) -> dict:
     """Bağlantı kurulu mu? Anahtarın kendisi hiçbir zaman tarayıcıya geri gönderilmez."""
-    tablo = _ayar().get("tablo")
-    try:
-        hesap = _istemci().hesap
-    except GirdiHatasi:
-        hesap = None
-    return {"ayarli": bool(tablo and hesap), "hesap": hesap, "tablo": tablo, "tablo_adi": _ayar().get("tablo_adi")}
+    return sheets.baglanti_durumu(_http())
 
 
 def islem_sheets_ayar(g: dict) -> dict:
-    try:
-        kimlik = tablo_kimligi(str(g.get("tablo") or ""))
-    except SheetsHatasi as hata:
-        raise GirdiHatasi(str(hata)) from None
-    klasor = ayar_klasoru()
-    icerik = g.get("anahtar_icerik")
-    if icerik:
-        try:
-            anahtar = json.loads(icerik)
-            if not isinstance(anahtar, dict) or anahtar.get("type") != "service_account" or not anahtar.get("client_email"):
-                raise ValueError
-            rsa_anahtari_coz(str(anahtar.get("private_key") or ""))
-        except (ValueError, SheetsHatasi):
-            raise GirdiHatasi("Seçtiğiniz dosya bir hizmet hesabı anahtarı değil. Google Cloud'da hizmet hesabı için "
-                              "indirdiğiniz JSON dosyasını seçin.") from None
-        klasor.mkdir(parents=True, exist_ok=True)
-        yol = klasor / "hizmet-hesabi.json"
-        yol.write_text(json.dumps(anahtar), encoding="utf-8")
-        try:
-            yol.chmod(0o600)  # yalnızca bu kullanıcı okuyabilsin
-        except OSError:
-            pass
-    istemci = _istemci()  # anahtar hiç yüklenmemişse burada anlaşılır hata verir
-    try:
-        bilgi = istemci._cagir("GET", f"{kimlik}?fields=properties.title")
-    except SheetsHatasi as hata:
-        raise GirdiHatasi(str(hata)) from None
-    tablo_adi = (bilgi.get("properties") or {}).get("title") or ""
-    klasor.mkdir(parents=True, exist_ok=True)
-    (klasor / "ayarlar.json").write_text(json.dumps({"tablo": f"https://docs.google.com/spreadsheets/d/{kimlik}/edit",
-                                                      "tablo_adi": tablo_adi}, ensure_ascii=False), encoding="utf-8")
-    return islem_sheets_durum({})
+    return _sheets(sheets.baglanti_kur, str(g.get("tablo") or ""), g.get("anahtar_icerik") or None)
 
 
 def islem_sheets_kaldir(_: dict) -> dict:
-    for ad in ("hizmet-hesabi.json", "ayarlar.json"):
-        (ayar_klasoru() / ad).unlink(missing_ok=True)
+    sheets.baglanti_kaldir()
     return islem_sheets_durum({})
 
 
 def _yanit(html: str, sayfalar: list, dosya_adi: str, sheets_iste: bool) -> dict:
     yanit = {"html": html, "excel": base64.b64encode(kitap_yaz(sayfalar)).decode("ascii"), "excel_adi": dosya_adi}
     if sheets_iste:
-        tablo = _ayar().get("tablo")
-        if not tablo:
-            raise GirdiHatasi("Google Sheets bağlantısı kurulmamış. Sayfanın altındaki “Google Sheets bağlantısı” bölümünden kurun.")
-        try:
-            yanit["sheets"] = _istemci().yaz(tablo, sayfalar)
-        except SheetsHatasi as hata:
-            raise GirdiHatasi(str(hata)) from None
+        yanit["sheets"] = _sheets(sheets.kayitli_tabloya_yaz, sayfalar)
     return yanit
 
 

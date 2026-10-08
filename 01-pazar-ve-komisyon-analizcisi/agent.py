@@ -7,6 +7,8 @@ Kullanım:
     python agent.py pazar urunler.csv --kategori kozmetik --maliyet 180
     python agent.py komisyon giyim 599 --excel sonuc.xlsx
     python agent.py kategoriler
+    python agent.py sheets-kur TABLO_ADRESI anahtar.json      (bir kez)
+    python agent.py komisyon giyim 599 --sheets               (kayıtlı tabloya gönderir)
 """
 
 from __future__ import annotations
@@ -189,19 +191,58 @@ def _excel_kaydet(yol: str, icerik: bytes) -> None:
     print(f"\nExcel dosyası kaydedildi: {hedef}")
 
 
+KAYITLI = "kayitli"
+
+
+def komut_sheets_kur(a) -> int:
+    from sheets import SheetsHatasi, baglanti_kur
+    try:
+        icerik = Path(a.anahtar_dosyasi).expanduser().read_text(encoding="utf-8")
+    except OSError:
+        print(f"Hata: Anahtar dosyası okunamadı: {a.anahtar_dosyasi}")
+        return 1
+    try:
+        durum = baglanti_kur(a.tablo, icerik)
+    except SheetsHatasi as hata:
+        print(f"Google Sheets hatası: {hata}")
+        return 1
+    print(f"Bağlantı kuruldu: {durum['tablo_adi']} ({durum['tablo']})")
+    print(f"Hizmet hesabı: {durum['hesap']}")
+    print("Artık komutlara --sheets ekleyerek sonuçları bu tabloya gönderebilirsiniz.")
+    return 0
+
+
+def komut_sheets_durum() -> int:
+    from sheets import baglanti_durumu
+    d = baglanti_durumu()
+    if d["ayarli"]:
+        print(f"Bağlı: {d['tablo_adi']} ({d['tablo']})\nHizmet hesabı: {d['hesap']}")
+    elif d["hesap"]:
+        print(f"Anahtar kayıtlı ama tablo bağlanmamış. Hizmet hesabı: {d['hesap']}")
+    else:
+        print("Google Sheets bağlantısı kurulmamış.")
+    return 0 if d["ayarli"] else 1
+
+
 def _cikti(a, sayfalar: list) -> int:
     """İstenmişse sonucu Excel dosyasına ve/veya Google Sheets tablosuna yazar."""
     if a.excel:
         _excel_kaydet(a.excel, kitap_yaz(sayfalar))
     if a.sheets:
-        if not a.anahtar:
-            print("\nHata: Google Sheets'e yazmak için --anahtar ile hizmet hesabı anahtar dosyasını da verin.")
-            return 1
-        from sheets import SheetsHatasi, tabloya_yaz
+        from sheets import SheetsHatasi, kayitli_tabloya_yaz, tabloya_yaz
         try:
-            sonuc = tabloya_yaz(a.sheets, a.anahtar, sayfalar)
+            if a.sheets == KAYITLI:
+                sonuc = kayitli_tabloya_yaz(sayfalar)
+            elif not a.anahtar:
+                print("\nHata: Tablo adresi verdiğinizde --anahtar ile hizmet hesabı anahtar dosyasını da verin; "
+                      "ya da önce `python agent.py sheets-kur` ile bağlantıyı kaydedin.")
+                return 1
+            else:
+                sonuc = tabloya_yaz(a.sheets, a.anahtar, sayfalar)
         except SheetsHatasi as hata:
             print(f"\nGoogle Sheets hatası: {hata}")
+            if "kurulmamış" in str(hata):
+                print("Kurmak için: python agent.py sheets-kur TABLO_ADRESI ANAHTAR_DOSYASI")
             return 1
         print(f"\nGoogle Sheets'e yazıldı ({', '.join(sonuc['sekmeler'])}): {sonuc['adres']}")
         if sonuc["hatali_hucre"]:
@@ -255,8 +296,9 @@ def main(argv: list[str] | None = None) -> int:
     def oran_secenekleri(q):
         q.add_argument("--maliyet", help="Ürün maliyeti (TL); verilirse kâr da hesaplanır")
         q.add_argument("--excel", metavar="DOSYA", help="Sonucu Excel dosyası olarak da kaydeder, ör. sonuc.xlsx")
-        q.add_argument("--sheets", metavar="ADRES", help="Sonucu bu Google Sheets tablosuna yazar (tablonun adresi)")
-        q.add_argument("--anahtar", metavar="DOSYA", help="Google hizmet hesabı anahtarı (JSON); --sheets ile birlikte gerekir")
+        q.add_argument("--sheets", metavar="ADRES", nargs="?", const=KAYITLI,
+                       help="Sonucu Google Sheets'e yazar. Adres vermezseniz sheets-kur ile kaydedilen tablo kullanılır")
+        q.add_argument("--anahtar", metavar="DOSYA", help="Hizmet hesabı anahtarı (JSON); yalnızca --sheets ile adres verildiğinde gerekir")
         for anahtar, pz in veri["pazaryerleri"].items():
             q.add_argument(f"--{anahtar}", type=float, metavar="ORAN",
                            help=f"{pz['ad']} için kendi sözleşme oranınız (%%)")
@@ -273,12 +315,21 @@ def main(argv: list[str] | None = None) -> int:
 
     alt.add_parser("kategoriler", help="Komisyon tablosundaki kategorileri listeler")
 
+    sk = alt.add_parser("sheets-kur", help="Google Sheets bağlantısını bir kez kurar ve kaydeder")
+    sk.add_argument("tablo", help="Google Sheets tablonuzun adresi")
+    sk.add_argument("anahtar_dosyasi", help="Google Cloud'dan indirdiğiniz hizmet hesabı anahtarı (.json)")
+    alt.add_parser("sheets-durum", help="Kayıtlı Google Sheets bağlantısını gösterir")
+
     a = p.parse_args(argv)
     try:
         if a.komut == "kategoriler":
             for kat in veri["kategoriler"]:
                 print(f"- {kat['ad']}")
             return 0
+        if a.komut == "sheets-kur":
+            return komut_sheets_kur(a)
+        if a.komut == "sheets-durum":
+            return komut_sheets_durum()
         if a.komut == "komisyon":
             return komut_komisyon(a, veri)
         return komut_pazar(a, veri)

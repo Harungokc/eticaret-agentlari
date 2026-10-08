@@ -16,6 +16,20 @@ dosyaya çift tıklarsınız ve araç tarayıcınızda bir sayfa olarak açılı
 > Tek istisna, isteğe bağlı Google Sheets çıktısıdır: onu siz açarsanız sonuçlar yalnızca sizin
 > belirttiğiniz Google tablosuna yazılır.
 
+## En kolay yol: yapay zekâ asistanınıza kurdurun
+
+Bilgisayarınızda komut çalıştırabilen bir yapay zekâ asistanı kullanıyorsanız (örneğin Claude Code
+veya Claude Cowork), kurulumu ona yaptırabilirsiniz:
+
+1. **[Kılavuzu indirin (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf)**
+2. PDF'i asistanınıza verin ve **"Bu kılavuza göre aracı kur."** deyin.
+3. Sonrasında konuşur gibi sorun: *"899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım?"*
+
+Asistan hesabı bu araçla yapar, sonucu anlatır ve isterseniz Google Sheets tablonuza yazar. Kılavuz,
+Google Sheets bağlantısını adım adım anlatır ve asistanın izleyeceği talimatları içerir.
+
+Asistan kullanmıyorsanız aşağıdaki adımlarla kendiniz kurabilirsiniz.
+
 ---
 
 ## İçindekiler
