@@ -27,7 +27,7 @@ class Formul:
 
 
 # Biçem numaraları (styles.xml içindeki cellXfs sırası)
-DUZ, BASLIK, SUTUN, ETIKET, GIRDI_TL, TL, GIRDI_YUZDE, YUZDE, TAM, NOT, SARMA, ONDALIK, VURGU_TL, GIRDI_METIN = range(14)
+DUZ, BASLIK, SUTUN, ETIKET, GIRDI_TL, TL, GIRDI_YUZDE, YUZDE, TAM, NOT, SARMA, ONDALIK, VURGU_TL, GIRDI_METIN, AFIS = range(15)
 
 _STILLER = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -36,19 +36,20 @@ _STILLER = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <numFmt numFmtId="165" formatCode="0.0#%"/>
 <numFmt numFmtId="166" formatCode="0.0"/>
 </numFmts>
-<fonts count="6">
+<fonts count="7">
 <font><sz val="10"/><name val="Arial"/></font>
 <font><b/><sz val="14"/><name val="Arial"/></font>
 <font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>
 <font><b/><sz val="10"/><name val="Arial"/></font>
 <font><sz val="10"/><color rgb="FF0000FF"/><name val="Arial"/></font>
 <font><sz val="9"/><color rgb="FF595959"/><name val="Arial"/></font>
+<font><b/><sz val="15"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>
 </fonts>
 <fills count="5">
 <fill><patternFill patternType="none"/></fill>
 <fill><patternFill patternType="gray125"/></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FF1F3864"/><bgColor indexed="64"/></patternFill></fill>
-<fill><patternFill patternType="solid"><fgColor rgb="FFFFFF00"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFFFF2CC"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFDDEBF7"/><bgColor indexed="64"/></patternFill></fill>
 </fills>
 <borders count="2">
@@ -56,21 +57,22 @@ _STILLER = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <border><left/><right/><top/><bottom style="thin"><color rgb="FFBFBFBF"/></bottom><diagonal/></border>
 </borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-<cellXfs count="14">
+<cellXfs count="15">
 <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top"/></xf>
 <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/>
 <xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
-<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0"/>
-<xf numFmtId="164" fontId="4" fillId="3" borderId="1" xfId="0" applyNumberFormat="1"/>
-<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1"/>
-<xf numFmtId="165" fontId="4" fillId="3" borderId="1" xfId="0" applyNumberFormat="1"/>
-<xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1"/>
-<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1"/>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="164" fontId="4" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="165" fontId="4" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
 <xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
-<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
-<xf numFmtId="166" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1"/>
-<xf numFmtId="164" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1"/>
-<xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0"/>
+<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+<xf numFmtId="166" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="164" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="6" fillId="2" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" indent="1"/></xf>
 </cellXfs>
 <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
 </styleSheet>"""
@@ -103,6 +105,14 @@ class Sayfa:
         self.satirlar: dict[int, list[tuple[int, object, int]]] = {}
         self.yukseklikler: dict[int, float] = {}
         self.birlesimler: list[str] = []
+        # Google Sheets çıktısında çizilecek grafikler (Excel dosyasında grafik üretilmez).
+        self.grafikler: list[dict] = []
+
+    def grafik(self, baslik: str, alan: str, seriler: list[str], konum: str, tur: str = "COLUMN",
+               genislik: int = 560, yukseklik: int = 330) -> None:
+        """`alan` etiket sütunu, `seriler` değer sütunlarıdır; hepsinin ilk satırı başlıktır."""
+        self.grafikler.append({"baslik": baslik, "alan": alan, "seriler": seriler, "konum": konum, "tur": tur,
+                               "genislik": genislik, "yukseklik": yukseklik})
 
     def yaz(self, hucre: str, deger, bicem: int = DUZ) -> None:
         harfler = "".join(k for k in hucre if k.isalpha())
@@ -208,7 +218,8 @@ def komisyon_sayfasi(kategori_adi: str, fiyat: float, maliyet: float | None, sat
                      fiyat_formulu: Formul | None = None) -> Sayfa:
     """Komisyon karşılaştırması. Fiyat B4, maliyet B5; oranlar tabloda sarı hücrelerde."""
     s = Sayfa("Komisyon", [24, 13, 13, 12, 16, 16, 17, 17, 16, 16, 70], dondur="A9")
-    s.yaz("A1", "Komisyon Karşılaştırması", BASLIK)
+    s.yaz("A1", "Komisyon Karşılaştırması", AFIS)
+    s.birlestir("A1:K1", yukseklik=30)
     s.yaz("A2", ACIKLAMA, NOT)
     s.birlestir("A2:K2")
     s.yaz("A3", "Kategori", ETIKET)
@@ -262,6 +273,10 @@ def komisyon_sayfasi(kategori_adi: str, fiyat: float, maliyet: float | None, sat
         s.yaz(f"A{r}", n, NOT)
         s.birlestir(f"A{r}:K{r}", yukseklik=28 if len(n) > 150 else None)
         r += 1
+    son = 8 + len(satirlar)
+    s.grafik("Elinize geçen tutar (TL)", f"A8:A{son}", [f"G8:G{son}", f"H8:H{son}"], f"A{r + 1}")
+    if maliyet is not None:
+        s.grafik("Kârınız (TL)", f"A8:A{son}", [f"I8:I{son}", f"J8:J{son}"], f"F{r + 1}")
     return s
 
 
@@ -278,10 +293,11 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
     son = urun_sayisi + 1
     fiyat, puan, yorum, marka = (f"'Ürünler'!$C$2:$C${son}", f"'Ürünler'!$D$2:$D${son}", f"'Ürünler'!$E$2:$E${son}",
                                  f"'Ürünler'!$B$2:$B${son}")
-    s = Sayfa("Pazar", [34, 18, 18, 26, 4, 4], dondur=None)
-    s.yaz("A1", "Pazar Analizi", BASLIK)
+    s = Sayfa("Pazar", [42, 18, 18, 26, 20, 3], dondur=None)
+    s.yaz("A1", "Pazar Analizi", AFIS)
+    s.birlestir("A1:E1", yukseklik=30)
     s.yaz("A2", "Özetler “Ürünler” sayfasındaki listeden hesaplanır; oradaki fiyatları değiştirirseniz güncellenir.", NOT)
-    s.birlestir("A2:D2")
+    s.birlestir("A2:E2")
 
     s.satir(4, ["Fiyat", "Değer"], SUTUN)
     kalemler = [
@@ -299,7 +315,8 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
     ORTANCA_HUCRE = "B8"
 
     satir = 13
-    s.satir(satir, ["Fiyat bandı (alt sınır)", "Üst sınır", "Ürün sayısı", "Ürün başına ortalama yorum"], SUTUN)
+    s.satir(satir, ["Fiyat bandı (alt sınır)", "Üst sınır", "Ürün sayısı", "Ürün başına ortalama yorum", "Bant"], SUTUN)
+    bant_basi = satir
     for i, b in enumerate(r.bantlar):
         n = satir + 1 + i
         son_bant = i == len(r.bantlar) - 1
@@ -309,10 +326,19 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
         kosul = f'{fiyat},">="&A{n},{fiyat},"{ust_islec}"&B{n}'
         s.yaz(f"C{n}", Formul(f"COUNTIFS({kosul})", b.urun_sayisi), TAM)
         s.yaz(f"D{n}", Formul(f'IFERROR(AVERAGEIFS({yorum},{kosul}),"-")', b.ortalama_yorum if b.ortalama_yorum is not None else "-"), TAM)
+        s.yaz(f"E{n}", Formul(f'ROUND(A{n},0)&" – "&ROUND(B{n},0)&" TL"', f"{round(b.alt)} – {round(b.ust)} TL"), SARMA)
+    bant_sonu = satir + len(r.bantlar)
+    s.grafik("Fiyat bantlarına göre ürün sayısı", f"E{bant_basi}:E{bant_sonu}", [f"C{bant_basi}:C{bant_sonu}"], "G4",
+             genislik=520, yukseklik=300)
+    if r.yorum_medyan is not None:
+        s.grafik("Fiyat bantlarına göre ürün başına ortalama yorum", f"E{bant_basi}:E{bant_sonu}", [f"D{bant_basi}:D{bant_sonu}"],
+                 "G20", genislik=520, yukseklik=300)
     satir += len(r.bantlar) + 2
 
     if r.markalar:
         s.satir(satir, ["Öne çıkan markalar", "Ürün sayısı", "Payı"], SUTUN)
+        s.grafik("Öne çıkan markalar (ürün sayısı)", f"A{satir}:A{satir + len(r.markalar)}", [f"B{satir}:B{satir + len(r.markalar)}"],
+                 "G36", tur="BAR", genislik=520, yukseklik=300)
         for i, (m, adet, pay) in enumerate(r.markalar):
             n = satir + 1 + i
             s.yaz(f"A{n}", m, SARMA)

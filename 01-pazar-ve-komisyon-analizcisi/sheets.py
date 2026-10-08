@@ -20,7 +20,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from excel import (BASLIK, DUZ, ETIKET, GIRDI_METIN, GIRDI_TL, GIRDI_YUZDE, NOT, ONDALIK, SARMA, SUTUN, TAM, TL,
+from excel import (AFIS, BASLIK, DUZ, ETIKET, GIRDI_METIN, GIRDI_TL, GIRDI_YUZDE, NOT, ONDALIK, SARMA, SUTUN, TAM, TL,
                    VURGU_TL, YUZDE, Formul, Sayfa)
 
 KAPSAM = "https://www.googleapis.com/auth/spreadsheets"
@@ -142,7 +142,7 @@ def _renk(onaltilik: str) -> dict:
 
 _TL = {"type": "NUMBER", "pattern": '#,##0.00" TL"'}
 _YUZDE = {"type": "PERCENT", "pattern": "0.0#%"}
-_SARI, _MAVI_YAZI, _LACIVERT, _ACIK_MAVI, _GRI = _renk("FFFF00"), _renk("0000FF"), _renk("1F3864"), _renk("DDEBF7"), _renk("595959")
+_SARI, _MAVI_YAZI, _LACIVERT, _ACIK_MAVI, _GRI = _renk("FFF2CC"), _renk("0000FF"), _renk("1F3864"), _renk("DDEBF7"), _renk("595959")
 
 
 def _yazi(**ozellik) -> dict:
@@ -154,17 +154,19 @@ BICEMLER = {
     BASLIK: {"textFormat": _yazi(bold=True, fontSize=14)},
     SUTUN: {"textFormat": _yazi(bold=True, foregroundColor=_renk("FFFFFF")), "backgroundColor": _LACIVERT,
             "wrapStrategy": "WRAP", "verticalAlignment": "MIDDLE"},
-    ETIKET: {"textFormat": _yazi(bold=True)},
-    GIRDI_TL: {"textFormat": _yazi(foregroundColor=_MAVI_YAZI), "backgroundColor": _SARI, "numberFormat": _TL},
-    TL: {"textFormat": _yazi(), "numberFormat": _TL},
-    GIRDI_YUZDE: {"textFormat": _yazi(foregroundColor=_MAVI_YAZI), "backgroundColor": _SARI, "numberFormat": _YUZDE},
-    YUZDE: {"textFormat": _yazi(), "numberFormat": _YUZDE},
-    TAM: {"textFormat": _yazi(), "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}},
+    ETIKET: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(bold=True)},
+    GIRDI_TL: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(foregroundColor=_MAVI_YAZI), "backgroundColor": _SARI, "numberFormat": _TL},
+    TL: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(), "numberFormat": _TL},
+    GIRDI_YUZDE: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(foregroundColor=_MAVI_YAZI), "backgroundColor": _SARI, "numberFormat": _YUZDE},
+    YUZDE: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(), "numberFormat": _YUZDE},
+    TAM: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(), "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}},
     NOT: {"textFormat": _yazi(fontSize=9, foregroundColor=_GRI), "wrapStrategy": "WRAP", "verticalAlignment": "TOP"},
-    SARMA: {"textFormat": _yazi(), "wrapStrategy": "WRAP", "verticalAlignment": "TOP"},
-    ONDALIK: {"textFormat": _yazi(), "numberFormat": {"type": "NUMBER", "pattern": "0.0"}},
-    VURGU_TL: {"textFormat": _yazi(bold=True), "backgroundColor": _ACIK_MAVI, "numberFormat": _TL},
-    GIRDI_METIN: {"textFormat": _yazi(foregroundColor=_MAVI_YAZI), "backgroundColor": _SARI},
+    SARMA: {"textFormat": _yazi(), "wrapStrategy": "WRAP", "verticalAlignment": "MIDDLE"},
+    ONDALIK: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(), "numberFormat": {"type": "NUMBER", "pattern": "0.0"}},
+    VURGU_TL: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(bold=True), "backgroundColor": _ACIK_MAVI, "numberFormat": _TL},
+    GIRDI_METIN: {"verticalAlignment": "MIDDLE", "textFormat": _yazi(foregroundColor=_MAVI_YAZI), "backgroundColor": _SARI},
+    AFIS: {"textFormat": _yazi(bold=True, fontSize=15, foregroundColor=_renk("FFFFFF")), "backgroundColor": _LACIVERT,
+           "verticalAlignment": "MIDDLE", "padding": {"left": 10}},
 }
 
 
@@ -234,9 +236,46 @@ def sayfa_istekleri(sayfa: Sayfa, sayfa_no: int, ayirici: str) -> list[dict]:
         istekler.append({"updateDimensionProperties": {
             "range": {"sheetId": sayfa_no, "dimension": "COLUMNS", "startIndex": i, "endIndex": i + 1},
             "properties": {"pixelSize": int(genislik * 7 + 5)}, "fields": "pixelSize"}})
+    for no, yukseklik in sayfa.yukseklikler.items():  # punto → piksel
+        istekler.append({"updateDimensionProperties": {
+            "range": {"sheetId": sayfa_no, "dimension": "ROWS", "startIndex": no - 1, "endIndex": no},
+            "properties": {"pixelSize": int(yukseklik * 4 / 3)}, "fields": "pixelSize"}})
     donuk = int("".join(k for k in sayfa.dondur if k.isdigit())) - 1 if sayfa.dondur else 0
-    istekler.append({"updateSheetProperties": {"properties": {"sheetId": sayfa_no, "gridProperties": {"frozenRowCount": donuk}},
-                                               "fields": "gridProperties.frozenRowCount"}})
+    istekler.append({"updateSheetProperties": {
+        "properties": {"sheetId": sayfa_no, "gridProperties": {"frozenRowCount": donuk, "hideGridlines": True}},
+        "fields": "gridProperties.frozenRowCount,gridProperties.hideGridlines"}})
+    return istekler
+
+
+SERI_RENKLERI = [_renk("1F3864"), _renk("6FA8DC"), _renk("F6B26B")]
+
+
+def grafik_istekleri(sayfa: Sayfa, sayfa_no: int) -> list[dict]:
+    """Sayfanın grafiklerini ekleyen istekler. Sütun/çubuk grafiği; ilk satır başlık sayılır."""
+    istekler = []
+    for g in sayfa.grafikler:
+        yatay = g["tur"] == "BAR"
+        capa = _aralik(f'{g["konum"]}:{g["konum"]}', sayfa_no)
+        istekler.append({"addChart": {"chart": {
+            "spec": {
+                "title": g["baslik"],
+                "titleTextFormat": {"fontFamily": "Arial", "fontSize": 13, "bold": True, "foregroundColor": _renk("1F3864")},
+                "fontName": "Arial",
+                "basicChart": {
+                    "chartType": g["tur"], "headerCount": 1,
+                    "legendPosition": "BOTTOM_LEGEND" if len(g["seriler"]) > 1 else "NO_LEGEND",
+                    "axis": [{"position": "LEFT_AXIS" if yatay else "BOTTOM_AXIS"}, {"position": "BOTTOM_AXIS" if yatay else "LEFT_AXIS"}],
+                    "domains": [{"domain": {"sourceRange": {"sources": [_aralik(g["alan"], sayfa_no)]}}}],
+                    "series": [{"series": {"sourceRange": {"sources": [_aralik(a, sayfa_no)]}},
+                                "targetAxis": "BOTTOM_AXIS" if yatay else "LEFT_AXIS",
+                                "colorStyle": {"rgbColor": SERI_RENKLERI[i % len(SERI_RENKLERI)]}}
+                               for i, a in enumerate(g["seriler"])],
+                },
+            },
+            "position": {"overlayPosition": {
+                "anchorCell": {"sheetId": sayfa_no, "rowIndex": capa["startRowIndex"], "columnIndex": capa["startColumnIndex"]},
+                "widthPixels": g["genislik"], "heightPixels": g["yukseklik"]}},
+        }}})
     return istekler
 
 
@@ -288,8 +327,13 @@ class Istemci:
     def yaz(self, tablo: str, sayfalar: list[Sayfa]) -> dict:
         """Verilen sayfaları tabloya yazar. Aynı adlı sekme varsa içeriği değiştirilir; diğer sekmelere dokunulmaz."""
         kimlik = tablo_kimligi(tablo)
-        bilgi = self._cagir("GET", f"{kimlik}?fields=properties.locale,sheets.properties.sheetId,sheets.properties.title")
+        bilgi = self._cagir("GET", f"{kimlik}?fields=properties.locale,sheets.properties.sheetId,sheets.properties.title,"
+                                   "sheets.charts.chartId")
         mevcut = {s["properties"]["title"]: s["properties"]["sheetId"] for s in bilgi.get("sheets", [])}
+        yazilan = {s.ad for s in sayfalar}
+        # Yalnızca bu aracın yazdığı sekmelerdeki eski grafikler silinir; yoksa her çalıştırmada üst üste birikirdi.
+        eski_grafikler = [{"deleteEmbeddedObject": {"objectId": c["chartId"]}} for s in bilgi.get("sheets", [])
+                          if s["properties"]["title"] in yazilan for c in s.get("charts", [])]
         dil = (bilgi.get("properties") or {}).get("locale", "en_US")
         ayirici = "," if dil.split("_")[0] in ("en", "ja", "zh", "ko", "he", "th", "hi") else ";"
 
@@ -310,6 +354,8 @@ class Istemci:
             self._cagir("POST", f"{kimlik}:batchUpdate", {"requests": istekler})
             return self._hata_say(kimlik, [s.ad for s in sayfalar])
 
+        grafikler = [i for s in sayfalar for i in grafik_istekleri(s, mevcut[s.ad])]
+
         hatali = gonder(ayirici)
         if hatali:  # dil tahmini tutmadıysa diğer ayırıcıyla bir kez daha dene
             diger = "," if ayirici == ";" else ";"
@@ -317,8 +363,11 @@ class Istemci:
                 hatali, ayirici = 0, diger
             else:
                 hatali = gonder(ayirici)
+        if eski_grafikler or grafikler:  # hücreler kesinleştikten sonra, tek seferde
+            self._cagir("POST", f"{kimlik}:batchUpdate", {"requests": eski_grafikler + grafikler})
         return {"adres": f"https://docs.google.com/spreadsheets/d/{kimlik}/edit#gid={mevcut[sayfalar[0].ad]}",
-                "sekmeler": [s.ad for s in sayfalar], "eklenen_sekmeler": eksik, "hatali_hucre": hatali, "dil": dil}
+                "sekmeler": [s.ad for s in sayfalar], "eklenen_sekmeler": eksik, "hatali_hucre": hatali, "dil": dil,
+                "grafik_sayisi": len(grafikler)}
 
     def _hata_say(self, kimlik: str, adlar: list[str]) -> int:
         """Yazılan sekmelerde hata gösteren (#ERROR!, #NAME? ...) hücre sayısı."""

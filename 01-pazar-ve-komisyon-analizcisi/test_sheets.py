@@ -46,8 +46,9 @@ def komisyon_ornegi():
 class SahteGoogle:
     """Sheets API'nin bu aracın kullandığı kısmını taklit eder ve gelen istekleri kaydeder."""
 
-    def __init__(self, sekmeler=("Sayfa1",), dil="tr_TR", hatali=(0,), jeton_kodu=200, api_kodu=200, api_mesaji=""):
+    def __init__(self, sekmeler=("Sayfa1",), dil="tr_TR", hatali=(0,), jeton_kodu=200, api_kodu=200, api_mesaji="", grafikler=None):
         self.sekmeler = {ad: i * 100 for i, ad in enumerate(sekmeler)}
+        self.grafikler = grafikler or {}  # sekme adı → o sekmede zaten duran grafik kimlikleri
         self.dil, self.hatali, self.jeton_kodu, self.api_kodu, self.api_mesaji = dil, list(hatali), jeton_kodu, api_kodu, api_mesaji
         self.istekler, self.jeton_istegi = [], None
 
@@ -65,7 +66,8 @@ class SahteGoogle:
             return 200, json.dumps({"sheets": [{"data": [{"rowData": [{"values": [{"effectiveValue": {"errorValue": {"type": "ERROR", "message": "Formula parse error."}}}] * n}]}]}]}).encode()
         if yontem == "GET":
             return 200, json.dumps({"properties": {"locale": self.dil}, "sheets": [
-                {"properties": {"sheetId": no, "title": ad}} for ad, no in self.sekmeler.items()]}).encode()
+                {"properties": {"sheetId": no, "title": ad}, "charts": [{"chartId": c} for c in self.grafikler.get(ad, [])]}
+                for ad, no in self.sekmeler.items()]}).encode()
         yanitlar = []
         for i in json.loads(govde)["requests"]:
             if "addSheet" in i:
@@ -76,6 +78,13 @@ class SahteGoogle:
 
     def toplu(self):
         return [g["requests"] for y, a, g, _ in self.istekler if y == "POST"]
+
+    def hucre_toplusu(self):
+        """Hücreleri yazan son toplu istek (ardından gelen grafik isteği hariç)."""
+        return [t for t in self.toplu() if any("updateCells" in i for i in t)][-1]
+
+    def grafik_toplusu(self):
+        return [t for t in self.toplu() if any("addChart" in i or "deleteEmbeddedObject" in i for i in t)]
 
 
 @unittest.skipUnless(OPENSSL, "openssl bulunamadı")
@@ -188,7 +197,7 @@ class Istekler(unittest.TestCase):
         self.assertEqual(istekler[2]["updateCells"]["start"], {"sheetId": 7, "rowIndex": 0, "columnIndex": 0})
         hucre = lambda a1_satir, sutun: satirlar[a1_satir - 1]["values"][sutun - 1]
         self.assertEqual(hucre(4, 2)["userEnteredValue"], {"numberValue": 1000})  # B4 fiyat: girdi
-        self.assertEqual(hucre(4, 2)["userEnteredFormat"]["backgroundColor"], {"red": 1.0, "green": 1.0, "blue": 0.0})
+        self.assertEqual(hucre(4, 2)["userEnteredFormat"]["backgroundColor"], {"red": 1.0, "green": 242 / 255, "blue": 204 / 255})
         self.assertEqual(hucre(9, 5)["userEnteredValue"], {"formulaValue": '=IF(OR(B9="";C9="");"veri yok";$B$4*B9)'})
         self.assertEqual(hucre(9, 2)["userEnteredFormat"]["numberFormat"]["type"], "PERCENT")
         self.assertIn({"mergeCells": {"range": {"sheetId": 7, "startRowIndex": 1, "endRowIndex": 2, "startColumnIndex": 0,
@@ -236,21 +245,59 @@ class Akis(unittest.TestCase):
         google = SahteGoogle(sekmeler=("Sayfa1", "Notlarım"))
         self.istemci(google).yaz(KIMLIK, pazar_sayfalari(pazar_analiz_et(urunler), urunler, None, VERI))
         siralama = [(i["updateSheetProperties"]["properties"]["sheetId"], i["updateSheetProperties"]["properties"]["index"])
-                    for i in google.toplu()[-1] if i.get("updateSheetProperties", {}).get("fields") == "index"]
+                    for i in google.hucre_toplusu() if i.get("updateSheetProperties", {}).get("fields") == "index"]
         self.assertEqual(siralama, [(google.sekmeler["Pazar"], 0), (google.sekmeler["Ürünler"], 1)])
         self.assertFalse(any("deleteSheet" in i for t in google.toplu() for i in t))
+
+    def test_grafikler_eklenir(self):
+        urunler = [Urun(ad=f"u{i}", marka=f"m{i % 3}", fiyat=100 + i * 10, yorum=10 * i) for i in range(25)]
+        rapor = pazar_analiz_et(urunler)
+        satirlar = analiz_et(kat("kozmetik"), rapor.fiyat_medyan, VERI, maliyet=50)
+        google = SahteGoogle()
+        sonuc = self.istemci(google).yaz(KIMLIK, pazar_sayfalari(rapor, urunler, ("Kozmetik", 50, satirlar), VERI))
+        (toplu,) = google.grafik_toplusu()  # hücreler yazıldıktan sonra tek istek
+        grafikler = [i["addChart"]["chart"] for i in toplu if "addChart" in i]
+        basliklar = [g["spec"]["title"] for g in grafikler]
+        self.assertEqual(sonuc["grafik_sayisi"], len(grafikler))
+        self.assertIn("Elinize geçen tutar (TL)", basliklar)
+        self.assertIn("Kârınız (TL)", basliklar)  # maliyet verildiği için
+        self.assertIn("Fiyat bantlarına göre ürün sayısı", basliklar)
+        self.assertIn("Öne çıkan markalar (ürün sayısı)", basliklar)
+        ele = next(g for g in grafikler if g["spec"]["title"] == "Elinize geçen tutar (TL)")
+        kom = google.sekmeler["Komisyon"]
+        temel = ele["spec"]["basicChart"]
+        son = 8 + len(satirlar)
+        self.assertEqual(temel["domains"][0]["domain"]["sourceRange"]["sources"][0],
+                         {"sheetId": kom, "startRowIndex": 7, "endRowIndex": son, "startColumnIndex": 0, "endColumnIndex": 1})
+        self.assertEqual([x["series"]["sourceRange"]["sources"][0]["startColumnIndex"] for x in temel["series"]], [6, 7])  # G ve H
+        self.assertEqual(temel["headerCount"], 1)
+        self.assertEqual(ele["position"]["overlayPosition"]["anchorCell"]["sheetId"], kom)
+        marka = next(g for g in grafikler if g["spec"]["title"].startswith("Öne çıkan"))
+        self.assertEqual(marka["spec"]["basicChart"]["chartType"], "BAR")
+
+    def test_maliyet_yoksa_kar_grafigi_yok(self):
+        google = SahteGoogle()
+        self.istemci(google).yaz(KIMLIK, komisyon_sayfalari("Giyim", 1000, None, analiz_et(kat("giyim"), 1000, VERI), VERI))
+        basliklar = [i["addChart"]["chart"]["spec"]["title"] for t in google.grafik_toplusu() for i in t if "addChart" in i]
+        self.assertEqual(basliklar, ["Elinize geçen tutar (TL)"])
+
+    def test_eski_grafikler_yalnizca_yazilan_sekmelerden_silinir(self):
+        google = SahteGoogle(sekmeler=("Sayfa1", "Komisyon"), grafikler={"Sayfa1": [11], "Komisyon": [21, 22]})
+        self.istemci(google).yaz(KIMLIK, komisyon_ornegi())
+        silinen = [i["deleteEmbeddedObject"]["objectId"] for t in google.grafik_toplusu() for i in t if "deleteEmbeddedObject" in i]
+        self.assertEqual(silinen, [21, 22])  # kullanıcının Sayfa1'deki grafiğine (11) dokunulmaz
 
     def test_dile_gore_ayirici(self):
         for dil, beklenen in (("tr_TR", ";"), ("en_US", ","), ("de_DE", ";")):
             google = SahteGoogle(dil=dil)
             self.istemci(google).yaz(KIMLIK, komisyon_ornegi())
-            self.assertIn(f'=IF(OR(B9=""{beklenen}C9="")', json.dumps(google.toplu()[-1], ensure_ascii=False).replace('\\"', '"'), dil)
+            self.assertIn(f'=IF(OR(B9=""{beklenen}C9="")', json.dumps(google.hucre_toplusu(), ensure_ascii=False).replace('\\"', '"'), dil)
 
     def test_hata_cikarsa_diger_ayirici_denenir(self):
         google = SahteGoogle(dil="tr_TR", hatali=(24, 0))
         sonuc = self.istemci(google).yaz(KIMLIK, komisyon_ornegi())
         self.assertEqual(sonuc["hatali_hucre"], 0)
-        self.assertIn('OR(B9=\\"\\",C9', json.dumps(google.toplu()[-1]))  # ikinci denemede virgül kullanıldı
+        self.assertIn('OR(B9=\\"\\",C9', json.dumps(google.hucre_toplusu()))  # ikinci denemede virgül kullanıldı
 
     def test_iki_ayirici_da_hata_verirse_bildirilir(self):
         google = SahteGoogle(dil="tr_TR", hatali=(3, 5, 3))

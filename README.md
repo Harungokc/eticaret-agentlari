@@ -84,6 +84,18 @@ değiştirdiğinizde komisyon, elinize geçen tutar ve kâr Excel'in içinde yen
 Pazar analizinde dosya üç sayfadan oluşur: pazar özeti, komisyon karşılaştırması ve yüklediğiniz
 ürün listesi.
 
+### 4. Google Sheets çıktısı ve grafikler
+
+Sonuçları kendi Google Sheets tablonuza da gönderebilirsiniz. Araç tabloyu biçimlendirir ve
+grafiklerle destekler; sarı hücreleri değiştirdiğinizde tablo da grafikler de güncellenir.
+
+![Google Sheets'te komisyon karşılaştırması](kilavuz/gorseller/google-sheets-komisyon.png)
+
+![Google Sheets'te pazar analizi](kilavuz/gorseller/google-sheets-pazar.png)
+
+Görüntülerdeki ürün ve markalar örnek amaçlı uydurma verilerdir. Bağlantının nasıl kurulacağı
+[kılavuzda](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf) adım adım anlatılır.
+
 ---
 
 ## Kurulum
@@ -340,4 +352,8 @@ diğer araçlar için [SERI.md](SERI.md) dosyasına bakabilirsiniz.
 
 ## Lisans
 
-[MIT](LICENSE) © 2026 Harun Gökçe
+[MIT](LICENSE) © 2026 Harun Gökce
+
+## Geliştiren
+
+**Harun Gökce** — harungokce70@gmail.com · 0506 155 46 42

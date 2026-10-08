@@ -16,11 +16,15 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import CondPageBreak, KeepTogether, PageBreak, Paragraph, Preformatted, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import CondPageBreak, Image, KeepTogether, PageBreak, Paragraph, Preformatted, SimpleDocTemplate, Spacer, Table, TableStyle
 
 DEPO = "https://github.com/Harungokc/eticaret-agentlari"
 ZIP = DEPO + "/archive/refs/heads/main.zip"
 CIKTI = Path(__file__).parent / "Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf"
+GORSELLER = Path(__file__).parent / "gorseller"
+GELISTIREN = "Harun Gökce"
+EPOSTA = "harungokce70@gmail.com"
+TELEFON = "0506 155 46 42"
 
 # Türkçe harfler için sistem yazı tipleri (macOS ve Windows yolları)
 YAZI_TIPLERI = {
@@ -93,11 +97,37 @@ def tablo(basliklar, satirlar, genislikler):
     return [t, Spacer(1, 10)]
 
 
+def gelistiren_kutusu():
+    """Kapakta, başlığın hemen altında duran geliştirici bandı."""
+    sol = Paragraph("<font color='#C9D6F2' size='8.5'>GELİŞTİREN</font><br/><font size='13'><b>" + GELISTIREN + "</b></font>",
+                    ParagraphStyle("g1", fontName="Govde", fontSize=13, leading=17, textColor=colors.white))
+    sag = Paragraph(f"<font color='#C9D6F2' size='8.5'>İLETİŞİM</font><br/>{EPOSTA} &nbsp;·&nbsp; {TELEFON}",
+                    ParagraphStyle("g2", fontName="Govde", fontSize=10.5, leading=17, textColor=colors.white))
+    t = Table([[sol, sag]], colWidths=[GENISLIK * 0.38, GENISLIK * 0.62])
+    t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), LACIVERT), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                           ("LEFTPADDING", (0, 0), (-1, -1), 12), ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                           ("TOPPADDING", (0, 0), (-1, -1), 9), ("BOTTOMPADDING", (0, 0), (-1, -1), 10)]))
+    return [t, Spacer(1, 12)]
+
+
+def gorsel(dosya, aciklama):
+    yol = GORSELLER / dosya
+    r = Image(str(yol))
+    oran = r.imageHeight / r.imageWidth
+    en = GENISLIK * 0.80
+    r.drawWidth, r.drawHeight = en, en * oran
+    cerceve = Table([[r]], colWidths=[en], hAlign="CENTER")
+    cerceve.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.5, CIZGI), ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                                 ("RIGHTPADDING", (0, 0), (-1, -1), 0), ("TOPPADDING", (0, 0), (-1, -1), 0),
+                                 ("BOTTOMPADDING", (0, 0), (-1, -1), 0)]))
+    return KeepTogether([cerceve, Spacer(1, 3), Paragraph(aciklama, S["orta"]), Spacer(1, 10)])
+
+
 def alt_bilgi(tuval, belge):
     tuval.saveState()
     tuval.setFont("Govde", 8.5)
     tuval.setFillColor(GRI)
-    tuval.drawString(20 * mm, 11 * mm, "Pazar ve Komisyon Analizcisi — Asistanla kurulum ve kullanım kılavuzu")
+    tuval.drawString(20 * mm, 11 * mm, f"Pazar ve Komisyon Analizcisi — Geliştiren: {GELISTIREN} · {EPOSTA}")
     tuval.drawRightString(A4[0] - 20 * mm, 11 * mm, f"Sayfa {belge.page}")
     tuval.restoreState()
 
@@ -108,6 +138,7 @@ def icerik():
     # ------------------------------------------------------------ kapak ve özet
     h += [Spacer(1, 6), p("Pazar ve Komisyon Analizcisi", "kapak"),
           p("Yapay zekâ asistanınızla kurulum ve kullanım kılavuzu", "kapak_alt")]
+    h += gelistiren_kutusu()
     h.append(kutu(
         "Bu kılavuzu, bilgisayarınızda komut çalıştırabilen bir yapay zekâ asistanına verin ve "
         "<b>“Bu kılavuza göre aracı kur.”</b> deyin. Asistan aracı indirir, kurar ve dener. Sonrasında ona "
@@ -121,8 +152,8 @@ def icerik():
         "keseceği komisyonu, elinize geçecek tutarı ve kârınızı yan yana gösterir.",
         "<b>Pazar analizi:</b> Bir ürün listesinden fiyat bantlarını, öne çıkan markaları, rekabet yoğunluğunu ve az rakipli "
         "fiyat aralığını çıkarır.",
-        "<b>Google Sheets ve Excel çıktısı:</b> Sonuçları tablonuza yazar. Tablodaki sarı hücreleri (fiyat, maliyet, oranlar) "
-        "değiştirdiğinizde sonuçlar kendiliğinden yeniden hesaplanır.",
+        "<b>Google Sheets ve Excel çıktısı:</b> Sonuçları tablonuza yazar ve Google Sheets'te grafiklerle destekler. Tablodaki "
+        "sarı hücreleri (fiyat, maliyet, oranlar) değiştirdiğinizde sonuçlar ve grafikler kendiliğinden güncellenir.",
     ])
 
     h.append(p("Örnek bir konuşma", "h2"))
@@ -133,6 +164,22 @@ def icerik():
          "yeniden hesaplarım. Kargo ve diğer kesintiler bu hesaba dahil değil. Sonucu tablonuzun Komisyon sekmesine yazdım."],
     ], [0.38, 0.62])
 
+    h.append(p("Gerekenler", "h2"))
+    h += maddeler([
+        "Windows, macOS veya Linux bir bilgisayar",
+        "Python 3.10 veya üstü (yoksa asistanınız kurmanızı ister; python.org/downloads adresinden ücretsiz indirilir)",
+        "Google Sheets çıktısı için bir Google hesabı (isteğe bağlı; bu özellik olmadan da araç çalışır)",
+    ])
+
+    h.append(PageBreak())
+    h.append(p("Sonuç tablonuzda böyle görünür", "h2"))
+    h.append(p("Aşağıdaki görüntüler aracın Google Sheets'e yazdığı gerçek sayfalardır. İçlerindeki ürün ve markalar örnek "
+               "amaçlı uydurma verilerdir."))
+    h.append(gorsel("google-sheets-komisyon.png", "Komisyon sekmesi: sarı hücreleri değiştirdiğinizde tablo ve grafikler güncellenir."))
+    h.append(gorsel("google-sheets-pazar.png", "Pazar sekmesi: fiyat özeti, fiyat bantları, öne çıkan markalar ve grafikler."))
+
+
+    h.append(CondPageBreak(75 * mm))
     h.append(p("Hangi asistanla çalışır", "h2"))
     h.append(p("Asistanın iki şeyi yapabilmesi gerekir: <b>bilgisayarınızda komut çalıştırmak</b> ve <b>internete çıkmak</b> "
                "(aracı GitHub'dan indirmek ve tablonuza yazmak için Google'a bağlanmak)."))
@@ -146,12 +193,6 @@ def icerik():
     h.append(p("Bu kılavuzdaki adımlar Claude Code ile macOS üzerinde denenmiştir. Diğer asistanlarda komutlar aynıdır; "
                "asistanınızın komut çalıştırma ve internet izni olduğundan emin olun.", "kucuk"))
 
-    h.append(p("Gerekenler", "h2"))
-    h += maddeler([
-        "Windows, macOS veya Linux bir bilgisayar",
-        "Python 3.10 veya üstü (yoksa asistanınız kurmanızı ister; python.org/downloads adresinden ücretsiz indirilir)",
-        "Google Sheets çıktısı için bir Google hesabı (isteğe bağlı; bu özellik olmadan da araç çalışır)",
-    ])
 
     # ------------------------------------------------------------ bölüm A
     h.append(p("Bölüm A — Sizin yapacağınız iş: Google Sheets bağlantısı", "h1"))
@@ -235,7 +276,7 @@ Anahtar dosyasının içeriğini ekrana yazma.
                   "Bağlayıcı oran, satıcı panelinizdeki sözleşme ekranında yazar. Kendi oranınızı asistana söylerseniz hesap "
                   "kesinleşir. Kargo, sabit hizmet bedeli, stopaj, reklam ve iade maliyeti hesaba dahil değildir.",
                   renk=SARI, baslik="Sonuçları okurken"))
-    h.append(PageBreak())
+    h.append(CondPageBreak(90 * mm))
 
     # ------------------------------------------------------------ bölüm C
     h.append(p("Bölüm C — Asistan için talimatlar", "h1"))
@@ -259,6 +300,7 @@ Anahtar dosyasının içeriğini ekrana yazma.
         "tablosuna bak. Çözemezsen kullanıcıya mesajı aynen ilet.",
     ], numarali=True)
 
+    h.append(CondPageBreak(95 * mm))
     h.append(p("Kurulum", "h2"))
     h.append(p("Windows'ta <font face='Kod' size='9'>python3</font> yerine <font face='Kod' size='9'>py</font> ya da "
                "<font face='Kod' size='9'>python</font> kullan."))
@@ -302,10 +344,13 @@ python3 agent.py sheets-durum
         "Bu sekmeler yoksa oluşturulur, varsa <b>içerikleri yeni sonuçla değiştirilir</b>: önceki sonuç silinir. Kullanıcı eski "
         "sonucu saklamak istiyorsa önce sekmeyi tabloda kopyalamasını ya da sonucu <font face='Kod' size='9'>--excel</font> ile kaydetmeyi öner.",
         "Tablodaki diğer sekmelere dokunulmaz. Yazılan sekmeler tablonun en başına alınır.",
+        "Google Sheets'te her sekmeye <b>grafikler</b> de eklenir (elinize geçen tutar, kâr, fiyat bantları, markalar). Grafikler "
+        "tablodaki hücrelere bağlıdır. Excel dosyasında grafik yoktur; yalnızca tablolar ve formüller bulunur.",
         "Komut başarılıysa son satırda <font face='Kod' size='9'>Google Sheets'e yazıldı (...): &lt;adres&gt;</font> yazar; "
         "kullanıcıya bu adresi ver.",
     ])
 
+    h.append(CondPageBreak(70 * mm))
     h.append(p("Komisyon karşılaştırması", "h2"))
     h.append(kod("""
 python3 agent.py komisyon "<ürün türü ya da kategori>" <satış fiyatı> [seçenekler]
@@ -322,6 +367,7 @@ python3 agent.py kategoriler     # komisyon verisi olan kategoriler
                "kullanıcıya sor. Uygun kategori yoksa kullanıcıdan sözleşme oranlarını isteyip en yakın kategoriyle ve "
                "<font face='Kod' size='9'>--trendyol</font> gibi seçeneklerle hesapla."))
 
+    h.append(CondPageBreak(60 * mm))
     h.append(p("Pazar analizi", "h2"))
     h.append(p("Araç bir ürün listesi dosyası ister (.csv). Kullanıcı ürünleri sohbete yazdıysa ya da başka biçimde verdiyse "
                "onları aşağıdaki biçimde bir CSV dosyasına yaz. <b>Yalnızca kullanıcının verdiği değerleri kullan</b>; "
@@ -347,6 +393,7 @@ python3 agent.py pazar liste.csv --kategori "erkek parfüm" --maliyet 150 --shee
         "Pazar analizinde yorum sayısının satış rakamı olmadığını, yalnızca ilginin dolaylı göstergesi olduğunu hatırlat.",
     ])
 
+    h.append(CondPageBreak(60 * mm))
     h.append(p("Sorun giderme", "h2"))
     h += tablo(["Mesaj ya da durum", "Yapılacak"], [
         ["<font face='Kod' size='8.5'>python3: command not found</font> ya da sürüm 3.10'dan eski",
@@ -392,13 +439,17 @@ python3 agent.py pazar liste.csv --kategori "erkek parfüm" --maliyet 150 --shee
     h.append(kutu(f"Proje sayfası, kaynak kod ve asistansız kurulum adımları:<br/><b>{DEPO}</b><br/><br/>"
                   "Hata bildirmek ya da öneride bulunmak için proje sayfasındaki <b>Issues</b> bölümünü kullanabilirsiniz.",
                   baslik="Daha fazlası"))
+    h.append(kutu(f"Bu araç ve kılavuz <b>{GELISTIREN}</b> tarafından geliştirilmiştir.<br/>"
+                  f"E-posta: <b>{EPOSTA}</b> &nbsp;·&nbsp; Telefon: <b>{TELEFON}</b><br/><br/>"
+                  "Kurulumda takıldığınız bir yer olursa ya da işletmenize özel bir analiz aracı isterseniz yazabilirsiniz.",
+                  baslik="Geliştiren ve iletişim"))
     return h
 
 
 def main():
     belge = SimpleDocTemplate(str(CIKTI), pagesize=A4, leftMargin=20 * mm, rightMargin=20 * mm, topMargin=18 * mm, bottomMargin=20 * mm,
                               title="Pazar ve Komisyon Analizcisi — Asistanla kurulum ve kullanım kılavuzu",
-                              author="Harun Gökçe", subject="E-ticaret satıcıları için açık kaynak analiz aracı", lang="tr")
+                              author=GELISTIREN, subject="E-ticaret satıcıları için açık kaynak analiz aracı", lang="tr")
     belge.build(icerik(), onFirstPage=alt_bilgi, onLaterPages=alt_bilgi)
     print(CIKTI)
 
