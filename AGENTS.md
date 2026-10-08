@@ -31,10 +31,16 @@ Bu araç senin komut çalıştırdığın yerde kurulur ve çalışır.
 - **Kullanıcının bilgisayarında çalışıyorsan** (ör. Claude Code, Codex): komut çalıştırmak ve
   internete çıkmak için kullanıcının onayı gerekebilir. Gereken adresler: `github.com` (indirme),
   `oauth2.googleapis.com` ve `sheets.googleapis.com` (yalnızca Google Sheets çıktısı için).
-- **Uzak ya da bulut bir ortamda çalışıyorsan** (ör. Claude Cowork): aracı o ortama kur. Kullanıcıya
-  aracın kendi bilgisayarına değil senin çalışma ortamına kurulduğunu söyle. Anahtar dosyası
-  kullanıcının sana açtığı klasörde olmalıdır; `sheets-kur` onu ortamına kopyalar. Bunu kullanıcıya
-  açıkça belirt ve yukarıdaki adreslere ağ erişimi kapalıysa hangi adreslere izin gerektiğini söyle.
+- **Uzak ya da bulut bir ortamda çalışıyorsan** (ör. Claude Cowork): aracı o ortama kur ve
+  kullanıcıya aracın kendi bilgisayarına değil senin çalışma ortamına kurulduğunu söyle.
+  - Ortamın geçici olabilir: yeni bir görevde araç klasörü ya da `sheets-durum` bağlantısı yoksa
+    soru sormadan aracı yeniden indir ve `sheets-kur` komutunu yeniden çalıştır.
+  - Anahtar dosyası, kullanıcının sana bağladığı klasörde olmalıdır. Orada bulamazsan kullanıcıdan
+    dosyayı o klasöre koymasını iste; içeriğini sohbete yapıştırmasını isteme.
+  - `sheets.googleapis.com` ya da `oauth2.googleapis.com` adresine ulaşamıyorsan ağ erişimi
+    kısıtlıdır. Kullanıcıya bu iki adrese izin gerektiğini söyle (bireysel planlarda Ayarlar >
+    Yetenekler altındaki ağ erişimi; Team ve Enterprise planlarında kuruluş yöneticisi). O zamana
+    kadar sonucu `--excel` ile dosya olarak ver.
 
 ## Kurulum
 

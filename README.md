@@ -31,7 +31,7 @@ Asistan hesabı bu araçla yapar, sonucu anlatır ve isterseniz Google Sheets ta
 sizin yapacağınız tek işi, yani Google Sheets bağlantısını adım adım anlatır.
 
 Asistan, internetten indirdiği programı çalıştırmadan önce sizden onay ister; Claude Cowork'te araç
-bilgisayarınıza değil Cowork'ün çalışma ortamına kurulur. Kurulum adımları Claude Code ile denenmiştir.
+bilgisayarınıza değil Cowork'ün geçici çalışma ortamına kurulur ve her yeni görevde yeniden indirilir. Kurulum adımları Claude Code ile denenmiştir.
 
 Asistan kullanmıyorsanız aşağıdaki adımlarla kendiniz kurabilirsiniz.
 

@@ -187,9 +187,11 @@ def icerik():
                "(aracı GitHub'dan indirmek ve tablonuza yazmak için Google'a bağlanmak)."))
     h += tablo(["Asistan", "Nerede çalışır", "Bilmeniz gereken"], [
         ["<b>Claude Cowork</b>",
-         "Anthropic'in sunucularında, size ayrılmış yalıtılmış bir ortamda",
-         "Araç bilgisayarınıza değil o ortama kurulur. Anahtar dosyasını Cowork'e açtığınız klasöre koyun; asistan onu "
-         "oradan alır. GitHub ve Google adreslerine erişim için ağ izni vermeniz gerekebilir."],
+         "Anthropic'in sunucularında, her görev için açılan geçici bir ortamda. Bilgisayarınızdaki dosyalara, "
+         "bağladığınız klasörler üzerinden erişir.",
+         "Anahtar dosyasını Cowork'e bağladığınız klasöre koyun. Ortam geçici olduğu için asistan aracı her yeni görevde "
+         "yeniden indirir; bu bir dakikadan kısa sürer. Team ve Enterprise planlarında yöneticinizin ağ erişimini açması "
+         "gerekebilir."],
         ["<b>Claude Code</b>, <b>OpenAI Codex</b>",
          "Kendi bilgisayarınızda",
          "Komut çalıştırmadan ve internete çıkmadan önce sizden onay ister. Codex'te ağ erişimi başlangıçta kapalıdır; "
@@ -307,11 +309,11 @@ Anahtar dosyasının içeriğini ekrana yazma.
     h.append(p("Verileriniz ve gizlilik", "h2"))
     h += maddeler([
         "Araç, asistanınızın çalıştığı yerde çalışır: Claude Code ve Codex'te kendi bilgisayarınızda, Claude Cowork'te "
-        "Anthropic'in sunucularındaki size ayrılmış ortamda. Girdiğiniz fiyat, maliyet ve ürün listesi aracın yazarına gönderilmez.",
+        "Anthropic'in sunucularındaki geçici çalışma ortamında. Girdiğiniz fiyat, maliyet ve ürün listesi aracın yazarına gönderilmez.",
         "Google Sheets çıktısını kullanırsanız sonuçlar yalnızca sizin belirttiğiniz Google tablosuna yazılır.",
         "Asistanınıza yazdıklarınız, kullandığınız asistanın kendi gizlilik koşullarına tabidir.",
         "Anahtar dosyasının bir kopyası aracın çalıştığı yerde saklanır: kendi bilgisayarınızda ya da Cowork kullanıyorsanız "
-        "Cowork ortamınızda. Bağlantıyı kaldırmak için Google Cloud'daki hizmet hesabını ya da anahtarını silmeniz veya "
+        "görev süresince Cowork'ün geçici ortamında. Bağlantıyı kaldırmak için Google Cloud'daki hizmet hesabını ya da anahtarını silmeniz veya "
         "tablonuzun paylaşımından o adresi çıkarmanız yeterlidir.",
     ])
     h.append(p("Sınırlar", "h2"))
