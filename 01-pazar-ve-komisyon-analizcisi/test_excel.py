@@ -113,10 +113,11 @@ class PazarDosyasi(unittest.TestCase):
 
     def test_bantlarin_toplami_urun_sayisi(self):
         p = self.kitap["Pazar"]
-        toplam = sum(int(float(p[f"C{r}"][1])) for r in range(14, 14 + len(self.rapor.bantlar)))
+        toplam = sum(int(float(p[f"D{r}"][1])) for r in range(14, 14 + len(self.rapor.bantlar)))
         self.assertEqual(toplam, 25)
-        self.assertIn('"<="&B', p[f"C{13 + len(self.rapor.bantlar)}"][0])  # son bant üst sınırı kapsar
-        self.assertIn('"<"&B', p["C14"][0])
+        self.assertIn('"<="&C', p[f"D{13 + len(self.rapor.bantlar)}"][0])  # son bant üst sınırı kapsar
+        self.assertIn('"<"&C', p["D14"][0])
+        self.assertEqual(p["A14"][0], 'ROUND(B14,0)&" – "&ROUND(C14,0)&" TL"')  # bant etiketi sınırlardan türetilir
 
     def test_komisyon_fiyati_pazarin_ortancasina_bagli(self):
         self.assertEqual(self.kitap["Komisyon"]["B4"][0], "'Pazar'!B8")

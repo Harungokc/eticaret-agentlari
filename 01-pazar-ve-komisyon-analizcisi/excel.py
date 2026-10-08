@@ -217,7 +217,7 @@ ACIKLAMA = "Sarı hücreleri değiştirebilirsiniz; diğer hücreler kendiliğin
 def komisyon_sayfasi(kategori_adi: str, fiyat: float, maliyet: float | None, satirlar: list[Satir], veri: dict,
                      fiyat_formulu: Formul | None = None) -> Sayfa:
     """Komisyon karşılaştırması. Fiyat B4, maliyet B5; oranlar tabloda sarı hücrelerde."""
-    s = Sayfa("Komisyon", [24, 13, 13, 12, 16, 16, 17, 17, 16, 16, 70], dondur="A9")
+    s = Sayfa("Komisyon", [20, 11, 11, 10, 14, 14, 15, 15, 14, 14, 52], dondur="A9")
     s.yaz("A1", "Komisyon Karşılaştırması", AFIS)
     s.birlestir("A1:K1", yukseklik=30)
     s.yaz("A2", ACIKLAMA, NOT)
@@ -257,7 +257,7 @@ def komisyon_sayfasi(kategori_adi: str, fiyat: float, maliyet: float | None, sat
         if x.kaynak == "satıcının girdiği oran":
             notu = "Sizin girdiğiniz oran kullanıldı. " + notu
         s.yaz(f"K{r}", notu, SARMA)
-        s.yukseklikler[r] = 42
+        s.yukseklikler[r] = 48
 
     r = 9 + len(satirlar) + 1
     notlar = [
@@ -274,9 +274,9 @@ def komisyon_sayfasi(kategori_adi: str, fiyat: float, maliyet: float | None, sat
         s.birlestir(f"A{r}:K{r}", yukseklik=28 if len(n) > 150 else None)
         r += 1
     son = 8 + len(satirlar)
-    s.grafik("Elinize geçen tutar (TL)", f"A8:A{son}", [f"G8:G{son}", f"H8:H{son}"], f"A{r + 1}")
+    s.grafik("Elinize geçen tutar (TL)", f"A8:A{son}", [f"G8:G{son}", f"H8:H{son}"], f"A{r + 1}", genislik=500, yukseklik=300)
     if maliyet is not None:
-        s.grafik("Kârınız (TL)", f"A8:A{son}", [f"I8:I{son}", f"J8:J{son}"], f"F{r + 1}")
+        s.grafik("Kârınız (TL)", f"A8:A{son}", [f"I8:I{son}", f"J8:J{son}"], f"G{r + 1}", genislik=500, yukseklik=300)
     return s
 
 
@@ -293,13 +293,15 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
     son = urun_sayisi + 1
     fiyat, puan, yorum, marka = (f"'Ürünler'!$C$2:$C${son}", f"'Ürünler'!$D$2:$D${son}", f"'Ürünler'!$E$2:$E${son}",
                                  f"'Ürünler'!$B$2:$B${son}")
-    s = Sayfa("Pazar", [42, 18, 18, 26, 20, 3], dondur=None)
+    # Beş sütunluk tek bir blok: A etiket, B–E değerler. Bütün tablo başlıkları A–E boyunca uzanır ki
+    # tablolar alt alta hizalı dursun; grafikler G sütunundan başlar ve normal bir ekrana sığar.
+    s = Sayfa("Pazar", [34, 15, 15, 15, 20, 3], dondur=None)
     s.yaz("A1", "Pazar Analizi", AFIS)
     s.birlestir("A1:E1", yukseklik=30)
     s.yaz("A2", "Özetler “Ürünler” sayfasındaki listeden hesaplanır; oradaki fiyatları değiştirirseniz güncellenir.", NOT)
     s.birlestir("A2:E2")
 
-    s.satir(4, ["Fiyat", "Değer"], SUTUN)
+    s.satir(4, ["Fiyat", "Değer", "", "", ""], SUTUN)
     kalemler = [
         ("İncelenen ürün sayısı", Formul(f"COUNT({fiyat})", r.urun_sayisi), TAM),
         ("En düşük fiyat", Formul(f"MIN({fiyat})", r.fiyat_min), TL),
@@ -315,38 +317,38 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
     ORTANCA_HUCRE = "B8"
 
     satir = 13
-    s.satir(satir, ["Fiyat bandı (alt sınır)", "Üst sınır", "Ürün sayısı", "Ürün başına ortalama yorum", "Bant"], SUTUN)
+    s.satir(satir, ["Fiyat bandı", "Alt sınır", "Üst sınır", "Ürün sayısı", "Ürün başına ort. yorum"], SUTUN)
     bant_basi = satir
     for i, b in enumerate(r.bantlar):
         n = satir + 1 + i
         son_bant = i == len(r.bantlar) - 1
         ust_islec = "<=" if son_bant else "<"
-        s.yaz(f"A{n}", b.alt, TL)
-        s.yaz(f"B{n}", b.ust, TL)
-        kosul = f'{fiyat},">="&A{n},{fiyat},"{ust_islec}"&B{n}'
-        s.yaz(f"C{n}", Formul(f"COUNTIFS({kosul})", b.urun_sayisi), TAM)
-        s.yaz(f"D{n}", Formul(f'IFERROR(AVERAGEIFS({yorum},{kosul}),"-")', b.ortalama_yorum if b.ortalama_yorum is not None else "-"), TAM)
-        s.yaz(f"E{n}", Formul(f'ROUND(A{n},0)&" – "&ROUND(B{n},0)&" TL"', f"{round(b.alt)} – {round(b.ust)} TL"), SARMA)
+        s.yaz(f"A{n}", Formul(f'ROUND(B{n},0)&" – "&ROUND(C{n},0)&" TL"', f"{round(b.alt)} – {round(b.ust)} TL"), ETIKET)
+        s.yaz(f"B{n}", b.alt, TL)
+        s.yaz(f"C{n}", b.ust, TL)
+        kosul = f'{fiyat},">="&B{n},{fiyat},"{ust_islec}"&C{n}'
+        s.yaz(f"D{n}", Formul(f"COUNTIFS({kosul})", b.urun_sayisi), TAM)
+        s.yaz(f"E{n}", Formul(f'IFERROR(AVERAGEIFS({yorum},{kosul}),"-")', b.ortalama_yorum if b.ortalama_yorum is not None else "-"), TAM)
     bant_sonu = satir + len(r.bantlar)
-    s.grafik("Fiyat bantlarına göre ürün sayısı", f"E{bant_basi}:E{bant_sonu}", [f"C{bant_basi}:C{bant_sonu}"], "G4",
-             genislik=520, yukseklik=300)
+    s.grafik("Fiyat bantlarına göre ürün sayısı", f"A{bant_basi}:A{bant_sonu}", [f"D{bant_basi}:D{bant_sonu}"], "G4",
+             genislik=470, yukseklik=280)
     if r.yorum_medyan is not None:
-        s.grafik("Fiyat bantlarına göre ürün başına ortalama yorum", f"E{bant_basi}:E{bant_sonu}", [f"D{bant_basi}:D{bant_sonu}"],
-                 "G20", genislik=520, yukseklik=300)
+        s.grafik("Fiyat bantlarına göre ürün başına ortalama yorum", f"A{bant_basi}:A{bant_sonu}", [f"E{bant_basi}:E{bant_sonu}"],
+                 "G18", genislik=470, yukseklik=280)
     satir += len(r.bantlar) + 2
 
     if r.markalar:
-        s.satir(satir, ["Öne çıkan markalar", "Ürün sayısı", "Payı"], SUTUN)
+        s.satir(satir, ["Öne çıkan markalar", "Ürün sayısı", "Payı", "", ""], SUTUN)
         s.grafik("Öne çıkan markalar (ürün sayısı)", f"A{satir}:A{satir + len(r.markalar)}", [f"B{satir}:B{satir + len(r.markalar)}"],
-                 "G36", tur="BAR", genislik=520, yukseklik=300)
+                 "G32", tur="BAR", genislik=470, yukseklik=280)
         for i, (m, adet, pay) in enumerate(r.markalar):
             n = satir + 1 + i
-            s.yaz(f"A{n}", m, SARMA)
+            s.yaz(f"A{n}", m, ETIKET)
             s.yaz(f"B{n}", Formul(f"COUNTIF({marka},A{n})", adet), TAM)
             s.yaz(f"C{n}", Formul(f"B{n}/$B$5", pay / 100), YUZDE)
         satir += len(r.markalar) + 2
 
-    s.satir(satir, ["İlgi ve rekabet", "Değer"], SUTUN)
+    s.satir(satir, ["İlgi ve rekabet", "Değer", "", "", ""], SUTUN)
     satir += 1
     if r.puan_medyan is not None:
         s.yaz(f"A{satir}", "Ortanca puan", ETIKET)
@@ -357,7 +359,7 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
         s.yaz(f"B{satir}", Formul(f"MEDIAN({yorum})", r.yorum_medyan), TAM)
         satir += 1
     if r.ilk10_yorum_payi is not None:
-        s.yaz(f"A{satir}", "En çok yorumlanan 10 ürünün yorum payı", ETIKET)
+        s.yaz(f"A{satir}", "İlk 10 ürünün yorum payı", ETIKET)
         s.yaz(f"B{satir}", Formul(f"SUMPRODUCT(LARGE({yorum},ROW($1:$10)))/SUM({yorum})", r.ilk10_yorum_payi / 100), YUZDE)
         s.yaz(f"C{satir}", f"Pazar {r.yogunluk}", DUZ)
         satir += 1
@@ -385,7 +387,7 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
     okuma.append("Bu analiz yalnızca listedeki ürünleri kapsar. Satış adedi ve ciro bilgisi içermez; yorum sayısı ilginin dolaylı göstergesidir.")
     for o in okuma:
         s.yaz(f"A{satir}", o, NOT)
-        s.birlestir(f"A{satir}:D{satir}", yukseklik=26 if len(o) > 95 else None)
+        s.birlestir(f"A{satir}:E{satir}", yukseklik=26 if len(o) > 95 else None)
         satir += 1
     s.ortanca_hucre = ORTANCA_HUCRE
     return s
