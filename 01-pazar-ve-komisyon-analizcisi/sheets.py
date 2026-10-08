@@ -242,7 +242,7 @@ def sayfa_istekleri(sayfa: Sayfa, sayfa_no: int, ayirici: str) -> list[dict]:
             "properties": {"pixelSize": int(yukseklik * 4 / 3)}, "fields": "pixelSize"}})
     donuk = int("".join(k for k in sayfa.dondur if k.isdigit())) - 1 if sayfa.dondur else 0
     istekler.append({"updateSheetProperties": {
-        "properties": {"sheetId": sayfa_no, "gridProperties": {"frozenRowCount": donuk, "hideGridlines": True}},
+        "properties": {"sheetId": sayfa_no, "gridProperties": {"frozenRowCount": donuk, "hideGridlines": False}},
         "fields": "gridProperties.frozenRowCount,gridProperties.hideGridlines"}})
     return istekler
 
