@@ -1,0 +1,3 @@
+*.bat text eol=crlf
+*.command text eol=lf
+*.py text eol=lf

@@ -94,6 +94,13 @@ class SayiOkuma(unittest.TestCase):
         self.assertEqual(sayi_cevir("1.299,90"), 1299.90)
         self.assertEqual(sayi_cevir("1299.90"), 1299.90)
         self.assertEqual(sayi_cevir("249 TL"), 249.0)
+        # Türkçe yazımda nokta binlik ayırıcıdır: "1.000" bin liradır, bir lira değil.
+        self.assertEqual(sayi_cevir("1.000"), 1000.0)
+        self.assertEqual(sayi_cevir("12.500"), 12500.0)
+        self.assertEqual(sayi_cevir("21,5"), 21.5)
+        for bozuk in ("abc", "", "TL", "-"):
+            with self.assertRaises(ValueError):
+                sayi_cevir(bozuk)
 
 
 class VeriButunlugu(unittest.TestCase):

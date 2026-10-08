@@ -14,7 +14,7 @@ import argparse
 import sys
 
 from komisyon import Satir, analiz_et, kategori_bul, kesin_mi, veri_yukle
-from okuyucu import OkumaHatasi, oku
+from okuyucu import OkumaHatasi, oku, sayi
 from pazar import PazarRaporu
 from pazar import analiz_et as pazar_analiz_et
 
@@ -40,11 +40,11 @@ def yuzde(x: float) -> str:
 
 
 def sayi_cevir(metin: str) -> float:
-    """"1.299,90" ve "1299.90" biçimlerinin ikisini de kabul eder."""
-    metin = metin.strip().lower().replace("tl", "").replace("₺", "").strip()
-    if "," in metin:
-        metin = metin.replace(".", "").replace(",", ".")
-    return float(metin)
+    """"1.299,90", "1299.90" ve "1.000" (bin) biçimlerini kabul eder; anlaşılmazsa ValueError."""
+    sonuc = sayi(metin)
+    if sonuc is None or not any(k.isdigit() for k in metin):
+        raise ValueError(f"sayı anlaşılamadı: {metin!r}")
+    return sonuc
 
 
 def _tablo(satirlar: list[list[str]]) -> list[str]:
