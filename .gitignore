@@ -13,3 +13,6 @@ hizmet-hesabi*.json
 *anahtar*.json
 ayarlar.json
 gizli/
+
+# Üretilen paket; sürümlere (Releases) yüklenir
+paket/*.zip

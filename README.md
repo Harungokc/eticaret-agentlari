@@ -16,24 +16,37 @@ dosyaya çift tıklarsınız ve araç tarayıcınızda bir sayfa olarak açılı
 > Tek istisna, isteğe bağlı Google Sheets çıktısıdır: onu siz açarsanız sonuçlar yalnızca sizin
 > belirttiğiniz Google tablosuna yazılır.
 
-## En kolay yol: yapay zekâ asistanınıza kurdurun
+## En kolay yol: Claude ya da ChatGPT sohbetinde kullanın
 
-Claude Cowork, Claude Code ya da OpenAI Codex gibi komut çalıştırabilen bir yapay zekâ asistanı
-kullanıyorsanız kurulumu ona yaptırabilirsiniz:
+Kod bilmeniz ya da bilgisayarınıza program kurmanız gerekmez.
 
-1. **[Kılavuzu indirin (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf)**
-2. PDF'i asistanınıza verin ve **"Bu kılavuzdaki aracı kur."** deyin. Başka bir şey vermeniz
-   gerekmez: asistan aracı kendisi indirir ve depodaki [AGENTS.md](AGENTS.md) dosyasındaki adımları
-   izler.
-3. Sonrasında konuşur gibi sorun: *"899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım?"*
+**1. Paketi indirin:** [pazar-komisyon-analizcisi.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/pazar-komisyon-analizcisi.zip) (ZIP'ten çıkarmayın)
 
-Asistan hesabı bu araçla yapar, sonucu anlatır ve isterseniz Google Sheets tablonuza yazar. Kılavuz,
-sizin yapacağınız tek işi, yani Google Sheets bağlantısını adım adım anlatır.
+**2. Asistanınıza yükleyin:**
 
-Asistan, internetten indirdiği programı çalıştırmadan önce sizden onay ister; Claude Cowork'te araç
-bilgisayarınıza değil Cowork'ün geçici çalışma ortamına kurulur ve her yeni görevde yeniden indirilir. Kurulum adımları Claude Code ile denenmiştir.
+| | Nasıl yüklenir |
+|---|---|
+| **Claude** (claude.ai ya da uygulama) | **Customize → Skills → + → Upload a skill** deyip ZIP dosyasını seçin. Bir kez eklenir, her sohbette hazırdır. *Settings → Capabilities* altında kod yürütme açık olmalıdır. |
+| **ChatGPT** | Yeni sohbette ZIP dosyasını ekleyin ve şunu yazın: *"Bu ZIP dosyasını aç, içindeki SKILL.md dosyasını oku ve oradaki talimatlara göre çalış."* |
 
-Asistan kullanmıyorsanız aşağıdaki adımlarla kendiniz kurabilirsiniz.
+**3. Konuşur gibi sorun:** *"899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım? Maliyetim 400 lira."*
+
+Asistan hesabı bu araçla yapar, sonucu anlatır ve size bir Excel dosyası verir. Dosyayı Google
+Sheets'te de açabilirsiniz (*Dosya → İçe aktar → Yükle*).
+
+Adım adım anlatım: **[Kılavuz (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf)**
+
+> Paket ek kurulum ve internet bağlantısı gerektirmez. Bu yol henüz Claude ve ChatGPT sohbet
+> ekranlarının her planında denenmemiştir; takıldığınız yeri [bildirirseniz](../../issues) düzeltiriz.
+
+### Sonuçları doğrudan Google Sheets'e, grafiklerle yazdırmak
+
+Claude Cowork, Claude Code ya da OpenAI Codex gibi komut çalıştırabilen bir asistan kullanıyorsanız,
+kılavuzu ona verip **"Bu kılavuzdaki aracı kur."** diyebilirsiniz. Asistan aracı kendisi indirir,
+[AGENTS.md](AGENTS.md) dosyasındaki adımları izler ve sonuçları tablonuza grafiklerle yazar. Sizin
+yapacağınız Google Sheets bağlantısı kılavuzun Ek bölümünde anlatılır.
+
+Asistan kullanmıyorsanız aşağıdaki adımlarla aracı kendi bilgisayarınıza kurabilirsiniz.
 
 ---
 

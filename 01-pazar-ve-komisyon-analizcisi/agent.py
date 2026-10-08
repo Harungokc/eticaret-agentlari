@@ -288,7 +288,20 @@ def komut_pazar(a, veri: dict) -> int:
     return _cikti(a, pazar_sayfalari(rapor, urunler, (kategori["ad"], maliyet, satirlar), veri))
 
 
+def cikti_kodlamasini_ayarla() -> None:
+    """Türkçe harfleri gösteremeyen bir ortamda (ör. ASCII'ye ayarlı bir kum havuzu) çıktı yazarken çökmeyi önler."""
+    for akis in (sys.stdout, sys.stderr):
+        ayarla = getattr(akis, "reconfigure", None)
+        if ayarla is None:
+            continue
+        if (getattr(akis, "encoding", None) or "").lower().replace("_", "-") in ("ascii", "us-ascii", "ansi-x3.4-1968", "646"):
+            ayarla(encoding="utf-8", errors="replace")
+        else:
+            ayarla(errors="replace")
+
+
 def main(argv: list[str] | None = None) -> int:
+    cikti_kodlamasini_ayarla()
     veri = veri_yukle()
     p = argparse.ArgumentParser(description="Pazar analizi ve pazaryeri komisyon karşılaştırması.")
     alt = p.add_subparsers(dest="komut", required=True)

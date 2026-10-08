@@ -24,6 +24,9 @@ dosyaya yönlendirir; ayrıntılı adımların tek kaynağı burasıdır.
 6. Bir komut hata verirse hata mesajını oku; çoğu mesaj ne yapılacağını Türkçe olarak söyler.
    Aşağıdaki sorun giderme tablosuna bak. Çözemezsen kullanıcıya mesajı aynen ilet.
 
+> Sohbet ekranında (claude.ai ya da ChatGPT) depoyu indirmeden çalışıyorsan bu dosya yerine paketin
+> içindeki `SKILL.md` dosyasını izle; paket `paket/paket_olustur.py` ile üretilir.
+
 ## Çalıştığın ortam
 
 Bu araç senin komut çalıştırdığın yerde kurulur ve çalışır.
