@@ -13,7 +13,8 @@ dosyaya yönlendirir; ayrıntılı adımların tek kaynağı burasıdır.
    Dosyanın yalnızca yolunu `sheets-kur` komutuna ver; araç onu kendisi okur ve kendi ayar klasörüne
    kaydeder. Kurulumdan sonra araç kendi kopyasını kullanır; kullanıcı isterse indirdiği özgün dosyayı
    silebilir.
-3. Yalnızca bu dosyadaki komutları çalıştır. Python dışında yazılım kurma; Python kurulumu
+3. Yalnızca bu dosyadaki komutları çalıştır (çalıştırmadan önce depodaki dosyaları okuyup incelemen
+   serbesttir). Python dışında yazılım kurma; Python kurulumu
    gerekiyorsa kullanıcıya sor. Depodaki `Baslat.*` ve `arayuz.py` dosyaları asistansız kullanım için
    bir tarayıcı arayüzüdür; onlara ihtiyacın yok.
 4. Bir Google tablosuna **ilk kez** yazmadan önce hangi tabloya yazacağını kullanıcıya söyle.
@@ -67,7 +68,8 @@ python3 agent.py sheets-durum
 ```
 
 Bu komut anahtarı kullanıcının ana klasöründeki `.pazar-komisyon` klasörüne kaydeder ve bağlantıyı
-dener. Sonrasında komutlara yalnızca `--sheets` eklemen yeter.
+dener. Sonrasında komutlara yalnızca `--sheets` eklemen yeter. (Ayar klasörünü başka bir yere almak
+gerekirse `PAZAR_KOMISYON_AYAR` ortam değişkeniyle değiştirilebilir.)
 
 ### Tabloya yazma nasıl çalışır
 
@@ -143,7 +145,7 @@ hiçbir pazaryerine bağlanmaz ve ürün verisi toplamaz; listeyi kullanıcı sa
 | "Google Sheets bağlantısı kurulmamış" | Önce `sheets-kur` komutunu çalıştır. |
 | "kategori bulunamadı" | `python3 agent.py kategoriler` ile listeye bak, en yakınını kullanıcıya sor. |
 | "en az 8 ürün gerekir" | Kullanıcıdan daha fazla ürün iste; 20–40 ürün daha güvenilir sonuç verir. |
-| Çalıştığın ortam bir komutu (özellikle tabloya yazan `--sheets` komutunu) engelliyor ya da izin istiyor | Engeli aşmaya çalışma. Kullanıcıya hangi komut için izin gerektiğini söyle; izin vermezse komutu araç klasöründe kendisinin çalıştırabileceğini belirt ve komutu yaz. |
+| Çalıştığın ortam bir komutu engelliyor ya da izin istiyor. Bu, indirilen kodu ilk kez çalıştırırken (`python3 -m unittest`) ya da tabloya yazarken (`--sheets`) olabilir | Engeli aşmaya çalışma. Kullanıcıya aracı indirdiğini, ama indirilen programı çalıştırmak için onun onayının gerektiğini söyle. Onay verirse devam et; ortam yine reddediyorsa kalan komutları sırasıyla yaz ve araç klasöründe kendisinin çalıştırabileceğini belirt. Araç çalışmadan hiçbir rakam verme. |
 | "Uyarı: N hücre hata gösteriyor" | Tabloyu açıp kontrol etmesini kullanıcıya söyle ve durumu proje sayfasına bildirmesini öner. |
 
 ## Sınırlar

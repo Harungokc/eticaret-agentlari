@@ -191,8 +191,8 @@ def icerik():
          "Kurulumu yapamaz, çünkü bilgisayarınızda komut çalıştıramaz ve internetten program indiremez. Bu durumda "
          "aracı kendiniz kurabilirsiniz; adımlar proje sayfasında yazılıdır."],
     ], [0.55, 0.45])
-    h.append(p("Bu kılavuzdaki adımlar Claude Code ile macOS üzerinde denenmiştir. Diğer asistanlarda komutlar aynıdır; "
-               "asistanınızın komut çalıştırma ve internet izni olduğundan emin olun.", "kucuk"))
+    h.append(p("Komutlar Claude Code ile macOS üzerinde denenmiştir. Asistanın indirdiği programı çalıştırabilmesi sizin "
+               "onayınıza bağlıdır; tam otomatik çalışan ayarlarda asistan bu adımı reddedebilir (bkz. Bölüm B).", "kucuk"))
 
 
     # ------------------------------------------------------------ bölüm A
@@ -260,9 +260,12 @@ Google Sheets bağlantımı da kur:
 Anahtar dosyasının içeriğini ekrana yazma.
 """))
     h.append(p("Google Sheets kullanmayacaksanız mesajın ikinci paragrafını silin."))
-    h.append(p("Asistanınız kurulum sırasında komut çalıştırmak, internetten dosya indirmek ya da tablonuza yazmak için sizden "
-               "<b>izin isteyebilir</b>. Bu beklenen bir durumdur; ne yapacağını okuyup onaylayın. Asistan bir adımı kendi güvenlik "
-               "kuralları nedeniyle yapamazsa size çalıştırmanız gereken komutu verir."))
+    h.append(kutu("Asistanınız internetten indirdiği bir programı çalıştırmadan ya da tablonuza yazmadan önce sizden <b>izin "
+                  "ister</b>; bazı ayarlarda ise bu adımı kendiliğinden <b>reddeder</b> ve “indirilen programı çalıştıramıyorum” "
+                  "der. Bu bir hata değil, asistanın güvenlik önlemidir. İzin sorarsa ne yapacağını okuyup onaylayın. Reddederse "
+                  "ona bu aracı çalıştırmasına izin verdiğinizi açıkça yazın ya da asistanınızın izin ayarını “her komutta sor” "
+                  "biçimine getirip yeniden deneyin. Asistan yine yapamazsa size çalıştırmanız gereken komutları verir.",
+                  baslik="Asistanınız izin isterse ya da reddederse"))
 
     h.append(p("Kurulumdan sonra neler sorabilirsiniz", "h2"))
     h += maddeler([
