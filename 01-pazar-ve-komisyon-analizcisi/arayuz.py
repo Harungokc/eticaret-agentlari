@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import sys
 import tempfile
 import threading
@@ -19,16 +20,23 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from agent import aralik, sayi_cevir, tl, tl0, yuzde
-from excel import komisyon_dosyasi, pazar_dosyasi
+from excel import kitap_yaz, komisyon_sayfalari, pazar_sayfalari
 from komisyon import Satir, analiz_et, kesin_mi, veri_yukle
 from okuyucu import OkumaHatasi, oku
 from pazar import PazarRaporu
 from pazar import analiz_et as pazar_analiz_et
+from sheets import Istemci, SheetsHatasi, rsa_anahtari_coz, tablo_kimligi
 
 VERI = veri_yukle()
 EN_BUYUK_ISTEK = 15 * 1024 * 1024  # kaydedilmiş bir arama sayfası birkaç MB olabilir
 IZINLI_UZANTILAR = (".csv", ".json", ".html", ".htm")
 IZINLI_ADRESLER = ("127.0.0.1", "localhost")
+SHEETS_HTTP = None  # testlerde sahte ağ katmanı buraya konur
+
+
+def ayar_klasoru() -> Path:
+    """Google Sheets ayarları proje klasörünün DIŞINDA, kullanıcının ana klasöründe tutulur."""
+    return Path(os.environ.get("PAZAR_KOMISYON_AYAR") or Path.home() / ".pazar-komisyon")
 
 
 class GirdiHatasi(Exception):
@@ -179,8 +187,85 @@ def pazar_html(r: PazarRaporu) -> str:
 
 # ---------------------------------------------------------------- işlemler
 
-def _yanit(html: str, excel: bytes, dosya_adi: str) -> dict:
-    return {"html": html, "excel": base64.b64encode(excel).decode("ascii"), "excel_adi": dosya_adi}
+def _istemci() -> Istemci:
+    yol = ayar_klasoru() / "hizmet-hesabi.json"
+    try:
+        anahtar = json.loads(yol.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise GirdiHatasi("Google Sheets bağlantısı kurulmamış. Sayfanın altındaki “Google Sheets bağlantısı” bölümünden kurun.") from None
+    return Istemci(anahtar, SHEETS_HTTP) if SHEETS_HTTP else Istemci(anahtar)
+
+
+def _ayar() -> dict:
+    try:
+        ayar = json.loads((ayar_klasoru() / "ayarlar.json").read_text(encoding="utf-8"))
+        return ayar if isinstance(ayar, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def islem_sheets_durum(_: dict) -> dict:
+    """Bağlantı kurulu mu? Anahtarın kendisi hiçbir zaman tarayıcıya geri gönderilmez."""
+    tablo = _ayar().get("tablo")
+    try:
+        hesap = _istemci().hesap
+    except GirdiHatasi:
+        hesap = None
+    return {"ayarli": bool(tablo and hesap), "hesap": hesap, "tablo": tablo, "tablo_adi": _ayar().get("tablo_adi")}
+
+
+def islem_sheets_ayar(g: dict) -> dict:
+    try:
+        kimlik = tablo_kimligi(str(g.get("tablo") or ""))
+    except SheetsHatasi as hata:
+        raise GirdiHatasi(str(hata)) from None
+    klasor = ayar_klasoru()
+    icerik = g.get("anahtar_icerik")
+    if icerik:
+        try:
+            anahtar = json.loads(icerik)
+            if not isinstance(anahtar, dict) or anahtar.get("type") != "service_account" or not anahtar.get("client_email"):
+                raise ValueError
+            rsa_anahtari_coz(str(anahtar.get("private_key") or ""))
+        except (ValueError, SheetsHatasi):
+            raise GirdiHatasi("Seçtiğiniz dosya bir hizmet hesabı anahtarı değil. Google Cloud'da hizmet hesabı için "
+                              "indirdiğiniz JSON dosyasını seçin.") from None
+        klasor.mkdir(parents=True, exist_ok=True)
+        yol = klasor / "hizmet-hesabi.json"
+        yol.write_text(json.dumps(anahtar), encoding="utf-8")
+        try:
+            yol.chmod(0o600)  # yalnızca bu kullanıcı okuyabilsin
+        except OSError:
+            pass
+    istemci = _istemci()  # anahtar hiç yüklenmemişse burada anlaşılır hata verir
+    try:
+        bilgi = istemci._cagir("GET", f"{kimlik}?fields=properties.title")
+    except SheetsHatasi as hata:
+        raise GirdiHatasi(str(hata)) from None
+    tablo_adi = (bilgi.get("properties") or {}).get("title") or ""
+    klasor.mkdir(parents=True, exist_ok=True)
+    (klasor / "ayarlar.json").write_text(json.dumps({"tablo": f"https://docs.google.com/spreadsheets/d/{kimlik}/edit",
+                                                      "tablo_adi": tablo_adi}, ensure_ascii=False), encoding="utf-8")
+    return islem_sheets_durum({})
+
+
+def islem_sheets_kaldir(_: dict) -> dict:
+    for ad in ("hizmet-hesabi.json", "ayarlar.json"):
+        (ayar_klasoru() / ad).unlink(missing_ok=True)
+    return islem_sheets_durum({})
+
+
+def _yanit(html: str, sayfalar: list, dosya_adi: str, sheets_iste: bool) -> dict:
+    yanit = {"html": html, "excel": base64.b64encode(kitap_yaz(sayfalar)).decode("ascii"), "excel_adi": dosya_adi}
+    if sheets_iste:
+        tablo = _ayar().get("tablo")
+        if not tablo:
+            raise GirdiHatasi("Google Sheets bağlantısı kurulmamış. Sayfanın altındaki “Google Sheets bağlantısı” bölümünden kurun.")
+        try:
+            yanit["sheets"] = _istemci().yaz(tablo, sayfalar)
+        except SheetsHatasi as hata:
+            raise GirdiHatasi(str(hata)) from None
+    return yanit
 
 
 def islem_komisyon(g: dict) -> dict:
@@ -191,7 +276,8 @@ def islem_komisyon(g: dict) -> dict:
     maliyet = _sayi(g.get("maliyet"), "Ürün maliyeti")
     satirlar = analiz_et(kategori, fiyat, VERI, maliyet, _oranlar(g.get("oranlar")))
     return _yanit(komisyon_html(kategori, fiyat, satirlar, maliyet),
-                  komisyon_dosyasi(kategori["ad"], fiyat, maliyet, satirlar, VERI), "komisyon-karsilastirmasi.xlsx")
+                  komisyon_sayfalari(kategori["ad"], fiyat, maliyet, satirlar, VERI), "komisyon-karsilastirmasi.xlsx",
+                  bool(g.get("sheets")))
 
 
 def islem_pazar(g: dict) -> dict:
@@ -222,10 +308,11 @@ def islem_pazar(g: dict) -> dict:
         cikti += ("<hr><p><b>Komisyon karşılaştırması</b> — pazarın ortanca fiyatı üzerinden:</p>"
                   + komisyon_html(kategori, rapor.fiyat_medyan, satirlar, maliyet))
         komisyon = (kategori["ad"], maliyet, satirlar)
-    return _yanit(cikti, pazar_dosyasi(rapor, urunler, komisyon, VERI), "pazar-analizi.xlsx")
+    return _yanit(cikti, pazar_sayfalari(rapor, urunler, komisyon, VERI), "pazar-analizi.xlsx", bool(g.get("sheets")))
 
 
-ISLEMLER = {"/api/komisyon": islem_komisyon, "/api/pazar": islem_pazar}
+ISLEMLER = {"/api/komisyon": islem_komisyon, "/api/pazar": islem_pazar, "/api/sheets-durum": islem_sheets_durum,
+            "/api/sheets-ayar": islem_sheets_ayar, "/api/sheets-kaldir": islem_sheets_kaldir}
 
 
 # ---------------------------------------------------------------- sayfa
@@ -262,8 +349,15 @@ details{margin-top:14px} summary{cursor:pointer;color:var(--ana);font-weight:600
 details .iki label{font-weight:400}
 .gonder{margin-top:18px;padding:12px 20px;border:0;border-radius:8px;background:var(--ana);color:var(--ana-yazi);font:inherit;font-weight:600;cursor:pointer}
 .gonder:disabled{opacity:.6;cursor:wait}
-.indir{display:inline-block;margin:6px 0 4px;padding:10px 16px;border:1px solid var(--ana);border-radius:8px;color:var(--ana);font-weight:600;text-decoration:none}
-.indir-not{color:var(--soluk);font-size:.9rem;margin:0 0 12px}
+.dugmeler{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+.indir{display:inline-block;padding:10px 16px;border:1px solid var(--ana);border-radius:8px;color:var(--ana);background:transparent;font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.indir:disabled{opacity:.6;cursor:wait}
+.bilgi{background:var(--vurgu);border-radius:8px;padding:10px 14px;margin:8px 0}
+.bilgi a{color:var(--ana);font-weight:600}
+.durum{font-weight:600} .adim{color:var(--soluk);font-size:.9rem;padding-left:20px} .adim li{margin:4px 0}
+code{background:var(--vurgu);padding:1px 5px;border-radius:4px;font-size:.9em;word-break:break-all}
+.ikincil{margin-top:18px;margin-left:8px;padding:12px 16px;border:1px solid var(--cizgi);border-radius:8px;background:transparent;color:var(--yazi);font:inherit;cursor:pointer}
+.indir-not{color:var(--soluk);font-size:.9rem;margin:6px 0 12px}
 .tablo{overflow-x:auto} table{border-collapse:collapse;width:100%;margin:6px 0}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--cizgi);white-space:nowrap}
 th{font-size:.85rem;color:var(--soluk);font-weight:600}
@@ -312,10 +406,87 @@ footer{color:var(--soluk);font-size:.85rem;margin-top:24px}
 </section>
 
 <section class="kart" id="cikti" hidden aria-live="polite"></section>
+
+<section class="kart" id="sheets-karti">
+  <details id="sheets-ayar">
+    <summary>Google Sheets bağlantısı <span class="ipucu" style="display:inline;font-weight:400">— isteğe bağlı</span></summary>
+    <p class="ipucu">Sonuçları kendi Google Sheets tablonuza göndermek isterseniz bir kez kurmanız yeterli. Kurmazsanız araç aynen çalışır; sonuçları Excel olarak indirebilirsiniz.</p>
+    <p class="durum" id="sheets-durum">Durum denetleniyor…</p>
+    <form id="sheets-form">
+      <label>Google Sheets tablonuzun adresi<small>Tabloyu tarayıcıda açıp adres çubuğundaki adresi kopyalayın.</small>
+        <input type="text" name="tablo" placeholder="https://docs.google.com/spreadsheets/d/…" required></label>
+      <label>Hizmet hesabı anahtar dosyası<small>Google Cloud'dan indirdiğiniz .json dosyası. Bu bilgisayarda saklanır; başka hiçbir yere gönderilmez. Daha önce yüklediyseniz yeniden seçmeniz gerekmez.</small>
+        <input type="file" name="anahtar" accept=".json,application/json"></label>
+      <button class="gonder" type="submit">Kaydet ve bağlantıyı dene</button>
+      <button class="ikincil" type="button" id="sheets-kaldir" hidden>Bağlantıyı kaldır</button>
+    </form>
+    <p class="ipucu" style="margin-top:14px">Kurulumda tablonuzu hizmet hesabının e-posta adresiyle <b>Düzenleyen</b> olarak paylaşmanız gerekir. Araç yalnızca Pazar, Komisyon ve Ürünler adlı sekmeleri yazar; tablonuzdaki diğer sekmelere dokunmaz.</p>
+  </details>
+</section>
 <footer>Bu araç herhangi bir pazaryeriyle bağlantılı değildir. Sonuçlar bilgi amaçlıdır. Kapatmak için açılan siyah pencereyi kapatmanız yeterlidir.</footer>
 </main>
 <script>
 const cikti = document.getElementById('cikti');
+let sheets = {ayarli: false}, sonIstek = null;
+const sheetsKarti = document.getElementById('sheets-ayar'), sheetsDurum = document.getElementById('sheets-durum');
+async function gonderJson(uc, govde) {
+  const yanit = await fetch(uc, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(govde)});
+  return yanit.json();
+}
+function sheetsGoster(d) {
+  sheets = d || {ayarli: false};
+  sheetsDurum.textContent = '';
+  if (sheets.ayarli) {
+    sheetsDurum.append('Bağlı: ' + (sheets.tablo_adi || 'tablo') + ' — ');
+    const b = document.createElement('a'); b.href = sheets.tablo; b.target = '_blank'; b.rel = 'noopener'; b.textContent = 'tabloyu aç';
+    sheetsDurum.append(b);
+    document.querySelector('#sheets-form [name=tablo]').value = sheets.tablo;
+  } else if (sheets.hesap) {
+    sheetsDurum.append('Anahtar yüklü, tablo henüz bağlanmadı. Tablonuzu şu adresle paylaşın: ');
+    const k = document.createElement('code'); k.textContent = sheets.hesap; sheetsDurum.append(k);
+  } else sheetsDurum.textContent = 'Henüz kurulmadı.';
+  document.getElementById('sheets-kaldir').hidden = !sheets.hesap;
+}
+gonderJson('/api/sheets-durum', {}).then(sheetsGoster).catch(() => { sheetsDurum.textContent = 'Durum okunamadı.'; });
+document.getElementById('sheets-form').addEventListener('submit', async olay => {
+  olay.preventDefault();
+  const form = olay.target, dugme = form.querySelector('.gonder'), eski = dugme.textContent;
+  const govde = {tablo: form.tablo.value};
+  try {
+    const dosya = form.anahtar.files[0];
+    if (dosya) { if (dosya.size > 100 * 1024) throw new Error('buyuk'); govde.anahtar_icerik = await dosya.text(); }
+    dugme.disabled = true; dugme.textContent = 'Deneniyor…';
+    const veri = await gonderJson('/api/sheets-ayar', govde);
+    if (veri.hata) { sheetsDurum.textContent = veri.hata; sheetsDurum.className = 'hata'; return; }
+    sheetsDurum.className = 'durum'; sheetsGoster(veri); form.anahtar.value = '';
+  } catch (e) {
+    sheetsDurum.className = 'hata';
+    sheetsDurum.textContent = e.message === 'buyuk' ? 'Bu dosya bir anahtar dosyası için çok büyük.' : 'Program yanıt vermedi.';
+  } finally { dugme.disabled = false; dugme.textContent = eski; }
+});
+document.getElementById('sheets-kaldir').addEventListener('click', async () => {
+  sheetsDurum.className = 'durum'; sheetsGoster(await gonderJson('/api/sheets-kaldir', {}));
+  document.querySelector('#sheets-form [name=tablo]').value = '';
+});
+async function sheetsGonder(dugme, mesaj) {
+  if (!sheets.ayarli) {
+    sheetsKarti.open = true; sheetsKarti.scrollIntoView({behavior: 'smooth', block: 'center'});
+    mesaj.className = 'bilgi'; mesaj.textContent = 'Önce aşağıdaki “Google Sheets bağlantısı” bölümünden tablonuzu bağlayın.'; mesaj.hidden = false;
+    return;
+  }
+  const eski = dugme.textContent; dugme.disabled = true; dugme.textContent = 'Gönderiliyor…'; mesaj.hidden = true;
+  try {
+    const veri = await gonderJson(sonIstek.uc, {...sonIstek.govde, sheets: true});
+    mesaj.textContent = ''; mesaj.hidden = false;
+    if (veri.hata) { mesaj.className = 'hata'; mesaj.textContent = veri.hata; return; }
+    mesaj.className = 'bilgi';
+    mesaj.append('Tablonuza yazıldı (' + veri.sheets.sekmeler.join(', ') + '). ');
+    const b = document.createElement('a'); b.href = veri.sheets.adres; b.target = '_blank'; b.rel = 'noopener'; b.textContent = 'Tabloyu aç';
+    mesaj.append(b);
+    if (veri.sheets.hatali_hucre) mesaj.append(' Uyarı: ' + veri.sheets.hatali_hucre + ' hücre hata gösteriyor; tabloyu kontrol edin.');
+  } catch (e) { mesaj.className = 'hata'; mesaj.textContent = 'Program yanıt vermedi.'; mesaj.hidden = false; }
+  finally { dugme.disabled = false; dugme.textContent = eski; }
+}
 document.querySelectorAll('[data-sekme]').forEach(d => d.addEventListener('click', () => {
   document.querySelectorAll('[data-sekme]').forEach(x => x.setAttribute('aria-selected', x === d));
   for (const ad of ['komisyon', 'pazar']) document.getElementById(ad).hidden = ad !== d.dataset.sekme;
@@ -326,7 +497,7 @@ function hataGoster(mesaj) {
   const p = document.createElement('p'); p.className = 'hata'; p.textContent = mesaj;
   cikti.appendChild(p); cikti.hidden = false;
 }
-document.querySelectorAll('form').forEach(form => form.addEventListener('submit', async olay => {
+document.querySelectorAll('form[data-uc]').forEach(form => form.addEventListener('submit', async olay => {
   olay.preventDefault();
   const dugme = form.querySelector('.gonder'); const eski = dugme.textContent;
   const govde = {kategori: form.kategori.value, maliyet: form.maliyet.value, oranlar: {}};
@@ -340,9 +511,9 @@ document.querySelectorAll('form').forEach(form => form.addEventListener('submit'
       govde.dosya_adi = dosya.name; govde.icerik = await dosya.text();
     }
     dugme.disabled = true; dugme.textContent = 'Hesaplanıyor…';
-    const yanit = await fetch(form.dataset.uc, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(govde)});
-    const veri = await yanit.json();
+    const veri = await gonderJson(form.dataset.uc, govde);
     if (veri.hata) return hataGoster(veri.hata);
+    sonIstek = {uc: form.dataset.uc, govde};
     cikti.innerHTML = veri.html;
     if (veri.excel) {
       const ikili = Uint8Array.from(atob(veri.excel), k => k.charCodeAt(0));
@@ -351,7 +522,12 @@ document.querySelectorAll('form').forEach(form => form.addEventListener('submit'
       baglanti.download = veri.excel_adi; baglanti.className = 'indir'; baglanti.textContent = 'Excel olarak indir';
       const aciklama = document.createElement('p'); aciklama.className = 'indir-not';
       aciklama.textContent = 'Excel dosyasında sarı hücreleri (fiyat, maliyet, oranlar) değiştirdiğinizde sonuçlar yeniden hesaplanır.';
-      cikti.prepend(aciklama); cikti.prepend(baglanti);
+      const tabloDugmesi = document.createElement('button');
+      tabloDugmesi.type = 'button'; tabloDugmesi.className = 'indir'; tabloDugmesi.textContent = "Google Sheets'e gönder";
+      const mesaj = document.createElement('p'); mesaj.hidden = true;
+      tabloDugmesi.addEventListener('click', () => sheetsGonder(tabloDugmesi, mesaj));
+      const sira = document.createElement('div'); sira.className = 'dugmeler'; sira.append(baglanti, tabloDugmesi);
+      cikti.prepend(mesaj); cikti.prepend(aciklama); cikti.prepend(sira);
     }
     cikti.hidden = false; cikti.scrollIntoView({behavior: 'smooth', block: 'start'});
   } catch (e) {

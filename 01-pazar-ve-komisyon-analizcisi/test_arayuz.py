@@ -155,3 +155,115 @@ class Arayuz(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+import os
+import shutil
+import stat
+import subprocess
+import tempfile
+from pathlib import Path
+
+from test_sheets import SahteGoogle
+
+OPENSSL = shutil.which("openssl")
+TABLO = "https://docs.google.com/spreadsheets/d/1ku9FJFtbvgYXwa7U5rimba82ra5rJSmka2x9sT3p81Y/edit?gid=0"
+
+
+@unittest.skipUnless(OPENSSL, "openssl bulunamadı")
+class SheetsBaglantisi(unittest.TestCase):
+    """Arayüzdeki Google Sheets kurulumu ve gönderimi; Google'a bağlanılmaz."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.kok = tempfile.TemporaryDirectory()
+        pem = Path(cls.kok.name) / "ozel.pem"
+        subprocess.run([OPENSSL, "genpkey", "-algorithm", "RSA", "-pkeyopt", "rsa_keygen_bits:2048", "-out", str(pem)],
+                       check=True, capture_output=True)
+        cls.anahtar = json.dumps({"type": "service_account", "client_email": "arac@proje.iam.gserviceaccount.com",
+                                  "private_key": pem.read_text(), "private_key_id": "kimlik"})
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.kok.cleanup()
+
+    def setUp(self):
+        self.klasor = tempfile.TemporaryDirectory()
+        self.ayar = Path(self.klasor.name) / "ayar"
+        os.environ["PAZAR_KOMISYON_AYAR"] = str(self.ayar)
+        self.google = SahteGoogle()
+        arayuz.SHEETS_HTTP = self.google
+
+    def tearDown(self):
+        os.environ.pop("PAZAR_KOMISYON_AYAR", None)
+        arayuz.SHEETS_HTTP = None
+        self.klasor.cleanup()
+
+    def kur(self):
+        return arayuz.islem_sheets_ayar({"tablo": TABLO, "anahtar_icerik": self.anahtar})
+
+    def test_baslangicta_kurulu_degil(self):
+        self.assertEqual(arayuz.islem_sheets_durum({}), {"ayarli": False, "hesap": None, "tablo": None, "tablo_adi": None})
+        with self.assertRaises(arayuz.GirdiHatasi) as h:
+            arayuz.islem_komisyon({"kategori": "giyim", "fiyat": "1000", "sheets": True})
+        self.assertIn("kurulmamış", str(h.exception))
+        self.assertNotIn("sheets", arayuz.islem_komisyon({"kategori": "giyim", "fiyat": "1000"}))  # istenmeden gönderilmez
+        self.assertEqual(self.google.istekler, [])
+
+    def test_kurulum_ve_gonderim(self):
+        durum = self.kur()
+        self.assertTrue(durum["ayarli"])
+        self.assertEqual(durum["hesap"], "arac@proje.iam.gserviceaccount.com")
+        self.assertEqual(durum["tablo"], "https://docs.google.com/spreadsheets/d/1ku9FJFtbvgYXwa7U5rimba82ra5rJSmka2x9sT3p81Y/edit")
+        dosya = self.ayar / "hizmet-hesabi.json"
+        self.assertTrue(dosya.exists())
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(dosya.stat().st_mode), 0o600)
+        v = arayuz.islem_komisyon({"kategori": "giyim", "fiyat": "1000", "sheets": True})
+        self.assertEqual(v["sheets"]["sekmeler"], ["Komisyon"])
+        self.assertEqual(v["sheets"]["hatali_hucre"], 0)
+        csv = "ad,marka,fiyat,yorum\n" + "\n".join(f"u{i},m,{100 + i},{i}" for i in range(12))
+        v = arayuz.islem_pazar({"dosya_adi": "a.csv", "icerik": csv, "kategori": "kozmetik", "sheets": True})
+        self.assertEqual(v["sheets"]["sekmeler"], ["Pazar", "Komisyon", "Ürünler"])
+
+    def test_anahtar_tarayiciya_geri_gonderilmez(self):
+        self.kur()
+        for yanit in (arayuz.islem_sheets_durum({}), arayuz.islem_komisyon({"kategori": "giyim", "fiyat": "1000", "sheets": True})):
+            metin = json.dumps(yanit)
+            self.assertNotIn("PRIVATE KEY", metin)
+            self.assertNotIn("private_key", metin)
+
+    def test_tablo_adresi_degisince_anahtar_yeniden_istenmez(self):
+        self.kur()
+        self.assertTrue(arayuz.islem_sheets_ayar({"tablo": "1ku9FJFtbvgYXwa7U5rimba82ra5rJSmka2x9sT3p81Y"})["ayarli"])
+
+    def test_kurulum_hatalari(self):
+        for govde, beklenen in [
+            ({"tablo": "https://example.com/x", "anahtar_icerik": self.anahtar}, "Tablo adresi anlaşılamadı"),
+            ({"tablo": TABLO, "anahtar_icerik": "{bozuk"}, "hizmet hesabı anahtarı değil"),
+            ({"tablo": TABLO, "anahtar_icerik": '{"type":"service_account","client_email":"a@b","private_key":"x"}'}, "hizmet hesabı anahtarı değil"),
+            ({"tablo": TABLO}, "kurulmamış"),
+        ]:
+            with self.assertRaises(arayuz.GirdiHatasi) as h:
+                arayuz.islem_sheets_ayar(govde)
+            self.assertIn(beklenen, str(h.exception), govde.get("tablo"))
+        self.assertFalse((self.ayar / "hizmet-hesabi.json").exists())  # geçersiz anahtar diske yazılmaz
+
+    def test_paylasilmamis_tabloda_adres_gosterilir_ve_baglanti_kurulmus_sayilmaz(self):
+        arayuz.SHEETS_HTTP = SahteGoogle(api_kodu=403, api_mesaji="The caller does not have permission")
+        with self.assertRaises(arayuz.GirdiHatasi) as h:
+            self.kur()
+        self.assertIn("arac@proje.iam.gserviceaccount.com", str(h.exception))
+        durum = arayuz.islem_sheets_durum({})
+        self.assertFalse(durum["ayarli"])
+        self.assertEqual(durum["hesap"], "arac@proje.iam.gserviceaccount.com")  # paylaşacağı adresi görebilsin
+
+    def test_baglantiyi_kaldir(self):
+        self.kur()
+        self.assertEqual(arayuz.islem_sheets_kaldir({})["ayarli"], False)
+        self.assertEqual(list(self.ayar.iterdir()), [])
+
+    def test_ayarlar_proje_klasorunun_disinda(self):
+        os.environ.pop("PAZAR_KOMISYON_AYAR")
+        self.assertNotIn(Path(arayuz.__file__).parent.resolve(), arayuz.ayar_klasoru().resolve().parents)
+        self.assertEqual(arayuz.ayar_klasoru(), Path.home() / ".pazar-komisyon")
