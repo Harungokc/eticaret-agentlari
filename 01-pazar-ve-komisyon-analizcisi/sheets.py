@@ -300,8 +300,12 @@ class Istemci:
                 ozellik = cevap["addSheet"]["properties"]
                 mevcut[ozellik["title"]] = ozellik["sheetId"]
 
+        # Yazılan sekmeler en başa alınır: tabloyu açan kişi sonucu ilk sekmede görsün. Başka sekme silinmez.
+        one_al = [{"updateSheetProperties": {"properties": {"sheetId": mevcut[s.ad], "index": sira}, "fields": "index"}}
+                  for sira, s in enumerate(sayfalar)]
+
         def gonder(a: str) -> int:
-            istekler = [i for s in sayfalar for i in sayfa_istekleri(s, mevcut[s.ad], a)]
+            istekler = [i for s in sayfalar for i in sayfa_istekleri(s, mevcut[s.ad], a)] + one_al
             self._cagir("POST", f"{kimlik}:batchUpdate", {"requests": istekler})
             return self._hata_say(kimlik, [s.ad for s in sayfalar])
 

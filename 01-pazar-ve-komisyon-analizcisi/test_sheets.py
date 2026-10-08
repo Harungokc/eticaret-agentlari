@@ -222,6 +222,15 @@ class Akis(unittest.TestCase):
         self.assertEqual(sonuc["eklenen_sekmeler"], ["Pazar", "Komisyon", "Ürünler"])
         self.assertEqual([i["addSheet"]["properties"]["title"] for i in google.toplu()[0]], ["Pazar", "Komisyon", "Ürünler"])
 
+    def test_yazilan_sekmeler_basa_alinir(self):
+        urunler = [Urun(ad=f"u{i}", marka="m", fiyat=100 + i, yorum=i) for i in range(12)]
+        google = SahteGoogle(sekmeler=("Sayfa1", "Notlarım"))
+        self.istemci(google).yaz(KIMLIK, pazar_sayfalari(pazar_analiz_et(urunler), urunler, None, VERI))
+        siralama = [(i["updateSheetProperties"]["properties"]["sheetId"], i["updateSheetProperties"]["properties"]["index"])
+                    for i in google.toplu()[-1] if i.get("updateSheetProperties", {}).get("fields") == "index"]
+        self.assertEqual(siralama, [(google.sekmeler["Pazar"], 0), (google.sekmeler["Ürünler"], 1)])
+        self.assertFalse(any("deleteSheet" in i for t in google.toplu() for i in t))
+
     def test_dile_gore_ayirici(self):
         for dil, beklenen in (("tr_TR", ";"), ("en_US", ","), ("de_DE", ";")):
             google = SahteGoogle(dil=dil)
