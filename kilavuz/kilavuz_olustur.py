@@ -142,7 +142,7 @@ def icerik():
     h.append(kutu(
         "Bu kılavuzu <b>Claude Cowork</b>, <b>Claude Code</b> ya da <b>OpenAI Codex</b> gibi komut çalıştırabilen bir "
         "yapay zekâ asistanına verin ve <b>“Bu kılavuzdaki aracı kur.”</b> deyin. Asistan aracı kendisi indirir, kurar ve "
-        "dener; sizin başka bir dosya ya da adres vermeniz gerekmez. Sonrasında ona "
+        "dener; aracı sizin indirmeniz gerekmez. Sonrasında ona "
         "konuşur gibi yazarsınız: <i>“899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım?”</i> "
         "Asistan hesabı araçla yapar, sonucu size anlatır ve isterseniz Google Sheets tablonuza yazar.",
         baslik="Bu kılavuz nasıl kullanılır"))
@@ -194,7 +194,7 @@ def icerik():
          "Kendi bilgisayarınızda",
          "Komut çalıştırmadan ve internete çıkmadan önce sizden onay ister. Codex'te ağ erişimi başlangıçta kapalıdır; "
          "asistan izin istediğinde onaylayın."],
-        ["Yalnızca sohbet penceresi (tarayıcıdaki claude.ai ya da ChatGPT sohbeti)",
+        ["Normal sohbet (Cowork ya da Codex kullanmadan claude.ai veya ChatGPT sohbeti)",
          "—",
          "Kurulumu yapamaz: komut çalıştıramaz ve program indiremez. Aracı kendiniz kurabilirsiniz; adımlar proje "
          "sayfasında yazılıdır."],
@@ -223,6 +223,7 @@ def icerik():
         "<b>Enable</b> (Etkinleştir) düğmesine basın.",
     ], numarali=True)
 
+    h.append(CondPageBreak(45 * mm))
     h.append(p("3. Hizmet hesabını oluşturun", "h2"))
     h += maddeler([
         "Sol üstteki menüden <b>IAM &amp; Admin → Service Accounts</b> (IAM ve Yönetici → Hizmet Hesapları) sayfasına gidin.",
@@ -279,13 +280,13 @@ Anahtar dosyasının içeriğini ekrana yazma.
         "“249 liralık telefon kılıfını hangi pazaryerinde satmalıyım? Maliyetim 80 lira.”",
         "“Trendyol'daki komisyon oranım %21,5. Buna göre 1.299 liralık montta elime ne kalır?”",
         "“Şu ürün listesinden pazar analizi çıkar ve tabloma yaz.” (ürünleri ad, marka, fiyat, puan, yorum sayısı olarak yazın "
-        "ya da bir CSV/Excel dosyası verin)",
-        "“Bu sonucu Excel dosyası olarak masaüstüme kaydet.”",
+        "ya da bir CSV dosyası verin)",
+        "“Bu sonucu Excel dosyası olarak da kaydet.”",
         "“Hangi kategoriler için komisyon verisi var?”",
     ])
     h.append(kutu("Komisyon oranları yaklaşık değerlerdir: pazaryerleri oranları herkese açık tek bir tabloda yayımlamaz. "
-                  "Bağlayıcı oran, satıcı panelinizdeki sözleşme ekranında yazar. Kendi oranınızı asistana söylerseniz hesap "
-                  "kesinleşir. Kargo, sabit hizmet bedeli, stopaj, reklam ve iade maliyeti hesaba dahil değildir.",
+                  "Bağlayıcı oran, satıcı panelinizdeki sözleşme ekranında yazar. Kendi oranınızı asistana söylerseniz komisyon "
+                  "hesabı o orana göre yapılır. Kargo, sabit hizmet bedeli, stopaj, reklam ve iade maliyeti hesaba dahil değildir.",
                   renk=SARI, baslik="Sonuçları okurken"))
     # ------------------------------------------------------------ asistan için kısa not
     # Asistanın izleyeceği ayrıntılı adımlar depodaki AGENTS.md dosyasındadır. Burada yalnızca oraya
