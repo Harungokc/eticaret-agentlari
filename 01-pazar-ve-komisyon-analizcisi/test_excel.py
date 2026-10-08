@@ -10,7 +10,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import arayuz
-from agent import main
+from agent import main as _main
 from excel import komisyon_dosyasi, pazar_dosyasi
 from komisyon import analiz_et, veri_yukle
 from pazar import Urun
@@ -18,6 +18,15 @@ from pazar import analiz_et as pazar_analiz_et
 
 VERI = veri_yukle()
 NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+
+
+def main(argv):
+    """Aracın komut satırını çalıştırır; ekrana yazdıklarını yutar ki test çıktısı sade kalsın."""
+    import contextlib
+    import io
+    with contextlib.redirect_stdout(io.StringIO()):
+        return _main(argv)
+
 
 
 def kat(anahtar):

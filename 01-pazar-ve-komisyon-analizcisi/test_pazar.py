@@ -5,9 +5,18 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from agent import main
+from agent import main as _main
 from okuyucu import OkumaHatasi, html_oku, oku, sayi
 from pazar import Urun, analiz_et
+
+
+def main(argv):
+    """Aracın komut satırını çalıştırır; ekrana yazdıklarını yutar ki test çıktısı sade kalsın."""
+    import contextlib
+    import io
+    with contextlib.redirect_stdout(io.StringIO()):
+        return _main(argv)
+
 
 
 def urunler(fiyatlar, yorumlar=None, marka="M"):

@@ -13,7 +13,7 @@ import unittest
 from pathlib import Path
 from urllib.parse import parse_qs, unquote
 
-from agent import main
+from agent import main as _main
 from excel import komisyon_sayfalari, pazar_sayfalari
 from komisyon import analiz_et, veri_yukle
 from pazar import Urun
@@ -24,6 +24,15 @@ from sheets import (Istemci, SheetsHatasi, anahtar_oku, formul_cevir, jwt_olustu
 VERI = veri_yukle()
 OPENSSL = shutil.which("openssl")
 KIMLIK = "1ku9FJFtbvgYXwa7U5rimba82ra5rJSmka2x9sT3p81Y"
+
+
+def main(argv):
+    """Aracın komut satırını çalıştırır; ekrana yazdıklarını yutar ki test çıktısı sade kalsın."""
+    import contextlib
+    import io
+    with contextlib.redirect_stdout(io.StringIO()):
+        return _main(argv)
+
 
 
 def kat(anahtar):
