@@ -18,8 +18,8 @@ dosyaya çift tıklarsınız ve araç tarayıcınızda bir sayfa olarak açılı
 
 ## En kolay yol: yapay zekâ asistanınıza kurdurun
 
-Bilgisayarınızda komut çalıştırabilen bir yapay zekâ asistanı kullanıyorsanız (örneğin Claude Code
-veya Claude Cowork), kurulumu ona yaptırabilirsiniz:
+Claude Cowork, Claude Code ya da OpenAI Codex gibi komut çalıştırabilen bir yapay zekâ asistanı
+kullanıyorsanız kurulumu ona yaptırabilirsiniz:
 
 1. **[Kılavuzu indirin (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf)**
 2. PDF'i asistanınıza verin ve **"Bu kılavuzdaki aracı kur."** deyin. Başka bir şey vermeniz
@@ -29,6 +29,9 @@ veya Claude Cowork), kurulumu ona yaptırabilirsiniz:
 
 Asistan hesabı bu araçla yapar, sonucu anlatır ve isterseniz Google Sheets tablonuza yazar. Kılavuz,
 sizin yapacağınız tek işi, yani Google Sheets bağlantısını adım adım anlatır.
+
+Asistan, internetten indirdiği programı çalıştırmadan önce sizden onay ister; Claude Cowork'te araç
+bilgisayarınıza değil Cowork'ün çalışma ortamına kurulur. Kurulum adımları Claude Code ile denenmiştir.
 
 Asistan kullanmıyorsanız aşağıdaki adımlarla kendiniz kurabilirsiniz.
 

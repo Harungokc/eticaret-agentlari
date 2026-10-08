@@ -24,6 +24,18 @@ dosyaya yönlendirir; ayrıntılı adımların tek kaynağı burasıdır.
 6. Bir komut hata verirse hata mesajını oku; çoğu mesaj ne yapılacağını Türkçe olarak söyler.
    Aşağıdaki sorun giderme tablosuna bak. Çözemezsen kullanıcıya mesajı aynen ilet.
 
+## Çalıştığın ortam
+
+Bu araç senin komut çalıştırdığın yerde kurulur ve çalışır.
+
+- **Kullanıcının bilgisayarında çalışıyorsan** (ör. Claude Code, Codex): komut çalıştırmak ve
+  internete çıkmak için kullanıcının onayı gerekebilir. Gereken adresler: `github.com` (indirme),
+  `oauth2.googleapis.com` ve `sheets.googleapis.com` (yalnızca Google Sheets çıktısı için).
+- **Uzak ya da bulut bir ortamda çalışıyorsan** (ör. Claude Cowork): aracı o ortama kur. Kullanıcıya
+  aracın kendi bilgisayarına değil senin çalışma ortamına kurulduğunu söyle. Anahtar dosyası
+  kullanıcının sana açtığı klasörde olmalıdır; `sheets-kur` onu ortamına kopyalar. Bunu kullanıcıya
+  açıkça belirt ve yukarıdaki adreslere ağ erişimi kapalıysa hangi adreslere izin gerektiğini söyle.
+
 ## Kurulum
 
 Windows'ta `python3` yerine `py` ya da `python` kullan.

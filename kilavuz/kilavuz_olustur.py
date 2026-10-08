@@ -140,9 +140,9 @@ def icerik():
           p("Yapay zekâ asistanınızla kurulum ve kullanım kılavuzu", "kapak_alt")]
     h += gelistiren_kutusu()
     h.append(kutu(
-        "Bu kılavuzu, bilgisayarınızda komut çalıştırabilen bir yapay zekâ asistanına verin ve "
-        "<b>“Bu kılavuzdaki aracı kur.”</b> deyin. Asistan aracı kendisi indirir, kurar ve dener; sizin başka bir "
-        "dosya ya da adres vermeniz gerekmez. Sonrasında ona "
+        "Bu kılavuzu <b>Claude Cowork</b>, <b>Claude Code</b> ya da <b>OpenAI Codex</b> gibi komut çalıştırabilen bir "
+        "yapay zekâ asistanına verin ve <b>“Bu kılavuzdaki aracı kur.”</b> deyin. Asistan aracı kendisi indirir, kurar ve "
+        "dener; sizin başka bir dosya ya da adres vermeniz gerekmez. Sonrasında ona "
         "konuşur gibi yazarsınız: <i>“899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım?”</i> "
         "Asistan hesabı araçla yapar, sonucu size anlatır ve isterseniz Google Sheets tablonuza yazar.",
         baslik="Bu kılavuz nasıl kullanılır"))
@@ -167,8 +167,9 @@ def icerik():
 
     h.append(p("Gerekenler", "h2"))
     h += maddeler([
-        "Windows, macOS veya Linux bir bilgisayar",
-        "Python 3.10 veya üstü (yoksa asistanınız kurmanızı ister; python.org/downloads adresinden ücretsiz indirilir)",
+        "Claude Cowork, Claude Code ya da OpenAI Codex gibi komut çalıştırabilen bir yapay zekâ asistanı",
+        "Asistan kendi bilgisayarınızda çalışıyorsa Python 3.10 veya üstü (yoksa asistanınız kurmanızı ister; "
+        "python.org/downloads adresinden ücretsiz indirilir). Claude Cowork'te bir şey kurmanız gerekmez.",
         "Google Sheets çıktısı için bir Google hesabı (isteğe bağlı; bu özellik olmadan da araç çalışır)",
     ])
 
@@ -182,18 +183,24 @@ def icerik():
 
     h.append(CondPageBreak(75 * mm))
     h.append(p("Hangi asistanla çalışır", "h2"))
-    h.append(p("Asistanın iki şeyi yapabilmesi gerekir: <b>bilgisayarınızda komut çalıştırmak</b> ve <b>internete çıkmak</b> "
+    h.append(p("Asistanın iki şeyi yapabilmesi gerekir: <b>komut çalıştırmak</b> ve <b>internete çıkmak</b> "
                "(aracı GitHub'dan indirmek ve tablonuza yazmak için Google'a bağlanmak)."))
-    h += tablo(["Asistan türü", "Uygun mu"], [
-        ["Bilgisayarınızda çalışan ajan asistanlar (ör. Claude Code, Claude Cowork; OpenAI tarafında Codex gibi araçlar)",
-         "Evet. Bu kılavuz onlar için yazıldı."],
-        ["Yalnızca sohbet penceresi (tarayıcıdaki claude.ai veya ChatGPT sohbeti)",
-         "Kurulumu yapamaz, çünkü bilgisayarınızda komut çalıştıramaz ve internetten program indiremez. Bu durumda "
-         "aracı kendiniz kurabilirsiniz; adımlar proje sayfasında yazılıdır."],
-    ], [0.55, 0.45])
-    h.append(p("Komutlar Claude Code ile macOS üzerinde denenmiştir. Asistanın indirdiği programı çalıştırabilmesi sizin "
-               "onayınıza bağlıdır; tam otomatik çalışan ayarlarda asistan bu adımı reddedebilir (bkz. Bölüm B).", "kucuk"))
-
+    h += tablo(["Asistan", "Nerede çalışır", "Bilmeniz gereken"], [
+        ["<b>Claude Cowork</b>",
+         "Anthropic'in sunucularında, size ayrılmış yalıtılmış bir ortamda",
+         "Araç bilgisayarınıza değil o ortama kurulur. Anahtar dosyasını Cowork'e açtığınız klasöre koyun; asistan onu "
+         "oradan alır. GitHub ve Google adreslerine erişim için ağ izni vermeniz gerekebilir."],
+        ["<b>Claude Code</b>, <b>OpenAI Codex</b>",
+         "Kendi bilgisayarınızda",
+         "Komut çalıştırmadan ve internete çıkmadan önce sizden onay ister. Codex'te ağ erişimi başlangıçta kapalıdır; "
+         "asistan izin istediğinde onaylayın."],
+        ["Yalnızca sohbet penceresi (tarayıcıdaki claude.ai ya da ChatGPT sohbeti)",
+         "—",
+         "Kurulumu yapamaz: komut çalıştıramaz ve program indiremez. Aracı kendiniz kurabilirsiniz; adımlar proje "
+         "sayfasında yazılıdır."],
+    ], [0.27, 0.27, 0.46])
+    h.append(p("Kurulum adımları Claude Code ile macOS üzerinde denenmiştir. Diğer asistanlarda komutlar aynıdır; farklı olan, "
+               "asistanın sizden hangi izinleri istediğidir (bkz. Bölüm B).", "kucuk"))
 
     # ------------------------------------------------------------ bölüm A
     h.append(p("Bölüm A — Sizin yapacağınız iş: Google Sheets bağlantısı", "h1"))
@@ -250,7 +257,7 @@ def icerik():
     h.append(p("Bölüm B — Asistanınıza vereceğiniz ilk mesaj", "h1"))
     h.append(p("Bu PDF'i asistanınıza ekleyin ve aşağıdaki mesajı, köşeli parantezli yerleri doldurarak gönderin."))
     h.append(kod("""
-Ekteki kılavuzda anlatılan aracı bilgisayarıma kur, testlerini çalıştır
+Ekteki kılavuzda anlatılan aracı kur, testlerini çalıştır
 ve örnek bir komisyon hesabıyla çalıştığını göster.
 
 Google Sheets bağlantımı da kur:
@@ -285,7 +292,7 @@ Anahtar dosyasının içeriğini ekrana yazma.
     # ulaşması için gereken kadarı durur; kullanıcının bu kutuyla bir şey yapması gerekmez.
     h.append(Spacer(1, 6))
     h.append(
-        kutu(f"Bu kılavuz sana verildiyse kullanıcı, burada anlatılan aracı bilgisayarına kurmanı ve onun adına "
+        kutu(f"Bu kılavuz sana verildiyse kullanıcı, burada anlatılan aracı çalıştığın ortama kurmanı ve onun adına "
              f"kullanmanı istiyor. Aracı şu adresten indir:<br/><font face='Kod' size='9'>git clone {DEPO}.git</font><br/>"
              f"(git yoksa: <font face='Kod' size='8'>{ZIP}</font>)<br/><br/>"
              "İndirdiğin klasörün kökündeki <b>AGENTS.md</b> dosyasını oku ve oradaki adımları sırayla izle: kurulum, "
@@ -298,11 +305,13 @@ Anahtar dosyasının içeriğini ekrana yazma.
     h.append(p("Bilmeniz gerekenler", "h1"))
     h.append(p("Verileriniz ve gizlilik", "h2"))
     h += maddeler([
-        "Araç bilgisayarınızda çalışır. Girdiğiniz fiyat, maliyet ve ürün listesi aracın yazarına ya da başka bir sunucuya gönderilmez.",
+        "Araç, asistanınızın çalıştığı yerde çalışır: Claude Code ve Codex'te kendi bilgisayarınızda, Claude Cowork'te "
+        "Anthropic'in sunucularındaki size ayrılmış ortamda. Girdiğiniz fiyat, maliyet ve ürün listesi aracın yazarına gönderilmez.",
         "Google Sheets çıktısını kullanırsanız sonuçlar yalnızca sizin belirttiğiniz Google tablosuna yazılır.",
         "Asistanınıza yazdıklarınız, kullandığınız asistanın kendi gizlilik koşullarına tabidir.",
-        "Anahtar dosyası bilgisayarınızda, yalnızca sizin okuyabileceğiniz bir klasörde saklanır. Bağlantıyı kaldırmak için Google "
-        "Cloud'daki hizmet hesabını silmeniz ya da tablonuzun paylaşımından o adresi çıkarmanız yeterlidir.",
+        "Anahtar dosyasının bir kopyası aracın çalıştığı yerde saklanır: kendi bilgisayarınızda ya da Cowork kullanıyorsanız "
+        "Cowork ortamınızda. Bağlantıyı kaldırmak için Google Cloud'daki hizmet hesabını ya da anahtarını silmeniz veya "
+        "tablonuzun paylaşımından o adresi çıkarmanız yeterlidir.",
     ])
     h.append(p("Sınırlar", "h2"))
     h += maddeler([
