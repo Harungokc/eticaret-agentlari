@@ -22,13 +22,13 @@ Bilgisayarınızda komut çalıştırabilen bir yapay zekâ asistanı kullanıyo
 veya Claude Cowork), kurulumu ona yaptırabilirsiniz:
 
 1. **[Kılavuzu indirin (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf)**
-2. PDF'i asistanınıza verin ve **"Bu kılavuza göre aracı kur."** deyin. PDF vermek yerine bu sayfanın
-   adresini verip **"Bu depodaki aracı kur."** demeniz de yeterlidir: asistanın izleyeceği talimatlar
-   depodaki [AGENTS.md](AGENTS.md) dosyasında da yazılıdır.
+2. PDF'i asistanınıza verin ve **"Bu kılavuzdaki aracı kur."** deyin. Başka bir şey vermeniz
+   gerekmez: asistan aracı kendisi indirir ve depodaki [AGENTS.md](AGENTS.md) dosyasındaki adımları
+   izler.
 3. Sonrasında konuşur gibi sorun: *"899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım?"*
 
 Asistan hesabı bu araçla yapar, sonucu anlatır ve isterseniz Google Sheets tablonuza yazar. Kılavuz,
-Google Sheets bağlantısını adım adım anlatır ve asistanın izleyeceği talimatları içerir.
+sizin yapacağınız tek işi, yani Google Sheets bağlantısını adım adım anlatır.
 
 Asistan kullanmıyorsanız aşağıdaki adımlarla kendiniz kurabilirsiniz.
 

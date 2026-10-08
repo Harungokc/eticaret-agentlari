@@ -2,8 +2,8 @@
 
 Bu dosya, bu depoyu bir kullanıcı adına kuran ve kullanan yapay zekâ asistanı için yazılmıştır.
 Kullanıcı senden "bu depodaki aracı kur" ya da benzeri bir şey istediyse aşağıdaki adımları sırayla
-izle. Aynı talimatlar [kılavuzun](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf) "Bölüm C" kısmında
-da yer alır.
+izle. Kullanıcıya verilen [kılavuz (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf) seni bu
+dosyaya yönlendirir; ayrıntılı adımların tek kaynağı burasıdır.
 
 ## Rolün ve kuralların
 

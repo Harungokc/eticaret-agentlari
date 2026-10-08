@@ -141,7 +141,8 @@ def icerik():
     h += gelistiren_kutusu()
     h.append(kutu(
         "Bu kılavuzu, bilgisayarınızda komut çalıştırabilen bir yapay zekâ asistanına verin ve "
-        "<b>“Bu kılavuza göre aracı kur.”</b> deyin. Asistan aracı indirir, kurar ve dener. Sonrasında ona "
+        "<b>“Bu kılavuzdaki aracı kur.”</b> deyin. Asistan aracı kendisi indirir, kurar ve dener; sizin başka bir "
+        "dosya ya da adres vermeniz gerekmez. Sonrasında ona "
         "konuşur gibi yazarsınız: <i>“899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım?”</i> "
         "Asistan hesabı araçla yapar, sonucu size anlatır ve isterseniz Google Sheets tablonuza yazar.",
         baslik="Bu kılavuz nasıl kullanılır"))
@@ -187,8 +188,8 @@ def icerik():
         ["Bilgisayarınızda çalışan ajan asistanlar (ör. Claude Code, Claude Cowork; OpenAI tarafında Codex gibi araçlar)",
          "Evet. Bu kılavuz onlar için yazıldı."],
         ["Yalnızca sohbet penceresi (tarayıcıdaki claude.ai veya ChatGPT sohbeti)",
-         "Kurulumu yapamaz, çünkü bilgisayarınızda komut çalıştıramaz. Bu durumda aracı kendiniz kurabilirsiniz; adımlar "
-         "proje sayfasında yazılıdır."],
+         "Kurulumu yapamaz, çünkü bilgisayarınızda komut çalıştıramaz ve internetten program indiremez. Bu durumda "
+         "aracı kendiniz kurabilirsiniz; adımlar proje sayfasında yazılıdır."],
     ], [0.55, 0.45])
     h.append(p("Bu kılavuzdaki adımlar Claude Code ile macOS üzerinde denenmiştir. Diğer asistanlarda komutlar aynıdır; "
                "asistanınızın komut çalıştırma ve internet izni olduğundan emin olun.", "kucuk"))
@@ -249,8 +250,8 @@ def icerik():
     h.append(p("Bölüm B — Asistanınıza vereceğiniz ilk mesaj", "h1"))
     h.append(p("Bu PDF'i asistanınıza ekleyin ve aşağıdaki mesajı, köşeli parantezli yerleri doldurarak gönderin."))
     h.append(kod("""
-Ekteki kılavuzun "Bölüm C — Asistan için talimatlar" kısmını uygula:
-aracı kur, testleri çalıştır ve örnek bir komisyon hesabıyla çalıştığını göster.
+Ekteki kılavuzda anlatılan aracı bilgisayarıma kur, testlerini çalıştır
+ve örnek bir komisyon hesabıyla çalıştığını göster.
 
 Google Sheets bağlantımı da kur:
 - Tablo adresim: [tablonuzun adresi]
@@ -276,141 +277,19 @@ Anahtar dosyasının içeriğini ekrana yazma.
                   "Bağlayıcı oran, satıcı panelinizdeki sözleşme ekranında yazar. Kendi oranınızı asistana söylerseniz hesap "
                   "kesinleşir. Kargo, sabit hizmet bedeli, stopaj, reklam ve iade maliyeti hesaba dahil değildir.",
                   renk=SARI, baslik="Sonuçları okurken"))
-    h.append(CondPageBreak(90 * mm))
-
-    # ------------------------------------------------------------ bölüm C
-    h.append(p("Bölüm C — Asistan için talimatlar", "h1"))
-    h.append(p("Bu bölüm yapay zekâ asistanı için yazılmıştır. Kullanıcı senden bu kılavuzu uygulamanı istediyse aşağıdaki "
-               "adımları sırayla izle."))
-
-    h.append(p("Rolün ve kuralların", "h2"))
-    h += maddeler([
-        "Kullanıcının e-ticaret analiz asistanısın. Hesapları <b>kendin yapma ve tahmin yürütme</b>; her rakam aşağıdaki "
-        "aracın çıktısından gelsin. Araç “veri yok” diyorsa bunu aynen aktar.",
-        "Hizmet hesabı anahtar dosyasını <b>kendin açma, içeriğini ekrana yazma ya da bir yere kopyalama</b>. Dosyanın yalnızca "
-        "yolunu <font face='Kod' size='9'>sheets-kur</font> komutuna ver; araç onu kendisi okur ve kendi ayar klasörüne kaydeder. "
-        "Kurulumdan sonra araç kendi kopyasını kullanır; kullanıcı isterse indirdiği özgün dosyayı silebilir.",
-        "Yalnızca bu kılavuzdaki komutları çalıştır. Python dışında yazılım kurma; Python kurulumu gerekiyorsa kullanıcıya sor. "
-        "İndirilen klasörde başka dosyalar da vardır (ör. <font face='Kod' size='9'>Baslat</font>, <font face='Kod' size='9'>arayuz.py</font>: "
-        "asistansız kullanım için tarayıcı arayüzü); onlara ihtiyacın yok.",
-        "Bir Google tablosuna <b>ilk kez</b> yazmadan önce hangi tabloya yazacağını kullanıcıya söyle. Kullanıcı yazmanı "
-        "açıkça istediyse ayrıca onay bekleme.",
-        "Her sonuçta şunları belirt: oranlar yaklaşıktır; kargo, hizmet bedeli, stopaj, reklam ve iade dahil değildir.",
-        "Bir komut hata verirse hata mesajını oku; çoğu mesaj ne yapılacağını Türkçe olarak söyler. Aşağıdaki sorun giderme "
-        "tablosuna bak. Çözemezsen kullanıcıya mesajı aynen ilet.",
-    ], numarali=True)
-
-    h.append(CondPageBreak(95 * mm))
-    h.append(p("Kurulum", "h2"))
-    h.append(p("Windows'ta <font face='Kod' size='9'>python3</font> yerine <font face='Kod' size='9'>py</font> ya da "
-               "<font face='Kod' size='9'>python</font> kullan."))
-    h.append(kod(f"""
-# 1) Python sürümünü denetle (3.10 veya üstü olmalı)
-python3 --version
-
-# 2) Aracı indir (git yoksa ZIP adresini indirip aç;
-#    klasör zaten varsa içinde "git pull" ile güncelle)
-git clone {DEPO}.git
-#    ZIP: {ZIP}
-
-# 3) Araç klasörüne geç
-cd eticaret-agentlari/01-pazar-ve-komisyon-analizcisi
-
-# 4) Kurulumu doğrula: çıktı "Ran ... tests" ve "OK" satırlarıyla bitmeli
-#    (yaklaşık 90 test; "FAILED" görürsen dur ve kullanıcıya bildir)
-python3 -m unittest
-
-# 5) Örnek hesap: bir tablo ve "Sonuç:" satırı görmelisin
-python3 agent.py komisyon "kadın ayakkabı" 899 --maliyet 400
-"""))
-    h.append(p("Araç ek paket gerektirmez; <font face='Kod' size='9'>pip install</font> çalıştırma."))
-
-    h.append(CondPageBreak(55 * mm))
-    h.append(p("Google Sheets bağlantısı (kullanıcı tablo adresi ve anahtar dosyası verdiyse)", "h2"))
-    h.append(kod("""
-python3 agent.py sheets-kur "TABLO_ADRESI" "ANAHTAR_DOSYASININ_YOLU"
-
-# Adresi ve yolu çift tırnak içinde ver (adreste & ve # olabilir).
-# Başarılıysa "Bağlantı kuruldu: <tablo adı> (<tablo adresi>)" yazar.
-# Durumu sonradan görmek için:
-python3 agent.py sheets-durum
-"""))
-    h.append(p("Bu komut anahtarı kullanıcının ana klasöründeki <font face='Kod' size='9'>.pazar-komisyon</font> klasörüne "
-               "kaydeder ve bağlantıyı dener. Sonrasında komutlara yalnızca <font face='Kod' size='9'>--sheets</font> eklemen yeter."))
-    h.append(p("Tabloya yazma nasıl çalışır", "h2"))
-    h += maddeler([
-        "<font face='Kod' size='9'>komisyon ... --sheets</font> yalnızca <b>Komisyon</b> sekmesini yazar; "
-        "<font face='Kod' size='9'>pazar ... --sheets</font> <b>Pazar</b>, <b>Ürünler</b> ve (kategori verildiyse) <b>Komisyon</b> sekmelerini yazar.",
-        "Bu sekmeler yoksa oluşturulur, varsa <b>içerikleri yeni sonuçla değiştirilir</b>: önceki sonuç silinir. Kullanıcı eski "
-        "sonucu saklamak istiyorsa önce sekmeyi tabloda kopyalamasını ya da sonucu <font face='Kod' size='9'>--excel</font> ile kaydetmeyi öner.",
-        "Tablodaki diğer sekmelere dokunulmaz. Yazılan sekmeler tablonun en başına alınır.",
-        "Google Sheets'te her sekmeye <b>grafikler</b> de eklenir (elinize geçen tutar, kâr, fiyat bantları, markalar). Grafikler "
-        "tablodaki hücrelere bağlıdır. Excel dosyasında grafik yoktur; yalnızca tablolar ve formüller bulunur.",
-        "Komut başarılıysa son satırda <font face='Kod' size='9'>Google Sheets'e yazıldı (...): &lt;adres&gt;</font> yazar; "
-        "kullanıcıya bu adresi ver.",
-    ])
-
-    h.append(CondPageBreak(70 * mm))
-    h.append(p("Komisyon karşılaştırması", "h2"))
-    h.append(kod("""
-python3 agent.py komisyon "<ürün türü ya da kategori>" <satış fiyatı> [seçenekler]
-
-  --maliyet 400          ürün maliyeti; verilirse kâr da hesaplanır
-  --trendyol 21.5        kullanıcının kendi sözleşme oranı (yüzde);
-                         ayrıca --hepsiburada, --n11, --amazon
-  --sheets               sonucu kayıtlı Google tablosuna yazar
-  --excel sonuc.xlsx     sonucu Excel dosyası olarak kaydeder
-
-python3 agent.py kategoriler     # komisyon verisi olan kategoriler
-"""))
-    h.append(p("Kategori bulunamazsa <font face='Kod' size='9'>kategoriler</font> komutunu çalıştır, en yakın kategoriyi "
-               "kullanıcıya sor. Uygun kategori yoksa kullanıcıdan sözleşme oranlarını isteyip en yakın kategoriyle ve "
-               "<font face='Kod' size='9'>--trendyol</font> gibi seçeneklerle hesapla."))
-
-    h.append(CondPageBreak(60 * mm))
-    h.append(p("Pazar analizi", "h2"))
-    h.append(p("Araç bir ürün listesi dosyası ister (.csv). Kullanıcı ürünleri sohbete yazdıysa ya da başka biçimde verdiyse "
-               "onları aşağıdaki biçimde bir CSV dosyasına yaz. <b>Yalnızca kullanıcının verdiği değerleri kullan</b>; "
-               "bilmediğin puan ya da yorum sayısını boş bırak, uydurma. En az 8 ürün gerekir."))
-    h.append(kod("""
-ad;marka;fiyat;puan;yorum
-Erkek Parfüm 50 ml;Marka A;349,90;4,5;1250
-Kadın Parfüm 100 ml;Marka B;589;4,2;310
-"""))
-    h.append(kod("""
-python3 agent.py pazar liste.csv --kategori "erkek parfüm" --maliyet 150 --sheets
-"""))
-    h.append(p("<font face='Kod' size='9'>--kategori</font> verilirse pazarın ortanca fiyatı üzerinden komisyon "
-               "karşılaştırması da eklenir. Araç hiçbir pazaryerine bağlanmaz ve ürün verisi toplamaz; listeyi kullanıcı sağlar."))
-
-    h.append(p("Sonucu kullanıcıya nasıl aktarırsın", "h2"))
-    h += maddeler([
-        "En çok kazandıran pazaryerini ve elde kalan tutarı söyle (araç oran aralığı verdiyse aralık, tek oran verdiyse tek tutar).",
-        "Bazı pazaryerlerinde “veri yok” varsa kazananı “verisi olan pazaryerleri arasında” diye nitele.",
-        "Araç “oran aralıkları çakışıyor” diyorsa kesin bir kazanan ilan etme; kullanıcıdan sözleşme oranlarını iste.",
-        "“veri yok” yazan pazaryerlerini belirt ve kullanıcının kendi oranını verebileceğini söyle.",
-        "Tabloya yazdıysan aracın verdiği tablo adresini paylaş.",
-        "Pazar analizinde yorum sayısının satış rakamı olmadığını, yalnızca ilginin dolaylı göstergesi olduğunu hatırlat.",
-    ])
-
-    h.append(CondPageBreak(60 * mm))
-    h.append(p("Sorun giderme", "h2"))
-    h += tablo(["Mesaj ya da durum", "Yapılacak"], [
-        ["<font face='Kod' size='8.5'>python3: command not found</font> ya da sürüm 3.10'dan eski",
-         "Kullanıcıdan python.org/downloads adresinden Python kurmasını iste. Windows'ta kurulumda “Add python.exe to PATH” kutusu işaretlenmeli."],
-        ["“Tabloya erişilemedi … şu adresi Düzenleyen olarak ekleyin”",
-         "Mesajdaki e-posta adresini kullanıcıya ver; tablosunu o adresle Düzenleyen olarak paylaşmasını iste (Bölüm A, adım 5)."],
-        ["“Google Sheets API açık değil”", "Kullanıcıdan Google Cloud'da Google Sheets API için Enable düğmesine basmasını iste (Bölüm A, adım 2)."],
-        ["“Google hizmet hesabı anahtarını kabul etmedi”", "Anahtar silinmiş ya da bozulmuş olabilir. Kullanıcıdan yeni bir anahtar indirmesini iste (Bölüm A, adım 4)."],
-        ["“Bu dosya bir hizmet hesabı anahtarı değil”", "Kullanıcı yanlış dosya vermiş. Google Cloud'dan inen .json dosyasının yolunu iste."],
-        ["“Google Sheets bağlantısı kurulmamış”", "Önce <font face='Kod' size='8.5'>sheets-kur</font> komutunu çalıştır."],
-        ["“kategori bulunamadı”", "<font face='Kod' size='8.5'>python3 agent.py kategoriler</font> ile listeye bak, en yakınını kullanıcıya sor."],
-        ["“en az 8 ürün gerekir”", "Kullanıcıdan daha fazla ürün iste; 20–40 ürün daha güvenilir sonuç verir."],
-        ["Çalıştığın ortam bir komutu (özellikle tabloya yazan <font face='Kod' size='8.5'>--sheets</font> komutunu) engelliyor ya da izin istiyor",
-         "Engeli aşmaya çalışma. Kullanıcıya hangi komut için izin gerektiğini söyle; izin vermezse komutu araç klasöründe kendisinin "
-         "çalıştırabileceğini belirt ve komutu yaz."],
-        ["“Uyarı: N hücre hata gösteriyor”", "Tabloyu açıp kontrol etmesini kullanıcıya söyle ve durumu proje sayfasına bildirmesini öner."],
-    ], [0.42, 0.58])
+    # ------------------------------------------------------------ asistan için kısa not
+    # Asistanın izleyeceği ayrıntılı adımlar depodaki AGENTS.md dosyasındadır. Burada yalnızca oraya
+    # ulaşması için gereken kadarı durur; kullanıcının bu kutuyla bir şey yapması gerekmez.
+    h.append(Spacer(1, 6))
+    h.append(
+        kutu(f"Bu kılavuz sana verildiyse kullanıcı, burada anlatılan aracı bilgisayarına kurmanı ve onun adına "
+             f"kullanmanı istiyor. Aracı şu adresten indir:<br/><font face='Kod' size='9'>git clone {DEPO}.git</font><br/>"
+             f"(git yoksa: <font face='Kod' size='8'>{ZIP}</font>)<br/><br/>"
+             "İndirdiğin klasörün kökündeki <b>AGENTS.md</b> dosyasını oku ve oradaki adımları sırayla izle: kurulum, "
+             "doğrulama, Google Sheets bağlantısı ve kullanım komutları orada yazılıdır.<br/><br/>"
+             "İki kural her zaman geçerli: rakamları kendin hesaplama, araçtan al; hizmet hesabı anahtar dosyasını "
+             "açma ve içeriğini ekrana yazma, yalnızca yolunu araca ver.",
+             baslik="Yapay zekâ asistanı için not"))
 
     # ------------------------------------------------------------ kapanış
     h.append(p("Bilmeniz gerekenler", "h1"))
