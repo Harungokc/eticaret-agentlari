@@ -140,7 +140,7 @@ def _renk(onaltilik: str) -> dict:
 
 
 _TL = {"type": "NUMBER", "pattern": '#,##0.00" TL"'}
-_YUZDE = {"type": "PERCENT", "pattern": "0.0%"}
+_YUZDE = {"type": "PERCENT", "pattern": "0.0#%"}
 _SARI, _MAVI_YAZI, _LACIVERT, _ACIK_MAVI, _GRI = _renk("FFFF00"), _renk("0000FF"), _renk("1F3864"), _renk("DDEBF7"), _renk("595959")
 
 
