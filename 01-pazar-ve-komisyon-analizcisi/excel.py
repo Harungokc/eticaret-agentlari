@@ -332,7 +332,7 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
         satir += 1
     if r.ilk10_yorum_payi is not None:
         s.yaz(f"A{satir}", "En çok yorumlanan 10 ürünün yorum payı", ETIKET)
-        s.yaz(f"B{satir}", Formul(f"SUMPRODUCT(LARGE({yorum},{{1,2,3,4,5,6,7,8,9,10}}))/SUM({yorum})", r.ilk10_yorum_payi / 100), YUZDE)
+        s.yaz(f"B{satir}", Formul(f"SUMPRODUCT(LARGE({yorum},ROW($1:$10)))/SUM({yorum})", r.ilk10_yorum_payi / 100), YUZDE)
         s.yaz(f"C{satir}", f"Pazar {r.yogunluk}", DUZ)
         satir += 1
     if r.yorum_medyan is None:
@@ -365,11 +365,19 @@ def pazar_sayfasi(r: PazarRaporu, urun_sayisi: int) -> Sayfa:
     return s
 
 
+def komisyon_sayfalari(kategori_adi: str, fiyat: float, maliyet: float | None, satirlar: list[Satir], veri: dict) -> list[Sayfa]:
+    return [komisyon_sayfasi(kategori_adi, fiyat, maliyet, satirlar, veri)]
+
+
 def komisyon_dosyasi(kategori_adi: str, fiyat: float, maliyet: float | None, satirlar: list[Satir], veri: dict) -> bytes:
-    return kitap_yaz([komisyon_sayfasi(kategori_adi, fiyat, maliyet, satirlar, veri)])
+    return kitap_yaz(komisyon_sayfalari(kategori_adi, fiyat, maliyet, satirlar, veri))
 
 
 def pazar_dosyasi(rapor: PazarRaporu, urunler: list[Urun], komisyon: tuple | None, veri: dict) -> bytes:
+    return kitap_yaz(pazar_sayfalari(rapor, urunler, komisyon, veri))
+
+
+def pazar_sayfalari(rapor: PazarRaporu, urunler: list[Urun], komisyon: tuple | None, veri: dict) -> list[Sayfa]:
     """`komisyon` verilirse (kategori_adi, maliyet, satirlar) üçlüsüdür; fiyat, pazarın ortancasına bağlanır."""
     urunler = [u for u in urunler if u.fiyat and u.fiyat > 0]
     pazar = pazar_sayfasi(rapor, len(urunler))
@@ -378,4 +386,4 @@ def pazar_dosyasi(rapor: PazarRaporu, urunler: list[Urun], komisyon: tuple | Non
         kategori_adi, maliyet, satirlar = komisyon
         bag = Formul(f"'Pazar'!{pazar.ortanca_hucre}", rapor.fiyat_medyan)
         sayfalar.insert(1, komisyon_sayfasi(kategori_adi, rapor.fiyat_medyan, maliyet, satirlar, veri, fiyat_formulu=bag))
-    return kitap_yaz(sayfalar)
+    return sayfalar

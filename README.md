@@ -13,6 +13,8 @@ dosyaya çift tıklarsınız ve araç tarayıcınızda bir sayfa olarak açılı
 
 > **Gizlilik:** Araç kendi bilgisayarınızda çalışır. Girdiğiniz fiyat, maliyet ve yüklediğiniz dosya
 > internete gönderilmez; hiçbir pazaryerine bağlanılmaz.
+> Tek istisna, isteğe bağlı Google Sheets çıktısıdır: onu siz açarsanız sonuçlar yalnızca sizin
+> belirttiğiniz Google tablosuna yazılır.
 
 ---
 
@@ -230,7 +232,8 @@ Hayır. Araç ücretsizdir ve açık kaynaktır; dilediğiniz gibi kullanabilir,
 
 **Verilerim bir yere gidiyor mu?**
 Hayır. Araç internete bağlanmaz. Tarayıcıda açılan sayfa da kendi bilgisayarınızdan gelir; adres
-çubuğunda `127.0.0.1` yazması bunu gösterir.
+çubuğunda `127.0.0.1` yazması bunu gösterir. Yalnızca isteğe bağlı Google Sheets çıktısını kendiniz kurup
+kullanırsanız sonuçlar sizin Google tablonuza gönderilir.
 
 **Çift tıkladım, siyah pencere açılıp hemen kapandı.**
 Python kurulu değildir ya da Windows'ta kurulum sırasında "Add python.exe to PATH" kutusu

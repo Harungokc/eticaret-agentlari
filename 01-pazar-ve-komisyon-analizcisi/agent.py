@@ -16,7 +16,7 @@ import sys
 
 from pathlib import Path
 
-from excel import komisyon_dosyasi, pazar_dosyasi
+from excel import kitap_yaz, komisyon_sayfalari, pazar_sayfalari
 from komisyon import Satir, analiz_et, kategori_bul, kesin_mi, veri_yukle
 from okuyucu import OkumaHatasi, oku, sayi
 from pazar import PazarRaporu
@@ -189,6 +189,26 @@ def _excel_kaydet(yol: str, icerik: bytes) -> None:
     print(f"\nExcel dosyası kaydedildi: {hedef}")
 
 
+def _cikti(a, sayfalar: list) -> int:
+    """İstenmişse sonucu Excel dosyasına ve/veya Google Sheets tablosuna yazar."""
+    if a.excel:
+        _excel_kaydet(a.excel, kitap_yaz(sayfalar))
+    if a.sheets:
+        if not a.anahtar:
+            print("\nHata: Google Sheets'e yazmak için --anahtar ile hizmet hesabı anahtar dosyasını da verin.")
+            return 1
+        from sheets import SheetsHatasi, tabloya_yaz
+        try:
+            sonuc = tabloya_yaz(a.sheets, a.anahtar, sayfalar)
+        except SheetsHatasi as hata:
+            print(f"\nGoogle Sheets hatası: {hata}")
+            return 1
+        print(f"\nGoogle Sheets'e yazıldı ({', '.join(sonuc['sekmeler'])}): {sonuc['adres']}")
+        if sonuc["hatali_hucre"]:
+            print(f"Uyarı: {sonuc['hatali_hucre']} hücre hata gösteriyor; tabloyu açıp kontrol edin.")
+    return 0
+
+
 def _kendi_oranlar(a, veri: dict) -> dict[str, float]:
     return {k: getattr(a, k) for k in veri["pazaryerleri"] if getattr(a, k, None) is not None}
 
@@ -201,9 +221,7 @@ def komut_komisyon(a, veri: dict) -> int:
     maliyet = sayi_cevir(a.maliyet) if a.maliyet else None
     satirlar = analiz_et(kategori, fiyat, veri, maliyet, _kendi_oranlar(a, veri))
     print(komisyon_raporu(kategori, fiyat, satirlar, maliyet, veri))
-    if a.excel:
-        _excel_kaydet(a.excel, komisyon_dosyasi(kategori["ad"], fiyat, maliyet, satirlar, veri))
-    return 0
+    return _cikti(a, komisyon_sayfalari(kategori["ad"], fiyat, maliyet, satirlar, veri))
 
 
 def komut_pazar(a, veri: dict) -> int:
@@ -216,9 +234,7 @@ def komut_pazar(a, veri: dict) -> int:
     print(pazar_raporu(rapor, a.dosya))
     if not a.kategori:
         print('\nKomisyon karşılaştırması için --kategori ekleyin, ör. --kategori "erkek parfüm".')
-        if a.excel:
-            _excel_kaydet(a.excel, pazar_dosyasi(rapor, urunler, None, veri))
-        return 0
+        return _cikti(a, pazar_sayfalari(rapor, urunler, None, veri))
     kategori = _kategori_coz(a.kategori, veri)
     if kategori is None:
         return 1
@@ -228,9 +244,7 @@ def komut_pazar(a, veri: dict) -> int:
     print(f"KOMİSYON KARŞILAŞTIRMASI — pazarın ortanca fiyatı ({tl(fiyat)}) üzerinden\n")
     satirlar = analiz_et(kategori, fiyat, veri, maliyet, _kendi_oranlar(a, veri))
     print(komisyon_raporu(kategori, fiyat, satirlar, maliyet, veri))
-    if a.excel:
-        _excel_kaydet(a.excel, pazar_dosyasi(rapor, urunler, (kategori["ad"], maliyet, satirlar), veri))
-    return 0
+    return _cikti(a, pazar_sayfalari(rapor, urunler, (kategori["ad"], maliyet, satirlar), veri))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -241,6 +255,8 @@ def main(argv: list[str] | None = None) -> int:
     def oran_secenekleri(q):
         q.add_argument("--maliyet", help="Ürün maliyeti (TL); verilirse kâr da hesaplanır")
         q.add_argument("--excel", metavar="DOSYA", help="Sonucu Excel dosyası olarak da kaydeder, ör. sonuc.xlsx")
+        q.add_argument("--sheets", metavar="ADRES", help="Sonucu bu Google Sheets tablosuna yazar (tablonun adresi)")
+        q.add_argument("--anahtar", metavar="DOSYA", help="Google hizmet hesabı anahtarı (JSON); --sheets ile birlikte gerekir")
         for anahtar, pz in veri["pazaryerleri"].items():
             q.add_argument(f"--{anahtar}", type=float, metavar="ORAN",
                            help=f"{pz['ad']} için kendi sözleşme oranınız (%%)")

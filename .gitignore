@@ -6,3 +6,10 @@ __pycache__/
 # Kullanıcıların kaydettiği pazaryeri sayfaları depoya girmesin
 *.html
 *_files/
+
+# Google hizmet hesabı anahtarları ve kişisel ayarlar asla depoya girmemeli
+hizmet-hesabi*.json
+*service-account*.json
+*anahtar*.json
+ayarlar.json
+gizli/
