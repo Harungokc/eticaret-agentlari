@@ -1,0 +1,257 @@
+{
+  "_aciklama": "Kategori bazlı YAKLAŞIK komisyon aralıkları (yüzde). Pazaryerleri oranları herkese açık tek bir resmi tabloda yayımlamıyor; bağlayıcı oran satıcı panelindeki sözleşme ekranındadır. Buradaki değerler aşağıdaki ikincil kaynaklardan derlendi ve kaynaklar yer yer birbiriyle çelişiyor; bu yüzden tek sayı yerine aralık verildi. null = o kaynaklarda bu kategori için veri bulunamadı.",
+  "_derleme_tarihi": "2026-10-08",
+  "kaynaklar": {
+    "sentos_trendyol": {"url": "https://www.sentos.com.tr/trendyol-komisyon-oranlari/", "tarih": "2026-07-27"},
+    "sentos_hepsiburada": {"url": "https://www.sentos.com.tr/hepsiburada-komisyon-oranlari-ve-magaza-acilis-ucretleri/", "tarih": "2026-05-08"},
+    "sentos_n11": {"url": "https://www.sentos.com.tr/n11-komisyon-oranlari/", "tarih": "2026-02-27"},
+    "ticimax": {"url": "https://www.ticimax.com/blog/pazaryerleri-komisyon-oranlari", "tarih": "2026-04-20"},
+    "parasut_trendyol": {"url": "https://www.parasut.com/blog/trendyol-magaza-komisyon-oranlari", "tarih": "2026"},
+    "ideasoft_hepsiburada": {"url": "https://www.ideasoft.com.tr/hepsiburada-komisyon-oranlari/", "tarih": "2026"},
+    "sentos_amazon": {"url": "https://www.sentos.com.tr/amazon-turkiye-komisyon-oranlari/", "tarih": "2026"}
+  },
+  "pazaryerleri": {
+    "trendyol": {
+      "ad": "Trendyol",
+      "ek_kesinti_orani": 0.0,
+      "not": "Oran alt kategoriye, markaya ve satıcı seviyesine göre değişir. Sabit hizmet bedeli ve kargo bu hesaba dahil değil."
+    },
+    "hepsiburada": {
+      "ad": "Hepsiburada",
+      "ek_kesinti_orani": 0.0,
+      "not": "Komisyon KDV dahil satış fiyatı üzerinden hesaplanır; komisyon faturasına ayrıca KDV eklenir. Hizmet bedeli ve kargo bu hesaba dahil değil."
+    },
+    "n11": {
+      "ad": "n11",
+      "ek_kesinti_orani": 2.0,
+      "not": "Ek kesinti: %1 pazarlama hizmet bedeli + %0,67 pazaryeri hizmet bedeli, ikisi de + KDV (toplam yaklaşık %2,0). Kargo dahil değil."
+    },
+    "amazon": {
+      "ad": "Amazon Türkiye",
+      "ek_kesinti_orani": 0.0,
+      "not": "Komisyon, alıcının ödediği toplam tutar üzerinden hesaplanır. Basına göre 1 Mayıs 2026'dan itibaren Amazon Lojistik (FBA) ürünlerinde satış komisyonu alınmıyor; koşulları Amazon'dan doğrulayın. Aylık abonelik ve lojistik ücretleri dahil değil."
+    }
+  },
+  "kategoriler": [
+    {
+      "anahtar": "giyim",
+      "ad": "Giyim",
+      "es_anlamlilar": ["kadın giyim", "erkek giyim", "çocuk giyim", "tekstil", "elbise", "tişört", "pantolon", "kazak", "gömlek", "mont", "ceket", "eşofman", "pijama", "iç giyim", "tesettür"],
+      "oranlar": {
+        "trendyol": {"min": 17.0, "max": 22.5, "kaynak": ["sentos_trendyol", "ticimax", "parasut_trendyol"]},
+        "hepsiburada": {"min": 18.0, "max": 18.0, "kaynak": ["sentos_hepsiburada", "ticimax"]},
+        "n11": {"min": 20.0, "max": 21.0, "kaynak": ["sentos_n11", "ticimax"]},
+        "amazon": {"min": 15.0, "max": 15.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "ayakkabi",
+      "ad": "Ayakkabı",
+      "es_anlamlilar": ["sneaker", "spor ayakkabı", "bot", "çizme", "terlik", "sandalet", "topuklu", "babet", "kadın ayakkabı", "erkek ayakkabı"],
+      "oranlar": {
+        "trendyol": {"min": 21.5, "max": 22.5, "kaynak": ["parasut_trendyol"]},
+        "hepsiburada": {"min": 18.0, "max": 19.49, "kaynak": ["sentos_hepsiburada", "ticimax"]},
+        "n11": {"min": 15.0, "max": 20.34, "kaynak": ["ticimax", "sentos_n11"]},
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "canta",
+      "ad": "Çanta",
+      "es_anlamlilar": ["kadın çanta", "sırt çantası", "cüzdan", "valiz", "el çantası", "omuz çantası"],
+      "oranlar": {
+        "trendyol": {"min": 21.5, "max": 22.5, "kaynak": ["parasut_trendyol"]},
+        "hepsiburada": {"min": 18.0, "max": 18.0, "kaynak": ["ticimax", "ideasoft_hepsiburada"]},
+        "n11": {"min": 15.0, "max": 18.0, "kaynak": ["ticimax", "sentos_n11"]},
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "aksesuar_taki",
+      "ad": "Aksesuar ve takı",
+      "es_anlamlilar": ["aksesuar", "takı", "kolye", "küpe", "bileklik", "yüzük", "saat", "güneş gözlüğü", "kemer", "şapka", "atkı", "gümüş takı"],
+      "oranlar": {
+        "trendyol": {"min": 22.0, "max": 23.0, "kaynak": ["ticimax"]},
+        "hepsiburada": {"min": 18.0, "max": 18.64, "kaynak": ["ticimax"]},
+        "n11": {"min": 20.34, "max": 21.0, "kaynak": ["sentos_n11"]},
+        "amazon": {"min": 15.0, "max": 15.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "cep_telefonu",
+      "ad": "Cep telefonu",
+      "es_anlamlilar": ["telefon", "akıllı telefon", "iphone", "android telefon", "smartphone"],
+      "oranlar": {
+        "trendyol": {"min": 5.0, "max": 7.0, "kaynak": ["sentos_trendyol", "parasut_trendyol"]},
+        "hepsiburada": {"min": 4.5, "max": 7.0, "kaynak": ["sentos_hepsiburada", "ticimax", "ideasoft_hepsiburada"]},
+        "n11": null,
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "telefon_aksesuar",
+      "ad": "Telefon kılıfı ve aksesuarı",
+      "es_anlamlilar": ["telefon kılıfı", "kılıf", "ekran koruyucu", "şarj aleti", "şarj kablosu", "powerbank", "telefon yedek parça", "kulaklık kılıfı"],
+      "oranlar": {
+        "trendyol": {"min": 27.0, "max": 27.0, "kaynak": ["sentos_trendyol"]},
+        "hepsiburada": {"min": 23.0, "max": 23.0, "kaynak": ["sentos_hepsiburada"]},
+        "n11": null,
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "bilgisayar_tablet",
+      "ad": "Bilgisayar ve tablet",
+      "es_anlamlilar": ["bilgisayar", "laptop", "notebook", "dizüstü", "tablet", "masaüstü bilgisayar", "monitör"],
+      "oranlar": {
+        "trendyol": {"min": 7.0, "max": 10.0, "kaynak": ["parasut_trendyol"]},
+        "hepsiburada": {"min": 7.0, "max": 17.0, "kaynak": ["ideasoft_hepsiburada", "ticimax"]},
+        "n11": {"min": 5.5, "max": 8.0, "kaynak": ["ticimax"]},
+        "amazon": {"min": 6.0, "max": 6.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "televizyon",
+      "ad": "Televizyon",
+      "es_anlamlilar": ["tv", "smart tv", "led tv", "oled"],
+      "oranlar": {
+        "trendyol": {"min": 8.0, "max": 8.0, "kaynak": ["sentos_trendyol"]},
+        "hepsiburada": {"min": 6.0, "max": 6.78, "kaynak": ["sentos_hepsiburada", "ideasoft_hepsiburada"]},
+        "n11": null,
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "beyaz_esya",
+      "ad": "Beyaz eşya",
+      "es_anlamlilar": ["buzdolabı", "çamaşır makinesi", "bulaşık makinesi", "fırın", "kurutma makinesi", "derin dondurucu", "ankastre"],
+      "oranlar": {
+        "trendyol": {"min": 9.0, "max": 11.0, "kaynak": ["parasut_trendyol"]},
+        "hepsiburada": null,
+        "n11": {"min": 12.0, "max": 13.0, "kaynak": ["sentos_n11"]},
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "kozmetik",
+      "ad": "Kozmetik ve kişisel bakım",
+      "es_anlamlilar": ["kozmetik", "makyaj", "cilt bakımı", "parfüm", "şampuan", "saç bakımı", "kişisel bakım", "dermokozmetik", "güneş kremi", "ruj", "krem"],
+      "oranlar": {
+        "trendyol": {"min": 12.0, "max": 17.5, "kaynak": ["ticimax"]},
+        "hepsiburada": {"min": 15.25, "max": 17.0, "kaynak": ["ticimax", "ideasoft_hepsiburada"]},
+        "n11": {"min": 14.0, "max": 16.0, "kaynak": ["sentos_n11", "ticimax"]},
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "anne_bebek",
+      "ad": "Anne, bebek ve çocuk",
+      "es_anlamlilar": ["bebek", "bebek bezi", "bebek arabası", "mama", "biberon", "emzirme", "bebek giyim", "çocuk ürünleri"],
+      "oranlar": {
+        "trendyol": {"min": 16.5, "max": 16.5, "kaynak": ["ticimax"]},
+        "hepsiburada": {"min": 11.0, "max": 18.0, "kaynak": ["ideasoft_hepsiburada"]},
+        "n11": {"min": 12.0, "max": 21.0, "kaynak": ["sentos_n11"]},
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "ev_tekstili",
+      "ad": "Ev tekstili",
+      "es_anlamlilar": ["nevresim", "havlu", "perde", "halı", "battaniye", "yastık", "yorgan", "çarşaf", "bornoz", "masa örtüsü"],
+      "oranlar": {
+        "trendyol": null,
+        "hepsiburada": {"min": 18.0, "max": 18.0, "kaynak": ["ideasoft_hepsiburada"]},
+        "n11": {"min": 20.0, "max": 20.0, "kaynak": ["sentos_n11"]},
+        "amazon": {"min": 13.0, "max": 13.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "mobilya_dekorasyon",
+      "ad": "Mobilya ve dekorasyon",
+      "es_anlamlilar": ["mobilya", "dekorasyon", "koltuk", "masa", "sandalye", "dolap", "gardırop", "kitaplık", "ayna", "tablo", "aydınlatma", "avize", "lamba"],
+      "oranlar": {
+        "trendyol": null,
+        "hepsiburada": {"min": 18.0, "max": 22.0, "kaynak": ["sentos_hepsiburada", "ticimax"]},
+        "n11": {"min": 21.0, "max": 23.0, "kaynak": ["sentos_n11"]},
+        "amazon": {"min": 13.0, "max": 13.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "mutfak_zuccaciye",
+      "ad": "Mutfak ve züccaciye",
+      "es_anlamlilar": ["züccaciye", "mutfak", "tencere", "tava", "yemek takımı", "bardak", "çatal bıçak", "saklama kabı", "termos"],
+      "oranlar": {
+        "trendyol": null,
+        "hepsiburada": {"min": 18.0, "max": 18.0, "kaynak": ["ideasoft_hepsiburada"]},
+        "n11": null,
+        "amazon": {"min": 13.0, "max": 13.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "oyuncak",
+      "ad": "Oyuncak",
+      "es_anlamlilar": ["oyuncak", "lego", "puzzle", "oyuncak bebek", "kutu oyunu", "oyuncak araba"],
+      "oranlar": {
+        "trendyol": {"min": 20.0, "max": 22.0, "kaynak": ["parasut_trendyol"]},
+        "hepsiburada": {"min": 18.0, "max": 18.0, "kaynak": ["ticimax", "ideasoft_hepsiburada"]},
+        "n11": null,
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "spor_outdoor",
+      "ad": "Spor ve outdoor",
+      "es_anlamlilar": ["spor", "outdoor", "kamp", "fitness", "bisiklet", "yoga", "koşu", "çadır", "dambıl", "spor ekipmanı"],
+      "oranlar": {
+        "trendyol": {"min": 10.5, "max": 15.0, "kaynak": ["ticimax"]},
+        "hepsiburada": null,
+        "n11": {"min": 12.0, "max": 15.0, "kaynak": ["ticimax"]},
+        "amazon": {"min": 10.0, "max": 10.0, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "kitap_kirtasiye",
+      "ad": "Kitap ve kırtasiye",
+      "es_anlamlilar": ["kitap", "kırtasiye", "defter", "kalem", "roman", "ders kitabı", "okul çantası"],
+      "oranlar": {
+        "trendyol": {"min": 12.0, "max": 15.0, "kaynak": ["parasut_trendyol"]},
+        "hepsiburada": null,
+        "n11": null,
+        "amazon": {"min": 10.2, "max": 10.2, "kaynak": ["sentos_amazon"]}
+      }
+    },
+    {
+      "anahtar": "supermarket",
+      "ad": "Süpermarket ve gıda",
+      "es_anlamlilar": ["süpermarket", "gıda", "market", "deterjan", "temizlik", "kahve", "çay", "atıştırmalık", "evcil hayvan maması"],
+      "oranlar": {
+        "trendyol": {"min": 8.0, "max": 18.0, "kaynak": ["ticimax"]},
+        "hepsiburada": null,
+        "n11": null,
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "altin",
+      "ad": "Altın (yatırım)",
+      "es_anlamlilar": ["altın", "gram altın", "çeyrek altın", "külçe altın", "yatırım altını"],
+      "oranlar": {
+        "trendyol": null,
+        "hepsiburada": {"min": 4.0, "max": 6.0, "kaynak": ["sentos_hepsiburada", "ticimax"]},
+        "n11": {"min": 5.0, "max": 5.0, "kaynak": ["ticimax"]},
+        "amazon": null
+      }
+    },
+    {
+      "anahtar": "otomotiv",
+      "ad": "Otomotiv ve motosiklet",
+      "es_anlamlilar": ["otomotiv", "oto aksesuar", "araç", "lastik", "motor yağı", "motosiklet", "oto yedek parça"],
+      "oranlar": {
+        "trendyol": null,
+        "hepsiburada": null,
+        "n11": {"min": 0.0, "max": 14.0, "kaynak": ["ticimax", "sentos_n11"]},
+        "amazon": null
+      }
+    }
+  ]
+}
