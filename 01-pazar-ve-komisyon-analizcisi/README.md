@@ -14,7 +14,7 @@ E-ticaret satıcıları için iki soruya cevap veren açık kaynak bir analiz ar
 Python 3.10 veya üstü yeterli; ek paket gerekmez.
 
 ```bash
-git clone https://github.com/<kullanıcı>/eticaret-agentlari.git
+git clone https://github.com/Harungokc/eticaret-agentlari.git
 cd eticaret-agentlari/01-pazar-ve-komisyon-analizcisi
 python agent.py pazar ornek/ornek_urunler.csv --kategori "erkek parfüm"
 ```
