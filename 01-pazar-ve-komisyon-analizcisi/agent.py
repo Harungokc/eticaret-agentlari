@@ -5,6 +5,7 @@ Kullanım:
     python agent.py komisyon "telefon kılıfı" 249 --maliyet 80 --trendyol 26
     python agent.py pazar arama.html --kategori "erkek parfüm"
     python agent.py pazar urunler.csv --kategori kozmetik --maliyet 180
+    python agent.py komisyon giyim 599 --excel sonuc.xlsx
     python agent.py kategoriler
 """
 
@@ -13,6 +14,9 @@ from __future__ import annotations
 import argparse
 import sys
 
+from pathlib import Path
+
+from excel import komisyon_dosyasi, pazar_dosyasi
 from komisyon import Satir, analiz_et, kategori_bul, kesin_mi, veri_yukle
 from okuyucu import OkumaHatasi, oku, sayi
 from pazar import PazarRaporu
@@ -177,6 +181,14 @@ def _kategori_coz(metin: str, veri: dict):
     return e.kategori
 
 
+def _excel_kaydet(yol: str, icerik: bytes) -> None:
+    hedef = Path(yol)
+    if hedef.suffix.lower() != ".xlsx":
+        hedef = hedef.with_suffix(".xlsx")
+    hedef.write_bytes(icerik)
+    print(f"\nExcel dosyası kaydedildi: {hedef}")
+
+
 def _kendi_oranlar(a, veri: dict) -> dict[str, float]:
     return {k: getattr(a, k) for k in veri["pazaryerleri"] if getattr(a, k, None) is not None}
 
@@ -189,18 +201,23 @@ def komut_komisyon(a, veri: dict) -> int:
     maliyet = sayi_cevir(a.maliyet) if a.maliyet else None
     satirlar = analiz_et(kategori, fiyat, veri, maliyet, _kendi_oranlar(a, veri))
     print(komisyon_raporu(kategori, fiyat, satirlar, maliyet, veri))
+    if a.excel:
+        _excel_kaydet(a.excel, komisyon_dosyasi(kategori["ad"], fiyat, maliyet, satirlar, veri))
     return 0
 
 
 def komut_pazar(a, veri: dict) -> int:
     try:
-        rapor = pazar_analiz_et(oku(a.dosya))
+        urunler = oku(a.dosya)
+        rapor = pazar_analiz_et(urunler)
     except (OkumaHatasi, ValueError) as hata:
         print(f"Hata: {hata}")
         return 1
     print(pazar_raporu(rapor, a.dosya))
     if not a.kategori:
         print('\nKomisyon karşılaştırması için --kategori ekleyin, ör. --kategori "erkek parfüm".')
+        if a.excel:
+            _excel_kaydet(a.excel, pazar_dosyasi(rapor, urunler, None, veri))
         return 0
     kategori = _kategori_coz(a.kategori, veri)
     if kategori is None:
@@ -211,6 +228,8 @@ def komut_pazar(a, veri: dict) -> int:
     print(f"KOMİSYON KARŞILAŞTIRMASI — pazarın ortanca fiyatı ({tl(fiyat)}) üzerinden\n")
     satirlar = analiz_et(kategori, fiyat, veri, maliyet, _kendi_oranlar(a, veri))
     print(komisyon_raporu(kategori, fiyat, satirlar, maliyet, veri))
+    if a.excel:
+        _excel_kaydet(a.excel, pazar_dosyasi(rapor, urunler, (kategori["ad"], maliyet, satirlar), veri))
     return 0
 
 
@@ -221,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
 
     def oran_secenekleri(q):
         q.add_argument("--maliyet", help="Ürün maliyeti (TL); verilirse kâr da hesaplanır")
+        q.add_argument("--excel", metavar="DOSYA", help="Sonucu Excel dosyası olarak da kaydeder, ör. sonuc.xlsx")
         for anahtar, pz in veri["pazaryerleri"].items():
             q.add_argument(f"--{anahtar}", type=float, metavar="ORAN",
                            help=f"{pz['ad']} için kendi sözleşme oranınız (%%)")

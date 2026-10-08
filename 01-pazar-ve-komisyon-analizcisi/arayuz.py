@@ -8,6 +8,7 @@ Sunucu yalnızca bu bilgisayardan erişilebilir (127.0.0.1) ve internete hiçbir
 
 from __future__ import annotations
 
+import base64
 import json
 import sys
 import tempfile
@@ -18,6 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from agent import aralik, sayi_cevir, tl, tl0, yuzde
+from excel import komisyon_dosyasi, pazar_dosyasi
 from komisyon import Satir, analiz_et, kesin_mi, veri_yukle
 from okuyucu import OkumaHatasi, oku
 from pazar import PazarRaporu
@@ -177,16 +179,22 @@ def pazar_html(r: PazarRaporu) -> str:
 
 # ---------------------------------------------------------------- işlemler
 
-def islem_komisyon(g: dict) -> str:
+def _yanit(html: str, excel: bytes, dosya_adi: str) -> dict:
+    return {"html": html, "excel": base64.b64encode(excel).decode("ascii"), "excel_adi": dosya_adi}
+
+
+def islem_komisyon(g: dict) -> dict:
     kategori = _kategori(g.get("kategori"))
     fiyat = _sayi(g.get("fiyat"), "Satış fiyatı", zorunlu=True)
     if fiyat <= 0:
         raise GirdiHatasi("Satış fiyatı sıfırdan büyük olmalı.")
     maliyet = _sayi(g.get("maliyet"), "Ürün maliyeti")
-    return komisyon_html(kategori, fiyat, analiz_et(kategori, fiyat, VERI, maliyet, _oranlar(g.get("oranlar"))), maliyet)
+    satirlar = analiz_et(kategori, fiyat, VERI, maliyet, _oranlar(g.get("oranlar")))
+    return _yanit(komisyon_html(kategori, fiyat, satirlar, maliyet),
+                  komisyon_dosyasi(kategori["ad"], fiyat, maliyet, satirlar, VERI), "komisyon-karsilastirmasi.xlsx")
 
 
-def islem_pazar(g: dict) -> str:
+def islem_pazar(g: dict) -> dict:
     ad, icerik = str(g.get("dosya_adi") or ""), g.get("icerik")
     if not ad or not isinstance(icerik, str) or not icerik.strip():
         raise GirdiHatasi("Lütfen bir dosya seçin.")
@@ -198,20 +206,23 @@ def islem_pazar(g: dict) -> str:
         gecici.write(icerik)
         yol = Path(gecici.name)
     try:
-        rapor = pazar_analiz_et(oku(yol))
+        urunler = oku(yol)
+        rapor = pazar_analiz_et(urunler)
     except (OkumaHatasi, ValueError) as hata:
         raise GirdiHatasi(str(hata)) from None
     finally:
         yol.unlink(missing_ok=True)
 
     cikti = pazar_html(rapor)
+    komisyon = None
     if g.get("kategori"):
         kategori = _kategori(g["kategori"])
         maliyet = _sayi(g.get("maliyet"), "Ürün maliyeti")
         satirlar = analiz_et(kategori, rapor.fiyat_medyan, VERI, maliyet, _oranlar(g.get("oranlar")))
         cikti += ("<hr><p><b>Komisyon karşılaştırması</b> — pazarın ortanca fiyatı üzerinden:</p>"
                   + komisyon_html(kategori, rapor.fiyat_medyan, satirlar, maliyet))
-    return cikti
+        komisyon = (kategori["ad"], maliyet, satirlar)
+    return _yanit(cikti, pazar_dosyasi(rapor, urunler, komisyon, VERI), "pazar-analizi.xlsx")
 
 
 ISLEMLER = {"/api/komisyon": islem_komisyon, "/api/pazar": islem_pazar}
@@ -251,6 +262,8 @@ details{margin-top:14px} summary{cursor:pointer;color:var(--ana);font-weight:600
 details .iki label{font-weight:400}
 .gonder{margin-top:18px;padding:12px 20px;border:0;border-radius:8px;background:var(--ana);color:var(--ana-yazi);font:inherit;font-weight:600;cursor:pointer}
 .gonder:disabled{opacity:.6;cursor:wait}
+.indir{display:inline-block;margin:6px 0 4px;padding:10px 16px;border:1px solid var(--ana);border-radius:8px;color:var(--ana);font-weight:600;text-decoration:none}
+.indir-not{color:var(--soluk);font-size:.9rem;margin:0 0 12px}
 .tablo{overflow-x:auto} table{border-collapse:collapse;width:100%;margin:6px 0}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--cizgi);white-space:nowrap}
 th{font-size:.85rem;color:var(--soluk);font-weight:600}
@@ -330,7 +343,17 @@ document.querySelectorAll('form').forEach(form => form.addEventListener('submit'
     const yanit = await fetch(form.dataset.uc, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(govde)});
     const veri = await yanit.json();
     if (veri.hata) return hataGoster(veri.hata);
-    cikti.innerHTML = veri.html; cikti.hidden = false; cikti.scrollIntoView({behavior: 'smooth', block: 'start'});
+    cikti.innerHTML = veri.html;
+    if (veri.excel) {
+      const ikili = Uint8Array.from(atob(veri.excel), k => k.charCodeAt(0));
+      const baglanti = document.createElement('a');
+      baglanti.href = URL.createObjectURL(new Blob([ikili], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+      baglanti.download = veri.excel_adi; baglanti.className = 'indir'; baglanti.textContent = 'Excel olarak indir';
+      const aciklama = document.createElement('p'); aciklama.className = 'indir-not';
+      aciklama.textContent = 'Excel dosyasında sarı hücreleri (fiyat, maliyet, oranlar) değiştirdiğinizde sonuçlar yeniden hesaplanır.';
+      cikti.prepend(aciklama); cikti.prepend(baglanti);
+    }
+    cikti.hidden = false; cikti.scrollIntoView({behavior: 'smooth', block: 'start'});
   } catch (e) {
     hataGoster('Program yanıt vermedi. Siyah pencere açık mı? Kapattıysanız Başlat dosyasına yeniden çift tıklayın.');
   } finally { dugme.disabled = false; dugme.textContent = eski; }
@@ -402,7 +425,7 @@ class Istek(BaseHTTPRequestHandler):
         except (ValueError, UnicodeDecodeError):
             return self._json(400, {"hata": "İstek okunamadı."})
         try:
-            self._json(200, {"html": islem(girdi)})
+            self._json(200, islem(girdi))
         except GirdiHatasi as hata:
             self._json(200, {"hata": str(hata)})
         except Exception:  # beklenmeyen hata: ayrıntı terminale, kullanıcıya sade mesaj

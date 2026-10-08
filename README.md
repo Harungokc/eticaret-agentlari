@@ -1,7 +1,8 @@
 # Pazar ve Komisyon Analizcisi
 
 **E-ticaret satıcıları için ücretsiz, açık kaynak analiz aracı.** Ürününüzü hangi pazaryerinde
-satarsanız elinize ne kalacağını ve girdiğiniz pazarın nasıl göründüğünü gösterir.
+satarsanız elinize ne kalacağını ve girdiğiniz pazarın nasıl göründüğünü gösterir; sonucu üzerinde
+oynayabileceğiniz bir Excel dosyası olarak da verir.
 
 [![Testler](https://github.com/Harungokc/eticaret-agentlari/actions/workflows/test.yml/badge.svg)](https://github.com/Harungokc/eticaret-agentlari/actions/workflows/test.yml)
 [![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-blue.svg)](LICENSE)
@@ -56,6 +57,16 @@ pazarın fotoğrafını çıkarır:
 
 Kategori de seçerseniz, pazarın ortanca fiyatı üzerinden komisyon karşılaştırması aynı sayfaya
 eklenir.
+
+### 3. Excel çıktısı
+
+Her sonucu **Excel olarak indir** düğmesiyle bilgisayarınıza kaydedebilirsiniz. İnen dosya bir
+şablon gibi çalışır: sarı hücrelerdeki satış fiyatını, maliyeti veya komisyon oranlarını
+değiştirdiğinizde komisyon, elinize geçen tutar ve kâr Excel'in içinde yeniden hesaplanır. Böylece
+"fiyatı 50 TL artırsam ne olur?" sorusunu aracı yeniden çalıştırmadan deneyebilirsiniz.
+
+Pazar analizinde dosya üç sayfadan oluşur: pazar özeti, komisyon karşılaştırması ve yüklediğiniz
+ürün listesi.
 
 ---
 
@@ -151,6 +162,9 @@ Sözleşmenizdeki gerçek komisyon oranını biliyorsanız **Kendi komisyon oran
 yazın. O zaman yaklaşık aralık yerine sizin oranınız kullanılır ve sonuç kesinleşir. Oranınızı
 satıcı panelinizdeki sözleşme veya komisyon ekranında bulabilirsiniz.
 
+Sonucun üstündeki **Excel olarak indir** düğmesi aynı tabloyu Excel dosyası olarak verir. Dosyadaki
+sarı hücreleri değiştirerek farklı fiyat ve oranları deneyebilirsiniz.
+
 ### Pazar analizi
 
 Bu bölüm bir ürün listesi ister. Listeyi Excel'de hazırlayabilirsiniz:
@@ -234,7 +248,12 @@ Size en yakın kategoriyi seçip **Kendi komisyon oranlarım** bölümüne gerç
 kategori önerinizi [buradan](https://github.com/Harungokc/eticaret-agentlari/issues) iletebilirsiniz.
 
 **Excel dosyam (.xlsx) neden kabul edilmiyor?**
-Araç şimdilik CSV okur. Excel'de **Farklı Kaydet → CSV UTF-8** seçeneğiyle kaydedin.
+Araç ürün listesini şimdilik CSV olarak okur. Excel'de **Farklı Kaydet → CSV UTF-8** seçeneğiyle
+kaydedin. (Sonuçlar ise Excel dosyası olarak indirilebilir.)
+
+**İndirdiğim Excel dosyasında hangi hücreleri değiştirebilirim?**
+Sarı hücreleri: satış fiyatı, ürün maliyeti ve komisyon oranları. Diğer hücreler formüldür ve
+kendiliğinden güncellenir. Dosyanın üstünde bunu hatırlatan bir not vardır.
 
 **Yapay zekâ kullanıyor mu?**
 Hayır. Bütün sonuçlar düz hesapla üretilir; her sayı girdiğiniz veriden ve komisyon tablosundan
@@ -281,6 +300,7 @@ cd eticaret-agentlari/01-pazar-ve-komisyon-analizcisi
 
 python arayuz.py                                              # tarayıcı arayüzü
 python agent.py komisyon "kadın ayakkabı" 899 --maliyet 400   # komut satırı
+python agent.py komisyon giyim 599 --excel sonuc.xlsx         # Excel çıktısıyla
 python agent.py pazar ornek/ornek_urunler.csv --kategori "erkek parfüm"
 python -m unittest                                            # testler
 ```
@@ -290,6 +310,7 @@ python -m unittest                                            # testler
 | `komisyon.py` | Kategori eşleştirme ve komisyon hesabı |
 | `pazar.py` | Ürün listesinden pazar analizi |
 | `okuyucu.py` | CSV, JSON ve kaydedilmiş sayfa okuma |
+| `excel.py` | Excel dosyası üretimi (ek paket kullanmadan) |
 | `arayuz.py` | Yalnızca `127.0.0.1` üzerinde çalışan tarayıcı arayüzü |
 | `agent.py` | Komut satırı |
 | `veri/komisyon.json` | Komisyon oranları ve kaynakları |
