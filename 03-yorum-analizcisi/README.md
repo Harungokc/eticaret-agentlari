@@ -14,6 +14,8 @@ yanını görürsünüz. Sonucu sohbette özetler ve **Excel dosyası** olarak v
 
 ## Claude ya da ChatGPT sohbetinde kullanın
 
+Serideki bütün araçları tek seferde yüklemek için [tek paketi](../README.md) kullanabilirsiniz. Yalnızca bu aracı isterseniz:
+
 **1. Paketi indirin:** [yorum-analizcisi.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/yorum-analizcisi.zip) (ZIP'ten çıkarmayın)
 
 **2. Asistanınıza yükleyin:**

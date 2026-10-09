@@ -13,6 +13,8 @@ açık kaynak (MIT). Kod bilmeniz gerekmez.
 
 ## Claude ya da ChatGPT sohbetinde kullanın
 
+Serideki bütün araçları tek seferde yüklemek için [tek paketi](../README.md) kullanabilirsiniz. Yalnızca bu aracı isterseniz:
+
 **1. Paketi indirin:** [urun-fiyat-rakip-analizcisi.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/urun-fiyat-rakip-analizcisi.zip) (ZIP'ten çıkarmayın)
 
 **2. Asistanınıza yükleyin:**

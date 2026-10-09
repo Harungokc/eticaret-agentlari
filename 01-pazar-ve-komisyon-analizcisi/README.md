@@ -15,7 +15,7 @@ pazaryerinde elinize ne kalacak**. Bu araç ikisini birlikte hesaplar ve sonucu 
 
 ## Başlatma
 
-İlk kez kuruyorsanız adım adım anlatım [ana sayfadadır](../README.md#kurulum). Kurulum bittiyse bu
+İlk kez kuruyorsanız adım adım anlatım [ayrıntılı kılavuzdadır](AYRINTILI-KILAVUZ.md#kurulum). Kurulum bittiyse bu
 klasördeki dosyaya çift tıklamanız yeterli:
 
 | Bilgisayarınız | Çift tıklayacağınız dosya |
@@ -122,8 +122,8 @@ içermez.
 - **Pazar analizi satış rakamı içermez.** Yorum sayısı ilginin dolaylı göstergesidir; ciro tahmini
   yapılmaz ve analiz yüklediğiniz listeyle sınırlıdır.
 
-Daha fazlası için ana sayfadaki [Sonuçları nasıl okurum](../README.md#sonuçları-nasıl-okurum) ve
-[Sık sorulan sorular](../README.md#sık-sorulan-sorular) bölümlerine bakın.
+Daha fazlası için ayrıntılı kılavuzdaki [Sonuçları nasıl okurum](AYRINTILI-KILAVUZ.md#sonuçları-nasıl-okurum) ve
+[Sık sorulan sorular](AYRINTILI-KILAVUZ.md#sık-sorulan-sorular) bölümlerine bakın.
 
 ---
 

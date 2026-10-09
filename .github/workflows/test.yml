@@ -17,7 +17,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.10", "3.13"]
-        arac: ["01-pazar-ve-komisyon-analizcisi", "02-urun-fiyat-ve-rakip-analizcisi", "03-yorum-analizcisi"]
+        arac: ["01-pazar-ve-komisyon-analizcisi", "02-urun-fiyat-ve-rakip-analizcisi", "03-yorum-analizcisi", "04-satis-bolge-analizcisi"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

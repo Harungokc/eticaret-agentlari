@@ -1,6 +1,6 @@
 # E-ticaret Analiz Agent'ları — Seri Planı
 
-On agent'lık seri. Her biri kendi klasöründe, tek başına çalışır. 1 ve 2 tek araçta, 3, 4 ve 5 tek araçta birleştirildi.
+On agent'lık seri ve seriye sonradan eklenen araçlar. Her biri kendi klasöründe, tek başına çalışır. 1 ve 2 tek araçta, 3, 4 ve 5 tek araçta birleştirildi.
 
 | # | Agent | Girdi | Çıktı | Durum |
 |---|---|---|---|---|
@@ -14,6 +14,7 @@ On agent'lık seri. Her biri kendi klasöründe, tek başına çalışır. 1 ve 
 | 8 | Trend ve Sezon Analizcisi | Kategori | Talebin arttığı aylar, yükselen ürün türleri, kampanya takvimi | Bekliyor |
 | 9 | Kârlılık Simülatörü | Maliyet, fiyat, kategori, desi | Senaryolara göre ürün başına net kâr, zarar çizgisi | Bekliyor |
 | 10 | Yeni Ürün Fırsat Agent'ı | İlgilenilen alan | Talebi yüksek, satıcısı az ürün türleri; ortalama fiyat ve rekabet düzeyi | Bekliyor |
+| + | Satış Bölge Analizcisi | Sipariş listesi (il, ilçe, tutar) | İl, bölge ve ilçe bazında sipariş, ciro, ortalama sepet, iade oranı | Yayımlandı: `04-satis-bolge-analizcisi/` |
 
 ## Veri notu
 
