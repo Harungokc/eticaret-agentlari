@@ -74,7 +74,8 @@ python3 ARAC/agent.py analiz CIKTI/yorumlar.csv \
 
 - `--konu "Ad=kelime1,kelime2"`: kelimeler kök olarak verilir ve kelimenin başında aranır (`sızdır`
   → sızdırıyor, sızdırma). Ünsüz yumuşaması için iki biçimi de yaz (`kapak,kapağ`).
-- 1–4 ek konu yeterlidir. Kelimeleri yalnızca yorumlarda gerçekten geçenlerden seç.
+- 1–4 ek konu yeterlidir. Kelimeleri yalnızca yorumlarda gerçekten geçenlerden seç. Çok kısa kök verme
+  (`su`, `göz`): ilgisiz kelimelere de takılır; `su geçir`, `ıslan` gibi ayırt edici olanları kullan.
 - Hazır konuları görmek için: `python3 ARAC/agent.py konular`
 
 Aracın çalıştığını göstermek için örnek (uydurma) yorumlar: `ARAC/ornek/ornek_yorumlar.csv`. Örnek
@@ -93,7 +94,9 @@ sonucu kullanıcının ürününe aitmiş gibi sunma.
 5. **Övülenler:** ürün açıklamasında öne çıkarılabilecek güçlü yanlar.
 
 Araç bir "Not" yazdıysa aktar. Sınıflandırmada bariz bir hata görürsen (ör. ironik bir yorum övgü
-sayılmış) bunu kullanıcıya söyle; sayıyı sessizce değiştirme.
+sayılmış, açık bir şikâyet sayılmamış) aracın sayısını aynen ver ve yanına "aracın kaçırdığını
+gördüğüm" diye kendi notunu ekle; sayıyı sessizce değiştirme. "Hazır konulara girmeyen şikâyetler"
+bölümü yorum değil cümle listeler; aynı yorumdan iki cümle gelebilir.
 
 Excel dosyasını indirilebilir dosya olarak ver. "Yorumlar" sayfasında her yorum etiketleriyle durur;
 kullanıcı süzgeçle örneğin yalnızca kargo şikâyetlerini okuyabilir. Google Sheets'te açmak için:

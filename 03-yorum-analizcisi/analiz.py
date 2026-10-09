@@ -24,7 +24,7 @@ KONULAR: dict[str, tuple[str, ...]] = {
     "Fiyat": ("fiyat", "pahalı", "ucuz", "indirim", "parasını hak", "paranıza", "parama"),
     "Görsel ve renk uyumu": ("renk", "reng", "görsel", "fotoğraf", "resimde", "resimdeki", "göründüğü", "tonu"),
     "Koku": ("koku",),
-    "Dayanma ve arıza": ("bozuld", "kırıld", "yırtıld", "soldu", "söküld", "arıza", "çalışmıyor", "çalışmadı", "kalıcı", "döküld",
+    "Dayanma ve arıza": ("bozul", "kırıl", "yırtıl", "soldu", "sökül", "elimde kaldı", "koptu", "kopuyor", "arıza", "çalışmıyor", "çalışmadı", "kalıcı", "döküld",
                          "çatlad", "tüylen"),
     "Kullanım": ("kullanım", "kullanışlı", "kullanışsız", "kurulum", "pratik", "kullanması"),
     "Satıcı ve iletişim": ("satıcı", "mağaza", "iletişim", "cevap", "muhatap", "hediye"),
@@ -36,7 +36,8 @@ KONULAR: dict[str, tuple[str, ...]] = {
 OLUMSUZ = ("kötü", "berbat", "rezalet", "pişman", "memnun değil", "memnun kalmad", "beğenmed", "tavsiye etmem", "tavsiye etmiyorum",
            "almayın", "bozuk", "kırık", "defolu", "sahte", "çakma", "hayal kırıklığı", "vasat", "işe yaramaz", "geç geldi", "geç ulaş",
            "hasarlı", "ezik", "ezilmiş", "yırtık", "lekeli", "küçük geldi", "büyük geldi", "dar geldi", "bol geldi", "kısa geldi",
-           "uzun geldi", "pahalı", "özensiz", "eksik", "yanlış", "maalesef", "bozuld", "sızdır", "akıtıyor", "damlat", "soyul", "çizil", "göçük",
+           "uzun geldi", "pahalı", "özensiz", "eksik", "yanlış", "maalesef", "bozuld", "sızdır", "akıtıyor", "damlat", "soyul", "çizil", "göçük", "sökül", "bozul", "kırıl", "yırtıl", "elimde kaldı", "koptu", "kopuyor",
+           "su geçir", "ıslan",
            "kırıld", "yırtıld", "soldu", "söküld", "çalışmıyor", "çalışmadı", "kalitesiz", "kullanışsız", "değmez", "beklediğim gibi değil",
            "iade ett", "iade ed", "çürük", "incecik", "döküld", "çatlad", "kötü kok")
 OLUMLU = ("harika", "mükemmel", "çok güzel", "bayıld", "memnun kaldı", "memnunum", "tavsiye eder", "tavsiye ediyorum", "beğendi",

@@ -42,6 +42,12 @@ class Parcalar(unittest.TestCase):
         for metin in ("Satıcı cevap vermedi", "Tavsiye etmiyorum", "Beğenmedim", "Sünger girmiyor"):
             self.assertEqual(duygular(metin), ["şikâyet"], metin)
 
+    def test_notr_puanli_yorumda_ariza_sikayettir(self):
+        p = parcala([Yorum("Askı dikişi bir ayda sökülmeye başladı", 3)])[0]
+        self.assertEqual((p.duygu, p.konular), ("şikâyet", ["Kalite ve malzeme", "Dayanma ve arıza"]))
+        self.assertEqual(duygular("Fermuar ilk gün elimde kaldı"), ["şikâyet"])
+        self.assertEqual(duygular("Yağmurda içi ıslandı, su geçiriyor"), ["şikâyet"])
+
     def test_olumsuzlanan_sorun_ovgudur(self):
         for metin in ("Hiç sorun yaşamadım", "Sızdırmıyor", "Koku yapmıyor", "Hiç bozulmadı", "Sorunsuz ulaştı"):
             self.assertEqual(duygular(metin), ["övgü"], metin)

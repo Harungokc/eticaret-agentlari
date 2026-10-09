@@ -62,7 +62,7 @@ Her araç sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel d
 ## Bilmeniz gereken sınırlar
 
 - Komisyon oranları yaklaşıktır; bağlayıcı oran satıcı panelinizdeki sözleşme ekranındadır. Kargo,
-  sabit hizmet bedeli, stopaj, reklam ve iade hesaba dahil değildir.
+  sabit hizmet bedeli, KDV ve diğer vergiler, reklam ve iade hesaba dahil değildir; gerçek kârınız daha düşük olur.
 - Analizler verdiğiniz veriyle sınırlıdır; satış adedi ve ciro tahmini içermez.
 - Yorum analizi kelime eşleştirmesine dayanır; ironi ve dolaylı anlatımı kaçırabilir.
 - Araçlar Trendyol, Hepsiburada, n11 veya Amazon ile bağlantılı değildir ve onlar tarafından
