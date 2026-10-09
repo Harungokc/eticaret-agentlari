@@ -8,13 +8,15 @@ oynayabileceğiniz bir Excel dosyası olarak da verir.
 [![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-blue.svg)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 
-Kod yazmayı bilmeniz gerekmez. Kurulum bir kez yapılır, yaklaşık 5 dakika sürer; sonrasında bir
-dosyaya çift tıklarsınız ve araç tarayıcınızda bir sayfa olarak açılır.
+Kod yazmayı bilmeniz gerekmez. İki kullanım yolu vardır: aracı **Claude ya da ChatGPT sohbetine
+yükleyip** konuşarak kullanabilir ya da **kendi bilgisayarınıza kurup** tarayıcınızda bir sayfa olarak
+açabilirsiniz.
 
-> **Gizlilik:** Araç kendi bilgisayarınızda çalışır. Girdiğiniz fiyat, maliyet ve yüklediğiniz dosya
-> internete gönderilmez; hiçbir pazaryerine bağlanılmaz.
-> Tek istisna, isteğe bağlı Google Sheets çıktısıdır: onu siz açarsanız sonuçlar yalnızca sizin
-> belirttiğiniz Google tablosuna yazılır.
+> **Gizlilik:** Araç hiçbir pazaryerine bağlanmaz ve girdiğiniz fiyat, maliyet ve ürün listesini
+> aracın yazarına göndermez. Kendi bilgisayarınıza kurarsanız verileriniz bilgisayarınızdan çıkmaz;
+> Claude ya da ChatGPT sohbetinde kullanırsanız yazdıklarınız o asistanın kendi gizlilik koşullarına
+> tabidir. İsteğe bağlı Google Sheets çıktısını açarsanız sonuçlar yalnızca sizin belirttiğiniz
+> tabloya yazılır.
 
 ## En kolay yol: Claude ya da ChatGPT sohbetinde kullanın
 
@@ -37,7 +39,7 @@ Sheets'te de açabilirsiniz (*Dosya → İçe aktar → Yükle*).
 Adım adım anlatım: **[Kılavuz (PDF)](kilavuz/Pazar-ve-Komisyon-Analizcisi-Kilavuz.pdf)**
 
 > Paket ek kurulum ve internet bağlantısı gerektirmez. Bu yol henüz Claude ve ChatGPT sohbet
-> ekranlarının her planında denenmemiştir; takıldığınız yeri [bildirirseniz](../../issues) düzeltiriz.
+> ekranlarının her planında denenmemiştir; takıldığınız yeri [bildirirseniz](https://github.com/Harungokc/eticaret-agentlari/issues) düzeltiriz.
 
 ### Sonuçları doğrudan Google Sheets'e, grafiklerle yazdırmak
 
@@ -105,7 +107,9 @@ Pazar analizinde dosya üç sayfadan oluşur: pazar özeti, komisyon karşılaş
 ### 4. Google Sheets çıktısı ve grafikler
 
 Sonuçları kendi Google Sheets tablonuza da gönderebilirsiniz. Araç tabloyu biçimlendirir ve
-grafiklerle destekler; sarı hücreleri değiştirdiğinizde tablo da grafikler de güncellenir.
+grafiklerle destekler; sarı hücreleri değiştirdiğinizde tablo da grafikler de güncellenir. Bu özellik
+aracı kendi bilgisayarınıza kurduğunuzda ya da Claude Cowork, Claude Code, Codex gibi bir asistanla
+kullandığınızda çalışır; Excel dosyasında grafik bulunmaz.
 
 ![Google Sheets'te komisyon karşılaştırması](kilavuz/gorseller/google-sheets-komisyon.png)
 

@@ -172,7 +172,7 @@ def icerik():
     h += maddeler([
         "Bir <b>Claude</b> ya da <b>ChatGPT</b> hesabı. Dosya yükleme ve kod çalıştırma özelliği gerekir; bu özellik Claude'da "
         "ücretli planlarda, ChatGPT'de ücretli planlarda ve sınırlı olarak ücretsiz planda bulunur.",
-        f"Paket dosyası: <b>{PAKET_ADI}</b> (Kurulum bölümündeki adresten indirilir, 34 KB)",
+        f"Paket dosyası: <b>{PAKET_ADI}</b> (Kurulum bölümündeki adresten indirilir, yaklaşık 35 KB)",
     ])
 
     h.append(PageBreak())
@@ -186,7 +186,7 @@ def icerik():
     h.append(PageBreak())
     h.append(p("Kurulum", "h1"))
     h.append(p("Önce paket dosyasını bilgisayarınıza indirin. Dosyayı açmanıza (ZIP'ten çıkarmanıza) gerek yoktur:"))
-    h.append(kutu(f"<a href='{PAKET}' color='#1F4FD8'><font face='Kod' size='7.6'>{PAKET}</font></a>"))
+    h.append(kutu(f"<a href='{PAKET}' color='#1F4FD8'><font face='Kod' size='7.1'>{PAKET}</font></a>"))
 
     h.append(p("Claude kullanıyorsanız", "h2"))
     h.append(p("Paketi bir kez “Skill” (beceri) olarak eklersiniz; sonrasında her sohbette hazırdır."))
@@ -223,7 +223,7 @@ Bu ZIP dosyasını aç, içindeki SKILL.md dosyasını oku ve oradaki talimatlar
     ], numarali=True)
     h.append(kutu("Paket ek kurulum ve internet bağlantısı gerektirmez; yalnızca Python ile çalışır. Asistanınız paketi "
                   "çalıştıramadığını söylerse hesabı kendi başına yapmasına izin vermeyin; rakamlar araçtan gelmelidir. "
-                  "Sorunu son sayfadaki iletişim adresine yazabilirsiniz.",
+                  "Sorunu kapaktaki iletişim adresine yazabilirsiniz.",
                   renk=SARI, baslik="Asistan aracı çalıştıramazsa"))
 
     h.append(p("Neler sorabilirsiniz", "h2"))
@@ -276,7 +276,7 @@ Bu ZIP dosyasını aç, içindeki SKILL.md dosyasını oku ve oradaki talimatlar
                   "Kurulumda takıldığınız bir yer olursa ya da işletmenize özel bir analiz aracı isterseniz yazabilirsiniz.",
                   baslik="Geliştiren ve iletişim"))
     # ------------------------------------------------------------ ek: doğrudan Google Sheets
-    h.append(PageBreak())
+    h.append(Spacer(1, 8))
     h.append(p("Ek — Sonuçları doğrudan Google Sheets'e, grafiklerle yazdırmak", "h1"))
     h.append(p("Bu bölüm isteğe bağlıdır ve <b>Claude Cowork</b>, <b>Claude Code</b> ya da <b>OpenAI Codex</b> gibi, komut "
                "çalıştırabilen ve internete çıkabilen asistanlar içindir. Bu yolda asistan aracı GitHub'dan kendisi indirir, "
@@ -348,6 +348,7 @@ Bu ZIP dosyasını aç, içindeki SKILL.md dosyasını oku ve oradaki talimatlar
     h.append(p("Bu bölümün sonunda elinizde iki şey olmalı: <b>tablonuzun adresi</b> ve <b>anahtar dosyasının bilgisayarınızdaki yeri</b>."))
 
     # ------------------------------------------------------------ bölüm B
+    h.append(CondPageBreak(70 * mm))
     h.append(p("B. Asistanınıza vereceğiniz ilk mesaj", "h2"))
     h.append(p("Bu PDF'i asistanınıza ekleyin ve aşağıdaki mesajı, köşeli parantezli yerleri doldurarak gönderin."))
     h.append(kod("""

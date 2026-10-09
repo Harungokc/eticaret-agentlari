@@ -4,8 +4,8 @@ On agent'lık seri. Her biri kendi klasöründe, tek başına çalışır. 1 ve 
 
 | # | Agent | Girdi | Çıktı | Durum |
 |---|---|---|---|---|
-| 1 | Komisyon Tarife Analizcisi | Kategori + satış fiyatı | Trendyol, Hepsiburada, n11 ve Amazon'da komisyon, ele geçen tutar, hangisi daha kârlı | İlk sürüm yazıldı; 2 ile birlikte `01-pazar-ve-komisyon-analizcisi/` içinde |
-| 2 | Pazar Analizi Agent'ı | Kategori veya ürün türü | Satıcı sayısı, öne çıkan markalar, fiyat bantları, rekabet yoğunluğu | İlk sürüm yazıldı; 1 ile birlikte yayımlanıyor. Kaydedilmiş sayfa okuyucusu gerçek sayfada doğrulanacak |
+| 1 | Komisyon Tarife Analizcisi | Kategori + satış fiyatı | Trendyol, Hepsiburada, n11 ve Amazon'da komisyon, ele geçen tutar, hangisi daha kârlı | Yayımlandı: `01-pazar-ve-komisyon-analizcisi/` |
+| 2 | Pazar Analizi Agent'ı | Kategori veya ürün türü | Satıcı sayısı, öne çıkan markalar, fiyat bantları, rekabet yoğunluğu | Yayımlandı; 1 ile aynı araçta |
 | 3 | Ürün Ortalama Analizcisi | Ürün adı | Ortalama, en düşük ve en yüksek fiyat; ortalama puan, yorum, sepet ve favori sayıları | Bekliyor |
 | 4 | Fiyat Konumlandırma Agent'ı | Ürün + fiyat | Pazardaki fiyat sıralaması, önerilen fiyat aralığı | Bekliyor |
 | 5 | Rakip Karşılaştırma Agent'ı | Ürün + 3–5 rakip ürün | Fiyat, puan, yorum, görsel, kargo ve kampanya tablosu; geride kalınan noktalar | Bekliyor |
@@ -18,6 +18,5 @@ On agent'lık seri. Her biri kendi klasöründe, tek başına çalışır. 1 ve 
 ## Veri notu
 
 - 1 ve 9 komisyon tablolarıyla ve satıcının girdiği rakamlarla çalışır.
-- Diğer sekizi pazaryerindeki ürün verisine ihtiyaç duyar. Trendyol ürün sayfalarına otomatik
-  erişimi engelliyor; veri yolu (tarayıcı eklentisi, veri servisi veya satıcının yapıştırması)
-  her agent için ayrıca kararlaştırılacak.
+- Diğer sekizi pazaryerindeki ürün verisine ihtiyaç duyar. Araçlar pazaryerlerinden veri çekmez;
+  ürün verisini satıcı sağlar (liste yapıştırma ya da dosya yükleme).
