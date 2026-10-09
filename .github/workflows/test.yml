@@ -10,20 +10,21 @@ permissions:
 
 jobs:
   test:
-    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    name: ${{ matrix.arac }} / ${{ matrix.os }} / Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.10", "3.13"]
+        arac: ["01-pazar-ve-komisyon-analizcisi", "02-urun-fiyat-ve-rakip-analizcisi"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Testleri çalıştır
-        working-directory: 01-pazar-ve-komisyon-analizcisi
+        working-directory: ${{ matrix.arac }}
         env:
           PYTHONUTF8: "1"
         run: python -m unittest -v

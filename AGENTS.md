@@ -25,7 +25,7 @@ dosyaya yönlendirir; ayrıntılı adımların tek kaynağı burasıdır.
    Aşağıdaki sorun giderme tablosuna bak. Çözemezsen kullanıcıya mesajı aynen ilet.
 
 > Sohbet ekranında (claude.ai ya da ChatGPT) depoyu indirmeden çalışıyorsan bu dosya yerine paketin
-> içindeki `SKILL.md` dosyasını izle; paket `paket/paket_olustur.py` ile üretilir.
+> içindeki `SKILL.md` dosyasını izle; her aracın klasöründe durur ve paketler `paket/paket_olustur.py` ile üretilir.
 
 ## Çalıştığın ortam
 

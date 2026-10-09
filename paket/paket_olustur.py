@@ -1,4 +1,6 @@
-"""Aracı, Claude'a Skill olarak ya da ChatGPT'ye dosya olarak yüklenebilen tek bir ZIP hâline getirir.
+"""Araçları, Claude'a Skill olarak ya da ChatGPT'ye dosya olarak yüklenebilen ZIP dosyalarına çevirir.
+
+Her aracın talimatları kendi klasöründeki SKILL.md dosyasındadır.
 
 Çalıştırmak için: python paket/paket_olustur.py
 """
@@ -6,30 +8,35 @@
 import zipfile
 from pathlib import Path
 
-AD = "pazar-komisyon-analizcisi"
 KOK = Path(__file__).resolve().parent.parent
-ARAC = KOK / "01-pazar-ve-komisyon-analizcisi"
-CIKTI = Path(__file__).resolve().parent / f"{AD}.zip"
+CIKTI = Path(__file__).resolve().parent
 
-DOSYALAR = ["agent.py", "komisyon.py", "pazar.py", "okuyucu.py", "excel.py", "sheets.py",
-            "veri/komisyon.json", "ornek/ornek_urunler.csv", "ornek/sablon.csv"]
+PAKETLER = {
+    "pazar-komisyon-analizcisi": ("01-pazar-ve-komisyon-analizcisi", [
+        "SKILL.md", "agent.py", "komisyon.py", "pazar.py", "okuyucu.py", "excel.py", "sheets.py",
+        "veri/komisyon.json", "ornek/ornek_urunler.csv", "ornek/sablon.csv"]),
+    "urun-fiyat-rakip-analizcisi": ("02-urun-fiyat-ve-rakip-analizcisi", [
+        "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "xlsx.py",
+        "ornek/ornek_urunler.csv", "ornek/sablon.csv"]),
+}
 SABIT_TARIH = (2026, 1, 1, 0, 0, 0)  # aynı içerik her seferinde aynı ZIP'i üretsin
 
 
-def ekle(z: zipfile.ZipFile, ad: str, icerik: bytes) -> None:
-    bilgi = zipfile.ZipInfo(f"{AD}/{ad}", SABIT_TARIH)
+def ekle(z: zipfile.ZipFile, yol: str, icerik: bytes) -> None:
+    bilgi = zipfile.ZipInfo(yol, SABIT_TARIH)
     bilgi.compress_type = zipfile.ZIP_DEFLATED
     bilgi.external_attr = 0o644 << 16
     z.writestr(bilgi, icerik)
 
 
 def main() -> None:
-    with zipfile.ZipFile(CIKTI, "w") as z:
-        ekle(z, "SKILL.md", (Path(__file__).parent / "SKILL.md").read_bytes())
-        ekle(z, "LICENSE", (KOK / "LICENSE").read_bytes())
-        for ad in DOSYALAR:
-            ekle(z, ad, (ARAC / ad).read_bytes())
-    print(f"{CIKTI}  ({CIKTI.stat().st_size // 1024} KB)")
+    for ad, (klasor, dosyalar) in PAKETLER.items():
+        hedef = CIKTI / f"{ad}.zip"
+        with zipfile.ZipFile(hedef, "w") as z:
+            for dosya in dosyalar:
+                ekle(z, f"{ad}/{dosya}", (KOK / klasor / dosya).read_bytes())
+            ekle(z, f"{ad}/LICENSE", (KOK / "LICENSE").read_bytes())
+        print(f"{hedef}  ({hedef.stat().st_size // 1024} KB)")
 
 
 if __name__ == "__main__":

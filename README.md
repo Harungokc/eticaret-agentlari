@@ -18,6 +18,17 @@ açabilirsiniz.
 > tabidir. İsteğe bağlı Google Sheets çıktısını açarsanız sonuçlar yalnızca sizin belirttiğiniz
 > tabloya yazılır.
 
+## Serideki araçlar
+
+Bu depo, e-ticaret satıcıları için bir analiz araçları serisidir. Her araç tek başına çalışır.
+
+| # | Araç | Yanıtladığı soru | Paket |
+|---|---|---|---|
+| 1 | **Pazar ve Komisyon Analizcisi** (bu sayfa) | Hangi pazaryerinde elime ne kalır? Pazar nasıl görünüyor? | [ZIP](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/pazar-komisyon-analizcisi.zip) |
+| 2 | **[Ürün, Fiyat ve Rakip Analizcisi](02-urun-fiyat-ve-rakip-analizcisi/)** | Ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre nerede gerideyim? | [ZIP](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/urun-fiyat-rakip-analizcisi.zip) |
+
+Sıradaki araçlar için [SERI.md](SERI.md) dosyasına bakabilirsiniz.
+
 ## En kolay yol: Claude ya da ChatGPT sohbetinde kullanın
 
 Kod bilmeniz ya da bilgisayarınıza program kurmanız gerekmez.
