@@ -18,6 +18,10 @@ import sys
 
 from pathlib import Path
 
+# Araç hangi klasörden ve hangi Python ayarıyla çalıştırılırsa çalıştırılsın kendi dosyalarını bulsun
+# (bazı kum havuzları betiğin klasörünü arama yoluna eklemez).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from excel import kitap_yaz, komisyon_sayfalari, pazar_sayfalari
 from komisyon import Satir, analiz_et, kategori_bul, kesin_mi, veri_yukle
 from okuyucu import OkumaHatasi, oku, sayi

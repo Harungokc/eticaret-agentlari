@@ -17,6 +17,10 @@ import argparse
 import sys
 from pathlib import Path
 
+# Araç hangi klasörden ve hangi Python ayarıyla çalıştırılırsa çalıştırılsın kendi dosyalarını bulsun
+# (bazı kum havuzları betiğin klasörünü arama yoluna eklemez).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from analiz import Konum, Olcu, Ozet, RakipRaporu, ayir, konum, ozet, rakip_karsilastir, tl
 from okuyucu import OkumaHatasi, oku, sayi
 from rapor import UYARI, dosya
