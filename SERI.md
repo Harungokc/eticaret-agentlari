@@ -9,7 +9,7 @@ On agent'lık seri. Her biri kendi klasöründe, tek başına çalışır. 1 ve 
 | 3 | Ürün Ortalama Analizcisi | Ürün adı | Ortalama, en düşük ve en yüksek fiyat; ortalama puan, yorum, sepet ve favori sayıları | Yayımlandı: `02-urun-fiyat-ve-rakip-analizcisi/` |
 | 4 | Fiyat Konumlandırma Agent'ı | Ürün + fiyat | Pazardaki fiyat sıralaması, önerilen fiyat aralığı | Yayımlandı: `02-urun-fiyat-ve-rakip-analizcisi/` |
 | 5 | Rakip Karşılaştırma Agent'ı | Ürün + 3–5 rakip ürün | Fiyat, puan, yorum, görsel, kargo ve kampanya tablosu; geride kalınan noktalar | Yayımlandı: `02-urun-fiyat-ve-rakip-analizcisi/` |
-| 6 | Yorum Analiz Agent'ı | Bir ürün | Övülen ve şikâyet edilen konular, eklenmesi istenen özellikler | Bekliyor |
+| 6 | Yorum Analiz Agent'ı | Bir ürün | Övülen ve şikâyet edilen konular, eklenmesi istenen özellikler | Yayımlandı: `03-yorum-analizcisi/` |
 | 7 | Anahtar Kelime ve Başlık Analizcisi | Ürün adı | Rakip başlıklarındaki kelimeler, eksikler, önerilen başlık | Bekliyor |
 | 8 | Trend ve Sezon Analizcisi | Kategori | Talebin arttığı aylar, yükselen ürün türleri, kampanya takvimi | Bekliyor |
 | 9 | Kârlılık Simülatörü | Maliyet, fiyat, kategori, desi | Senaryolara göre ürün başına net kâr, zarar çizgisi | Bekliyor |

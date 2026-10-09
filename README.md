@@ -26,6 +26,7 @@ Bu depo, e-ticaret satıcıları için bir analiz araçları serisidir. Her ara�
 |---|---|---|---|
 | 1 | **Pazar ve Komisyon Analizcisi** (bu sayfa) | Hangi pazaryerinde elime ne kalır? Pazar nasıl görünüyor? | [ZIP](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/pazar-komisyon-analizcisi.zip) |
 | 2 | **[Ürün, Fiyat ve Rakip Analizcisi](02-urun-fiyat-ve-rakip-analizcisi/)** | Ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre nerede gerideyim? | [ZIP](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/urun-fiyat-rakip-analizcisi.zip) |
+| 3 | **[Yorum Analizcisi](03-yorum-analizcisi/)** | Müşteriler neden şikâyet ediyor, üründe ne istiyor? | [ZIP](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/yorum-analizcisi.zip) |
 
 Sıradaki araçlar için [SERI.md](SERI.md) dosyasına bakabilirsiniz.
 
