@@ -65,6 +65,11 @@ def _kargo(deger) -> bool | None:
 
 
 def oku(yol: str | Path) -> list[Urun]:
+    return oku_ayrintili(yol)[0]
+
+
+def oku_ayrintili(yol: str | Path) -> tuple[list[Urun], list[str]]:
+    """Ürünleri ve fiyatı okunamadığı için atlanan satırların adlarını döndürür."""
     yol = Path(yol)
     if not yol.exists():
         raise OkumaHatasi(f"Dosya bulunamadı: {yol}")
@@ -81,11 +86,13 @@ def oku(yol: str | Path) -> list[Urun]:
             if esleme["fiyat"] is None:
                 raise OkumaHatasi("Dosyada 'fiyat' sütunu bulunamadı. İlk satır şu başlıkları içermeli: "
                                   "ad;marka;fiyat;puan;yorum (isteğe bağlı: favori;kargo;benim)")
-            urunler = []
+            urunler, atlanan = [], []
             for i, satir in enumerate(okur, 1):
                 al = lambda alan: (satir.get(esleme[alan]) or "").strip() if esleme[alan] else ""  # noqa: E731
                 fiyat = sayi(al("fiyat"))
                 if fiyat is None or fiyat <= 0:
+                    if any((v or "").strip() for v in satir.values() if isinstance(v, str)):
+                        atlanan.append(al("ad") or f"{i}. satır")
                     continue
                 puan = sayi(al("puan"))
                 urunler.append(Urun(
@@ -98,4 +105,4 @@ def oku(yol: str | Path) -> list[Urun]:
         raise OkumaHatasi("Dosya okunamadı. CSV dosyasını UTF-8 olarak kaydedin.") from None
     if not urunler:
         raise OkumaHatasi("Dosyada fiyatı okunabilen ürün bulunamadı")
-    return urunler
+    return urunler, atlanan

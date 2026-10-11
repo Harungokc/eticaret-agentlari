@@ -21,15 +21,15 @@ from pathlib import Path
 # (bazı kum havuzları betiğin klasörünü arama yoluna eklemez).
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from analiz import Konum, Olcu, Ozet, RakipRaporu, ayir, konum, ozet, rakip_karsilastir, tl
-from okuyucu import OkumaHatasi, oku, sayi
+from analiz import Konum, Olcu, Ozet, RakipRaporu, ayir, konum, ozet, rakip_karsilastir, tl, yuvarla
+from okuyucu import OkumaHatasi, oku_ayrintili, sayi
 from rapor import UYARI, dosya
 
 
 def _sayi(deger: float | None, basamak: int = 0) -> str:
     if deger is None:
         return "bilinmiyor"
-    return f"{deger:,.{basamak}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"{yuvarla(deger, basamak):,.{basamak}f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
 def _satir(etiket: str, deger: str) -> str:
@@ -51,7 +51,8 @@ def ozet_yaz(o: Ozet) -> None:
     print(_satir("Yorum sayısı", olcu(o.yorum)))
     print(_satir("Favori sayısı", olcu(o.favori)))
     if o.ucretsiz_kargo_orani is not None:
-        print(_satir("Ücretsiz kargolu ürün oranı", f"%{_sayi(o.ucretsiz_kargo_orani)} ({o.kargo_bilinen} ürün)"))
+        print(_satir("Ücretsiz kargolu ürün oranı", f"%{_sayi(o.ucretsiz_kargo_orani)} (" + (f"kargo bilgisi olan {o.kargo_bilinen} ürün içinde"
+                                                    if o.kargo_bilinen < o.urun_sayisi else f"{o.kargo_bilinen} ürün") + ")"))
     for u in o.uyarilar:
         print(f"  Not: {u}")
 
@@ -122,7 +123,8 @@ def main(argv: list[str] | None = None) -> int:
     a = p.parse_args(argv)
 
     try:
-        benim, pazar = ayir(oku(a.dosya))
+        urunler, atlanan = oku_ayrintili(a.dosya)
+        benim, pazar = ayir(urunler)
         fiyat = None
         verilen = getattr(a, "fiyat", None)
         if verilen is not None:
@@ -146,6 +148,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Hata: {hata}", file=sys.stderr)
         return 1
 
+    if atlanan:
+        adlar = ", ".join(atlanan[:5]) + (" …" if len(atlanan) > 5 else "")
+        print(f"Not: Listedeki {len(atlanan)} satır, fiyatı okunamadığı için hesaba katılmadı: {adlar}\n")
     bolumler = []
     if a.komut in ("ortalama", "hepsi"):
         bolumler.append(lambda: ozet_yaz(o))

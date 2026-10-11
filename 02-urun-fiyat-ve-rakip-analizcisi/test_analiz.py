@@ -258,5 +258,54 @@ class KomutSatiri(unittest.TestCase):
             self.assertIn("Rakip karşılaştırması yapılmadı", cikti)
 
 
+class SunumDuzeltmeleri(unittest.TestCase):
+    def setUp(self):
+        self.klasor = tempfile.TemporaryDirectory()
+        self.yol = Path(self.klasor.name) / "liste.csv"
+
+    def tearDown(self):
+        self.klasor.cleanup()
+
+    def calistir(self, metin):
+        import contextlib
+        import io
+        from agent import main
+        self.yol.write_text(metin, encoding="utf-8")
+        cikti = io.StringIO()
+        with contextlib.redirect_stdout(cikti):
+            self.assertEqual(main(["hepsi", str(self.yol)]), 0)
+        return cikti.getvalue()
+
+    def test_fiyatsiz_satir_adiyla_bildirilir(self):
+        from okuyucu import oku_ayrintili
+        self.yol.write_text("ad;fiyat\na;100\nFiyatsız Ürün;\n;\nc;stokta yok\n", encoding="utf-8")
+        urunler, atlanan = oku_ayrintili(self.yol)
+        self.assertEqual((len(urunler), atlanan), (1, ["Fiyatsız Ürün", "c"]))  # tamamen boş satır sayılmaz
+        cikti = self.calistir("ad;fiyat;benim\nben;150;evet\n" + "".join(f"r{i};{100 + i * 20}\n" for i in range(6)) + "Fiyatsız Ürün;\n")
+        self.assertIn("1 satır, fiyatı okunamadığı için hesaba katılmadı: Fiyatsız Ürün", cikti)
+
+    def test_fiyatsiz_satir_yoksa_not_yazilmaz(self):
+        cikti = self.calistir("ad;fiyat;benim\nben;150;evet\n" + "".join(f"r{i};{100 + i * 20}\n" for i in range(6)))
+        self.assertNotIn("hesaba katılmadı", cikti)
+
+    def test_eksik_kargo_bilgisi_acikca_yazilir(self):
+        satirlar = "".join(f"r{i};{100 + i * 20};{'ücretsiz' if i < 4 else ''}\n" for i in range(7))
+        cikti = self.calistir("ad;fiyat;kargo;benim\nben;150;ücretsiz;evet\n" + satirlar)
+        self.assertIn("kargo bilgisi olan 4 rakibin 4 tanesinde ücretsiz (3 rakipte bilgi yok)", cikti)
+        self.assertIn("%100 (kargo bilgisi olan 4 ürün içinde)", cikti)
+
+    def test_kargo_bilgisi_tamsa_eski_ifade(self):
+        satirlar = "".join(f"r{i};{100 + i * 20};ücretsiz\n" for i in range(6))
+        cikti = self.calistir("ad;fiyat;kargo;benim\nben;150;ücretli;evet\n" + satirlar)
+        self.assertIn("rakipler: 6 rakibin 6 tanesinde ücretsiz | geride", cikti)
+        self.assertIn("%100 (6 ürün)", cikti)
+
+    def test_yarimlar_yukari_yuvarlanir(self):
+        from agent import _sayi
+        from analiz import tl, yuvarla
+        self.assertEqual((_sayi(447.5), _sayi(448.5), _sayi(4.25, 1)), ("448", "449", "4,3"))
+        self.assertEqual((yuvarla(2.5), yuvarla(0.125, 2), tl(1.005)), (3.0, 0.13, "1,01 TL"))
+
+
 if __name__ == "__main__":
     unittest.main()

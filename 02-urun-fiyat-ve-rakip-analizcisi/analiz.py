@@ -7,6 +7,7 @@ tahmin ya da dışarıdan veri eklenmez.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import ROUND_HALF_UP, Decimal
 from statistics import mean, median
 
 EN_AZ_URUN = 5  # bundan az ürünle ortalama ve konum anlamlı değil
@@ -224,12 +225,17 @@ def _bicim(deger: float, tur: str) -> str:
     if tur == "tl":
         return tl(deger)
     if tur == "puan":
-        return f"{deger:.1f}".replace(".", ",")
-    return f"{deger:,.0f}".replace(",", ".")
+        return f"{yuvarla(deger, 1):.1f}".replace(".", ",")
+    return f"{yuvarla(deger):,.0f}".replace(",", ".")
+
+
+def yuvarla(deger: float, basamak: int = 0) -> float:
+    """Yarımları yukarı yuvarlar (447,5 → 448); Excel'in gösterimiyle aynı sonucu verir."""
+    return float(Decimal(str(deger)).quantize(Decimal(1).scaleb(-basamak), rounding=ROUND_HALF_UP))
 
 
 def tl(tutar: float) -> str:
-    return f"{tutar:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " TL"
+    return f"{yuvarla(tutar, 2):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " TL"
 
 
 def _sayisal_kiyas(olcu: str, benim: float | None, rakip: list[float], dusuk_iyi: bool, tur: str) -> Kiyas | None:
@@ -268,6 +274,8 @@ def rakip_karsilastir(benim: Urun | None, rakipler: list[Urun], gosterilecek: in
     if kargolu:
         ucretsiz = sum(r.kargo_ucretsiz for r in kargolu)
         oran = f"{len(kargolu)} rakibin {ucretsiz} tanesinde ücretsiz"
+        if len(kargolu) < len(rakipler):  # eksik bilgi "bütün rakipler" diye okunmasın
+            oran = f"kargo bilgisi olan {oran} ({len(rakipler) - len(kargolu)} rakipte bilgi yok)"
         if benim.kargo_ucretsiz is None:
             kiyaslar.append(Kiyas("Kargo", "bilinmiyor", oran, None, None, "bilinmiyor", "Ürününüz için bu bilgi verilmemiş."))
         else:
@@ -279,7 +287,7 @@ def rakip_karsilastir(benim: Urun | None, rakipler: list[Urun], gosterilecek: in
             else:
                 durum = "aynı"
             kiyaslar.append(Kiyas("Kargo", "ücretsiz" if benim.kargo_ucretsiz else "ücretli", oran, None, None, durum,
-                                  f"Kargo bilgisi olan {oran}."))
+                                  (oran[0].upper() + oran[1:] if len(kargolu) < len(rakipler) else f"Kargo bilgisi olan {oran}") + "."))
     r = RakipRaporu(
         benim=benim,
         rakipler=sorted(rakipler, key=lambda u: abs(u.fiyat - benim.fiyat))[:gosterilecek],

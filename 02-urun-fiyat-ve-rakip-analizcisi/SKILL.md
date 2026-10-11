@@ -24,6 +24,8 @@ göster ve bunun örnek (uydurma) veri olduğunu söyle.
    ve favori sayısı ilginin dolaylı göstergesidir.
 4. Araç fiyat önermez. "Fiyatımı kaç yapayım?" sorusuna aracın gösterdiği ana fiyat aralığını ve en
    çok ilgi gören dilimi aktararak yanıt ver; kararın maliyet ve kâr hedefine de bağlı olduğunu söyle.
+5. Aracın çıktısındaki `Not:` satırlarını kullanıcıya aktar; özellikle fiyatı okunamadığı için hesaba
+   katılmayan ürünleri ve kargo bilgisi eksik olan rakip sayısını söyle.
 
 ## Ürün listesi
 
