@@ -1,36 +1,61 @@
 # Ürün, Fiyat ve Rakip Analizcisi
 
-Bir ürünü satmadan ya da fiyatını değiştirmeden önce üç soruya yanıt verir:
+**Fiyatınız pazarda nerede duruyor?** Rakip ürün listesini verirsiniz; pazarın ortalamasını, fiyatınızın
+yerini ve rakiplere göre geride kaldığınız noktaları hesaplar. Claude ya da ChatGPT sohbetinde çalışır;
+kod bilmeniz gerekmez. Ücretsiz, açık kaynak (MIT).
+
+![Akış: rakip listesi, sohbete yükleme, agent'ın üç hesabı, sonuç](../kilavuz/gorseller/02-fiyat-rakip-akis.gif)
+
+<sub>Şemadaki rakamlar bu depodaki uydurma örnek listeden (500 ml çelik termos) hesaplanmıştır.</sub>
+
+## Ne yapar
 
 | Soru | Araç ne gösterir |
 |---|---|
-| **Bu ürünün pazardaki ortalaması ne?** | Ortalama ve ortanca fiyat, en düşük–en yüksek, ortalama puan, yorum ve favori sayıları, ücretsiz kargo oranı |
-| **Fiyatım pazarda nerede duruyor?** | Kaç ürün sizden ucuz, kaçı pahalı; ortancadan farkınız; ürünlerin yoğunlaştığı fiyat aralığı; en çok ilgi gören fiyat dilimi |
+| **Bu ürün pazarda kaça satılıyor?** | Ortalama ve ortanca fiyat, en düşük–en yüksek, ortalama puan, yorum ve favori sayıları, ücretsiz kargo oranı |
+| **Fiyatım nerede duruyor?** | Kaç ürün sizden ucuz, kaçı pahalı; ortancadan farkınız; ürünlerin yoğunlaştığı fiyat aralığı; en çok ilgi gören fiyat dilimi |
 | **Rakiplerime göre neredeyim?** | Fiyat, puan, yorum, favori ve kargoda sıranız; öne geçtiğiniz ve geride kaldığınız noktalar |
 
-Sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel dosyası** olarak verir. Ücretsiz,
-açık kaynak (MIT). Kod bilmeniz gerekmez.
+Sonucu sohbette Türkçe özetler ve üzerinde oynayabileceğiniz dört sayfalık bir **Excel dosyası** verir.
 
-## Claude ya da ChatGPT sohbetinde kullanın
+## Claude'da üç adımda deneyin (örnek veriyle)
 
-Serideki bütün araçları tek seferde yüklemek için [tek paketi](../README.md) kullanabilirsiniz. Yalnızca bu aracı isterseniz:
+Kendi listenizi hazırlamadan önce aracı hazır örnek veriyle deneyebilirsiniz. Adımlar Claude masaüstü
+uygulaması ve claude.ai için aynıdır.
 
-**1. Paketi indirin:** [urun-fiyat-rakip-analizcisi.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/urun-fiyat-rakip-analizcisi.zip) (ZIP'ten çıkarmayın)
+**1. İki dosyayı indirin**
 
-**2. Asistanınıza yükleyin:**
+- Araç: [urun-fiyat-rakip-analizcisi.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/urun-fiyat-rakip-analizcisi.zip) (ZIP'ten çıkarmayın)
+- Örnek liste: [ornek_urunler.csv](ornek/ornek_urunler.csv) (uydurma veri: bir satıcının ürünü ve 30 rakip)
 
-| | Nasıl yüklenir |
-|---|---|
-| **Claude** (claude.ai ya da uygulama) | **Customize → Skills → + → Upload a skill** deyip ZIP dosyasını seçin. Bir kez eklenir, her sohbette hazırdır. *Settings → Capabilities* altında kod yürütme açık olmalıdır. |
-| **ChatGPT** | Yeni sohbette ZIP dosyasını ekleyin ve şunu yazın: *"Bu ZIP dosyasını aç, içindeki SKILL.md dosyasını oku ve oradaki talimatlara göre çalış."* |
+**2. Aracı Claude'a ekleyin**
 
-**3. Ürün listenizi verin ve sorun.** Örneğin:
+*Customize → Skills → + → Upload a skill* deyip ZIP dosyasını seçin. Bir kez eklenir, her sohbette
+hazırdır. *Settings → Capabilities* altında kod yürütme açık olmalıdır.
 
-> Aşağıda Trendyol'da "çelik termos 500 ml" aramasında gördüğüm ürünler var. Benim ürünüm 389,90 TL,
-> puanı 4,3, 86 yorumu var. Pazarın ortalamasını çıkar, fiyatımın yerini göster ve rakiplerime göre
-> nerede geride kaldığımı söyle.
+**3. Yeni sohbette örnek listeyi ekleyin ve sorun**
+
+> Bu listede benim ürünüm ve rakiplerim var. Fiyatım pazarda nerede duruyor, rakiplerime göre nerede
+> gerideyim? Sonucu Excel olarak da ver.
+
+Claude şunları söylemelidir: pazarın ortanca fiyatı **371,20 TL**; **16** ürün sizden ucuz, **14** ürün
+pahalı; fiyat, yorum sayısı, favori sayısı ve kargoda geridesiniz, puanda rakiplerle aynısınız.
+Farklı rakamlar görürseniz [bildirin](https://github.com/Harungokc/eticaret-agentlari/issues).
+
+**ChatGPT'de:** Yeni sohbete ZIP dosyasını ve örnek listeyi ekleyin, şunu yazın: *"Bu ZIP dosyasını aç,
+içindeki SKILL.md dosyasını oku ve oradaki talimatlara göre çalış. Listede benim ürünüm ve rakiplerim
+var; fiyatım pazarda nerede duruyor?"*
+
+Serideki bütün araçları tek seferde yüklemek için [tek paketi](../README.md) kullanabilirsiniz.
+
+## Kendi ürününüzle kullanın
+
+Aracı ekledikten sonra rakiplerinizi sohbete yazmanız yeterli. Örneğin:
+
+> Trendyol'da "çelik termos 500 ml" aramasında gördüğüm ürünler aşağıda. Benim ürünüm 389,90 TL,
+> puanı 4,3, 86 yorumu var. Fiyatımın yerini göster ve rakiplerime göre nerede geride kaldığımı söyle.
 >
-> *(ürünleri ad, marka, fiyat, puan, yorum olarak alt alta yazın ya da bir dosya yükleyin)*
+> *(ürünleri ad, fiyat, puan, yorum olarak alt alta yazın ya da bir dosya yükleyin)*
 
 ## Ürün listesini nasıl hazırlarım
 
