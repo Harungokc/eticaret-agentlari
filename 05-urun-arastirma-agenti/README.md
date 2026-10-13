@@ -20,7 +20,7 @@ açık kaynak (MIT).
 
 [Kullanım videosu (3 dakika, sessiz)](../kilavuz/gorseller/05-urun-arastirma-video.mp4): aracın Claude'a yüklenmesi, tek cümlelik
 istek, taramanın bitmesi, raporun ve Excel'in açılması, ürün ve Çin'de tedarik bağlantılarına tıklanması. Bekleme kısmı
-hızlandırılmıştır; gerçek tarama yaklaşık 7 dakika sürdü.
+hızlandırılmıştır; gerçek tarama 7 dakikadan uzun sürdü.
 
 ## Kim ne yapar
 
