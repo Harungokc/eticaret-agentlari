@@ -1,5 +1,9 @@
 # Satış Bölge Analizcisi
 
+
+https://github.com/user-attachments/assets/5eb9d5ed-25f8-4e15-b355-6ad600e6da6f
+
+
 Satışlarınız nereye gidiyor? Bu araç sipariş listenizdeki il ve ilçe bilgisini sayar:
 
 ![Sipariş listesi girer; il il, ilçe ilçe dağılım çıkar. Rakamlar örnek veridir.](../kilavuz/gorseller/04-satis-bolge-grafik.gif)
