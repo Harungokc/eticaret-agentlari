@@ -3,6 +3,12 @@
 Alanınızda yurt dışında şu an ne çok satıyor, ne yeni yükseliyor? Bu araç, Claude ya da ChatGPT'nin
 internette yaptığı taramayı kaynaklı ve tarihli bir **rapora** çevirir:
 
+[![Kullanım videosunu izleyin (3 dakika)](../kilavuz/gorseller/05-urun-arastirma-video-kapak.jpg)](https://github.com/Harungokc/eticaret-agentlari/blob/main/kilavuz/gorseller/05-urun-arastirma-video.mp4)
+
+**[▶ Kullanım videosunu izleyin](https://github.com/Harungokc/eticaret-agentlari/blob/main/kilavuz/gorseller/05-urun-arastirma-video.mp4)** (3 dakika, sessiz): aracın
+Claude'a yüklenmesi, tek cümlelik istek, raporun ve Excel'in açılması, ürün ve Çin'de tedarik bağlantılarına tıklanması. Bekleme
+kısmı hızlandırılmıştır; gerçek tarama 7 dakikadan uzun sürdü.
+
 ![Akış: alanınızı yazarsınız, asistan internette tarar, agent puanlar ve raporu yazar, raporu alırsınız](../kilavuz/gorseller/05-urun-arastirma-akis.gif)
 
 | Soru | Rapor ne gösterir |
@@ -17,12 +23,6 @@ internette yaptığı taramayı kaynaklı ve tarihli bir **rapora** çevirir:
 
 Sonucu **rapor sayfası** (tarayıcıda açılır, yazdırılır) ve **Excel dosyası** olarak verir. Ücretsiz,
 açık kaynak (MIT).
-
-## Videoda görün
-
-[Kullanım videosu (3 dakika, sessiz)](../kilavuz/gorseller/05-urun-arastirma-video.mp4): aracın Claude'a yüklenmesi, tek cümlelik
-istek, taramanın bitmesi, raporun ve Excel'in açılması, ürün ve Çin'de tedarik bağlantılarına tıklanması. Bekleme kısmı
-hızlandırılmıştır; gerçek tarama 7 dakikadan uzun sürdü.
 
 ## Kim ne yapar
 
