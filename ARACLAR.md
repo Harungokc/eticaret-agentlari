@@ -15,7 +15,6 @@ Claude'a ya da ChatGPT'ye yüklersiniz, sonra konuşur gibi sorarsınız. Kod bi
 |---|---|---|
 | Hangi pazaryerinde elime ne kalır? | [Pazar ve Komisyon Analizcisi](01-pazar-ve-komisyon-analizcisi/) | Kategori ve satış fiyatı |
 | Ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre nerede gerideyim? | [Ürün, Fiyat ve Rakip Analizcisi](02-urun-fiyat-ve-rakip-analizcisi/) | Ürün listesi |
-| Müşteriler neden şikâyet ediyor, üründe ne istiyor? | [Yorum Analizcisi](03-yorum-analizcisi/) | Ürün yorumları |
 | Satışlarım hangi il, ilçe ve mahalleye gidiyor? Ne yapmalıyım? | [Satış Bölge Analizcisi](04-satis-bolge-analizcisi/) | Sipariş listesi (il, ilçe, mahalle, tutar) |
 | Yurt dışında ne çok satıyor, ne yeni yükseliyor, Çin'den kaça gelir? | [Ürün Araştırma Agent'ı](05-urun-arastirma-agenti/) | İlgilendiğiniz alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
@@ -23,7 +22,7 @@ Her araç sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel d
 
 ## Kurulum: tek dosya, üç adım
 
-**1. Paketi indirin:** [eticaret-analiz-araclari.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/eticaret-analiz-araclari.zip) — beş aracın hepsi içinde. ZIP'ten çıkarmayın.
+**1. Paketi indirin:** [eticaret-analiz-araclari.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/eticaret-analiz-araclari.zip) — dört aracın hepsi içinde. ZIP'ten çıkarmayın.
 
 **2. Asistanınıza yükleyin:**
 
@@ -36,7 +35,6 @@ Her araç sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel d
 
 - *"899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım? Maliyetim 400 lira."*
 - *"Aşağıda 'çelik termos' aramasında gördüğüm ürünler var. Benim fiyatım 389,90 TL; pazardaki yerimi ve rakiplerime göre durumumu çıkar."*
-- *"Bunlar ürünümün yorumları. Müşteriler en çok neden şikâyet ediyor, ne istiyorlar?"*
 - *"Bu sipariş listesinden satışlarımın il ve bölge dağılımını çıkar."*
 
 > **Denenme durumu:** Araçların kendisi Windows, macOS ve Linux'ta otomatik testlerden geçer. Paketin
@@ -47,7 +45,7 @@ Her araç sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel d
 
 - **Araçlar hesaplar, asistan anlatır.** Her tutar, oran ve sayı bu depodaki Python kodundan gelir;
   asistan rakam uydurmaz. Aynı girdiye her zaman aynı sonucu alırsınız.
-- **Veri çekilmez.** Araçlar hiçbir pazaryerine bağlanmaz. Ürün listesini, yorumları ve siparişleri
+- **Veri çekilmez.** Araçlar hiçbir pazaryerine bağlanmaz. Ürün listesini ve siparişleri
   siz verirsiniz: yazarak, sayfadan kopyalayıp yapıştırarak ya da dosya yükleyerek.
 - **Kurulum gerektirmez.** Paket ek program ve internet bağlantısı istemez; asistanınızın kod
   çalıştırma ortamında çalışır.
@@ -67,7 +65,6 @@ Her araç sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel d
 - Komisyon oranları yaklaşıktır; bağlayıcı oran satıcı panelinizdeki sözleşme ekranındadır. Kargo,
   sabit hizmet bedeli, KDV ve diğer vergiler, reklam ve iade hesaba dahil değildir; gerçek kârınız daha düşük olur.
 - Analizler verdiğiniz veriyle sınırlıdır; satış adedi ve ciro tahmini içermez.
-- Yorum analizi kelime eşleştirmesine dayanır; ironi ve dolaylı anlatımı kaçırabilir.
 - Araçlar Trendyol, Hepsiburada, n11 veya Amazon ile bağlantılı değildir ve onlar tarafından
   onaylanmamıştır. Sonuçlar bilgi amaçlıdır.
 

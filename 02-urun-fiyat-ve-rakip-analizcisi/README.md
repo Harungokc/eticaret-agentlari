@@ -1,14 +1,12 @@
 # Ürün, Fiyat ve Rakip Analizcisi
 
-
-
-https://github.com/user-attachments/assets/9ddce90e-3a87-4357-8c9c-2fc8adcb58af
-
-
-
 **Fiyatınız pazarda nerede duruyor?** Rakip ürün listesini verirsiniz; pazarın ortalamasını, fiyatınızın
 yerini ve rakiplere göre geride kaldığınız noktaları hesaplar. Claude ya da ChatGPT sohbetinde çalışır;
 kod bilmeniz gerekmez. Ücretsiz, açık kaynak (MIT).
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/9ddce90e-3a87-4357-8c9c-2fc8adcb58af" controls></video>
+</div>
 
 ![Akış: rakip listesi, sohbete yükleme, agent'ın üç hesabı, sonuç](../kilavuz/gorseller/02-fiyat-rakip-akis.gif)
 

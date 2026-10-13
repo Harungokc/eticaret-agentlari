@@ -39,7 +39,7 @@ kullanabileceklerini ayıkladı. Türkiye pazaryerleri için eksik kalan yerlerd
 
 ## Türkiye pazaryerleri için: bu deponun araçları
 
-Türkiye pazaryerleri için hazırlanmış, kurulum gerektirmeyen beş analiz aracı. **Durum: Denedik** (otomatik
+Türkiye pazaryerleri için hazırlanmış, kurulum gerektirmeyen dört analiz aracı. **Durum: Denedik** (otomatik
 testler Windows, macOS ve Linux'ta geçiyor; paketin Claude ve ChatGPT sohbet ekranına yüklenmesi her planda
 denenmedi).
 
@@ -47,7 +47,6 @@ denenmedi).
 |---|---|---|
 | Hangi pazaryerinde elime ne kalır? | [Pazar ve Komisyon Analizcisi](01-pazar-ve-komisyon-analizcisi/) | Kategori ve satış fiyatı |
 | Fiyatım nerede duruyor? Rakiplerime göre nerede gerideyim? | [Ürün, Fiyat ve Rakip Analizcisi](02-urun-fiyat-ve-rakip-analizcisi/) | Ürün listesi |
-| Müşteriler neden şikâyet ediyor, üründe ne istiyor? | [Yorum Analizcisi](03-yorum-analizcisi/) | Ürün yorumları |
 | Satışlarım hangi il, ilçe ve mahalleye gidiyor? | [Satış Bölge Analizcisi](04-satis-bolge-analizcisi/) | Sipariş listesi (il, ilçe, mahalle, tutar) |
 | Yurt dışında ne çok satıyor, ne yeni yükseliyor, Çin'den kaça gelir? | [Ürün Araştırma Agent'ı](05-urun-arastirma-agenti/) | İlgilendiğiniz alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
@@ -62,7 +61,7 @@ denenmedi).
 3. **Sorun:** *"899 liralık kadın ayakkabıyı hangi pazaryerinde satmalıyım? Maliyetim 400 lira."*
 
 Araçlar hesaplar, asistan anlatır: her rakam bu depodaki koddan gelir. Araçlar hiçbir pazaryerine bağlanmaz;
-ürün listesini, yorumları ve siparişleri siz verirsiniz. Ayrıntılar, sınırlar ve gizlilik notları:
+ürün listesini ve siparişleri siz verirsiniz. Ayrıntılar, sınırlar ve gizlilik notları:
 **[ARACLAR.md](ARACLAR.md)**
 
 ---
@@ -131,7 +130,6 @@ kendi topladığınız listeyle yapmanız gerekir ([Ürün, Fiyat ve Rakip Anali
 
 ### Yorum analizi
 
-Türkçe yorumlar için bu deponun [Yorum Analizcisi](03-yorum-analizcisi/). Alternatif:
 **[review-analyzer-skill](https://github.com/buluslan/review-analyzer-skill)** (132 yıldız · MIT · Kurulum: Orta · Durum:
 İnceledik): yorumlardan 15 bölümlük rapor ve pano üretir; Claude Code gibi bir kodlama asistanı ister, belgeleri
 Çince ağırlıklıdır ve Türkçe yorumla denenmemiştir.

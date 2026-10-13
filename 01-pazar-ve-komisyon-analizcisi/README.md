@@ -1,14 +1,12 @@
 # Pazar ve Komisyon Analizcisi
 
-
-
-https://github.com/user-attachments/assets/d24a3cbd-f913-4809-98b9-00dba8fd1bad
-
-
-
 Ürününüzü satmadan önce iki şeyi bilmek istersiniz: **pazar nasıl görünüyor** ve **hangi
 pazaryerinde elinize ne kalacak**. Bu araç ikisini birlikte hesaplar ve sonucu hem ekranda hem de
 üzerinde oynayabileceğiniz bir **Excel dosyası** olarak verir.
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/d24a3cbd-f913-4809-98b9-00dba8fd1bad" controls></video>
+</div>
 
 ![899 TL'lik ayakkabı üç pazaryerinde: komisyon kesilir, elinize geçen tutar ve kârınız kalır. Oranlar yaklaşıktır.](../kilavuz/gorseller/01-komisyon-grafik.gif)
 
