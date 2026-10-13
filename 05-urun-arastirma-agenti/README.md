@@ -7,7 +7,7 @@ internette yaptığı taramayı kaynaklı ve tarihli bir **rapora** çevirir:
   <video src="https://github.com/user-attachments/assets/50fb48d6-d7f9-47fa-8c89-5a6c8f229dcf" controls></video>
 </div>
 
-![Akış: alanınızı yazarsınız, asistan internette tarar, agent puanlar ve raporu yazar, raporu alırsınız](../kilavuz/gorseller/05-urun-arastirma-akis.gif)
+![Videodaki mutfak taramasından altı ürün: yurt dışı satış fiyatı ve Çin'de fabrika liste fiyatı yan yana](../kilavuz/gorseller/05-urun-arastirma-grafik.gif)
 
 | Soru | Rapor ne gösterir |
 |---|---|
