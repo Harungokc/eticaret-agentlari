@@ -22,7 +22,7 @@ PAKETLER = {
         "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "xlsx.py",
         "ornek/ornek_yorumlar.csv", "ornek/sablon.csv"]),
     "satis-bolge-analizcisi": ("04-satis-bolge-analizcisi", [
-        "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "xlsx.py",
+        "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py",
         "ornek/ornek_siparisler.csv", "ornek/sablon.csv"]),
     "urun-arastirma-agenti": ("05-urun-arastirma-agenti", [
         "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py",

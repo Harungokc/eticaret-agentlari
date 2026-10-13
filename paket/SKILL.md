@@ -22,7 +22,7 @@ dediyse beş aracı birer cümleyle tanıt ve hangisiyle başlamak istediğini s
 | Hangi pazaryerinde elime ne kalır? Komisyon ne kadar? Bu kategoride pazar nasıl? | `ARAC/komisyon/` | Kategori ve satış fiyatı (pazar analizi için ürün listesi) |
 | Bu ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre neredeyim? | `ARAC/urun/` | Ürün listesi (ad, fiyat, puan, yorum) |
 | Müşteriler neden şikâyet ediyor? Üründe ne istiyorlar? Neresi geliştirilebilir? | `ARAC/yorum/` | Ürün yorumları |
-| Satışlarım hangi illere gidiyor? Nerede güçlüyüm, nereye satamıyorum? | `ARAC/bolge/` | Sipariş listesi (yalnızca il, ilçe, tutar) |
+| Satışlarım hangi illere gidiyor? Nerede güçlüyüm, nereye satamıyorum? | `ARAC/bolge/` | Sipariş listesi (yalnızca il, ilçe, mahalle, tutar) |
 | Yurt dışında ne çok satıyor, ne yeni yükseliyor (viral)? Ne satsam? Bu ürünü getirsem kâr eder miyim? | `ARAC/arastirma/` | İlgilendiği alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
 **Bir aracı ilk kez kullanmadan önce o klasördeki `TALIMATLAR.md` dosyasını oku** ve oradaki

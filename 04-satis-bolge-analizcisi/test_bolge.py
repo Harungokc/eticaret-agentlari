@@ -9,9 +9,12 @@ from pathlib import Path
 from xml.dom import minidom
 
 from agent import main as _main
-from analiz import BOLGELER, IL_BOLGESI, Siparis, analiz_et, baslik, il_bul
+from datetime import date
+
+from analiz import BOLGELER, IL_BOLGESI, MAHALLE_EN_AZ, Siparis, analiz_et, baslik, il_bul, mahalle_adi
 from okuyucu import OkumaHatasi, oku
 from rapor import dosya
+from rapor_html import sayfa
 
 ORNEK = str(Path(__file__).parent / "ornek" / "ornek_siparisler.csv")
 
@@ -147,7 +150,7 @@ class ExcelVeKomut(unittest.TestCase):
                 if ad.endswith((".xml", ".rels")):
                     minidom.parseString(z.read(ad))
                     icerik += z.read(ad).decode("utf-8")
-        for ad in ("Özet", "İller", "İlçeler", "Siparişler"):
+        for ad in ("Özet", "Öneriler", "İller", "İlçeler", "Siparişler"):
             self.assertIn(f'name="{ad}"', icerik)
         self.assertNotIn("Gizli", icerik)
 
@@ -163,6 +166,83 @@ class ExcelVeKomut(unittest.TestCase):
             self.assertEqual(main(["analiz", ORNEK, "--excel", str(hedef)])[0], 0)
             self.assertTrue(zipfile.is_zipfile(hedef.with_suffix(".xlsx")))
         self.assertEqual(main(["analiz", "yok.csv"])[0], 1)
+
+
+class MahalleVeOneriler(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.siparisler = oku(ORNEK)
+        cls.r = analiz_et(cls.siparisler)
+
+    def test_mahalle_adi_sadelesir(self):
+        self.assertEqual([mahalle_adi(x) for x in ("ATAKENT MAH.", "Atakent Mahallesi", "atakent mh", "Atakent")], ["Atakent"] * 4)
+
+    def test_il_icinde_ilce_ve_mahalle(self):
+        ilceler = self.r.il_ilceleri["İstanbul"]
+        self.assertEqual((ilceler[0].ad, ilceler[0].siparis), ("Ümraniye", 33))
+        self.assertEqual(sum(x.siparis for x in ilceler), self.r.iller[0].siparis)
+        mahalleler = self.r.ilce_mahalleleri["İstanbul / Ümraniye"]
+        self.assertEqual((mahalleler[0].ad, mahalleler[0].siparis), ("Atakent", 20))
+        self.assertTrue(self.r.mahalle_bilgisi_var)
+
+    def test_az_siparisli_mahalle_listelenmez(self):
+        self.assertTrue(all(x.siparis >= MAHALLE_EN_AZ for x in self.r.mahalleler))
+        self.assertTrue(all(x.siparis >= MAHALLE_EN_AZ for v in self.r.ilce_mahalleleri.values() for x in v))
+        self.assertGreater(self.r.kucuk_mahalle, 0)
+
+    def test_mahalle_sutunu_yoksa(self):
+        r = analiz_et([sip("Bursa", ilce="Nilüfer", no=str(i)) for i in range(15)])
+        self.assertFalse(r.mahalle_bilgisi_var)
+        self.assertEqual((r.mahalleler, r.ilce_mahalleleri), ([], {}))
+        self.assertNotIn("Mahalle", [o.tur for o in r.oneriler])
+
+    def test_oneriler_sayilara_dayanir(self):
+        turler = [o.tur for o in self.r.oneriler]
+        for tur in ("Reklam", "İlçe", "Mahalle", "Kargo", "Sepet", "İade", "Boşluk", "Ürün"):
+            self.assertIn(tur, turler)
+        reklam = self.r.oneriler[0]
+        self.assertIn("%57,8", reklam.baslik)
+        self.assertIn("İstanbul, Ankara ve İzmir", reklam.bulgu)
+        iade = next(o for o in self.r.oneriler if o.tur == "İade")
+        self.assertIn("İstanbul / Ümraniye: 33 siparişte 3 iade", iade.bulgu)
+        self.assertNotIn("Antalya", iade.baslik)  # 21 siparişte 2 iade: sayı az, bulgu sayılmaz
+        self.assertTrue(all(o.bulgu and o.oneri for o in self.r.oneriler))
+
+    def test_dengeli_listede_yogunlasma_onerisi_cikmaz(self):
+        iller = ("İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Konya", "Adana", "Şanlıurfa", "Gaziantep", "Kocaeli")
+        r = analiz_et([sip(il, no=f"{il}{i}", tutar=100.0) for il in iller for i in range(12)])
+        self.assertEqual([o.tur for o in r.oneriler], [])
+
+    def test_rapor_sayfasi(self):
+        html = sayfa(self.r, date(2026, 10, 13), "Deneme")
+        for metin in ("Bulgular ve öneriler", "İl il, ilçe ilçe, mahalle mahalle", "Atakent", "13 Ekim 2026", "Yöntem ve sınırlar"):
+            self.assertIn(metin, html)
+        self.assertNotIn("http://", html.replace("github.com", ""))
+        self.assertNotIn("<script", html)
+
+    def test_rapor_sayfasi_kod_calistirmaz(self):
+        kotu = '<script>alert(1)</script>'
+        s = [Siparis(il="Bursa", il_ham="Bursa", ilce=kotu, mahalle='"><img src=x onerror=alert(2)>', urun=kotu, no=str(i), tutar=10.0)
+             for i in range(12)]
+        html = sayfa(analiz_et(s), date(2026, 10, 13), kotu)
+        self.assertNotIn("<script", html)
+        self.assertNotIn("<img", html)
+
+    def test_komut_rapor_ve_tarih(self):
+        with tempfile.TemporaryDirectory() as k:
+            hedef = Path(k) / "rapor"
+            kod, cikti, _ = main(["analiz", ORNEK, "--rapor", str(hedef), "--tarih", "2026-10-13"])
+            self.assertEqual(kod, 0)
+            self.assertIn("BULGULAR VE ÖNERİLER", cikti)
+            self.assertIn("İSTANBUL İÇİNDE İLÇELER VE MAHALLELER", cikti)
+            self.assertIn("13 Ekim 2026", hedef.with_suffix(".html").read_text(encoding="utf-8"))
+        self.assertEqual(main(["analiz", ORNEK, "--tarih", "13.10.2026"])[0], 1)
+
+    def test_excelde_mahalle_ve_oneri_sayfasi(self):
+        with zipfile.ZipFile(io.BytesIO(dosya(self.siparisler, self.r))) as z:
+            kitap = z.read("xl/workbook.xml").decode("utf-8")
+        for ad in ("Öneriler", "Mahalleler"):
+            self.assertIn(f'name="{ad}"', kitap)
 
 
 if __name__ == "__main__":

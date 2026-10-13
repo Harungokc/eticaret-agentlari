@@ -1,5 +1,5 @@
-"""Sipariş listesini CSV dosyasından okur. Yalnızca il, ilçe, tutar, ürün, sipariş no ve durum sütunları
-alınır; müşteri adı, telefon ve adres sütunları dosyada olsa bile okunmaz."""
+"""Sipariş listesini CSV dosyasından okur. Yalnızca il, ilçe, mahalle, tutar, ürün, sipariş no ve durum
+sütunları alınır; müşteri adı, telefon ve açık adres sütunları dosyada olsa bile okunmaz."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ class OkumaHatasi(Exception):
 _SUTUNLAR = {
     "il": ("il", "şehir", "sehir", "teslimat ili", "teslimat şehri", "il adı", "city", "province", "fatura ili"),
     "ilce": ("ilçe", "ilce", "teslimat ilçesi", "ilçe adı", "district", "semt"),
+    "mahalle": ("mahalle", "mahalle adı", "teslimat mahallesi", "mahalle/köy", "neighborhood", "neighbourhood"),
     "tutar": ("tutar", "toplam tutar", "sipariş tutarı", "satış tutarı", "faturalanacak tutar", "fatura tutarı", "toplam", "fiyat",
               "amount", "total"),
     "urun": ("ürün", "urun", "ürün adı", "urun adi", "product", "ürün ismi"),
@@ -56,7 +57,7 @@ def oku(yol: str | Path) -> list[Siparis]:
             esleme = {alan: next((basliklar[a] for a in adlar if a in basliklar), None) for alan, adlar in _SUTUNLAR.items()}
             if esleme["il"] is None:
                 raise OkumaHatasi("Dosyada 'il' sütunu bulunamadı. İlk satır şu başlıkları içermeli: il;ilçe;tutar "
-                                  "(isteğe bağlı: ürün;sipariş no;durum)")
+                                  "(isteğe bağlı: mahalle;ürün;sipariş no;durum)")
             siparisler = []
             for satir in okur:
                 al = lambda alan: (satir.get(esleme[alan]) or "").strip() if esleme[alan] else ""  # noqa: E731
@@ -66,7 +67,7 @@ def oku(yol: str | Path) -> list[Siparis]:
                 durum = al("durum").replace("İ", "i").replace("I", "ı").lower()
                 tutar = sayi(al("tutar"))
                 siparisler.append(Siparis(
-                    il=il_bul(il_ham), il_ham=il_ham, ilce=al("ilce"), tutar=tutar if tutar is not None and tutar >= 0 else None,
+                    il=il_bul(il_ham), il_ham=il_ham, ilce=al("ilce"), mahalle=al("mahalle"), tutar=tutar if tutar is not None and tutar >= 0 else None,
                     urun=al("urun"), no=al("no"), iade="iade" in durum, iptal="iptal" in durum,
                 ))
     except UnicodeDecodeError:

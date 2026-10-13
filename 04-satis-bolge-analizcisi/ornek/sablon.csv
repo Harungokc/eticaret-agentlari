@@ -1,3 +1,3 @@
-﻿sipariş no;il;ilçe;ürün;tutar;durum
-1001;İstanbul;Kadıköy;Ürün adı;389,90;Teslim edildi
-1002;Ankara;Çankaya;Ürün adı;279,90;İade edildi
+﻿sipariş no;il;ilçe;mahalle;ürün;tutar;durum
+1001;İstanbul;Kadıköy;Göztepe;Çelik Termos 500 ml;389,90;Teslim edildi
+1002;Ankara;Çankaya;Ayrancı;Termos Kupa;279,90;İade edildi

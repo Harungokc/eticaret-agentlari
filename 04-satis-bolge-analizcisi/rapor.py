@@ -1,14 +1,14 @@
-"""Sonuçları Excel dosyasına döker: Özet, İller, Bölgeler, İlçeler ve Siparişler sayfaları.
+"""Sonuçları Excel dosyasına döker: Özet, Öneriler, İller, İlçeler, Mahalleler ve Siparişler sayfaları.
 
-"Siparişler" sayfasına yalnızca il, bölge, ilçe, tutar, ürün ve durum yazılır; kişisel bilgi yazılmaz.
+"Siparişler" sayfasına yalnızca il, bölge, ilçe, mahalle, tutar, ürün ve durum yazılır; kişisel bilgi yazılmaz.
 """
 
 from __future__ import annotations
 
-from analiz import IL_BOLGESI, Rapor, Satir, Siparis, baslik
+from analiz import IL_BOLGESI, MAHALLE_EN_AZ, Rapor, Satir, Siparis, baslik, mahalle_adi
 from xlsx import AFIS, DUZ, ETIKET, NOT, SARMA, SUTUN, TAM, TL, YUZDE, Formul, Sayfa, kitap_yaz
 
-UYARI = ("Bu analiz yalnızca verilen sipariş listesini kapsar. İl ve ilçe, listedeki teslimat bilgisinden alınır; müşteri adı, "
+UYARI = ("Bu analiz yalnızca verilen sipariş listesini kapsar. İl, ilçe ve mahalle, listedeki teslimat bilgisinden alınır; müşteri adı, "
          "telefon ve açık adres kullanılmaz. Araç herhangi bir pazaryeriyle bağlantılı değildir.")
 
 
@@ -74,20 +74,37 @@ def liste_sayfasi(ad: str, baslik_metni: str, sutun_adi: str, satirlar: list[Sat
     return s
 
 
+def oneriler_sayfasi(r: Rapor) -> Sayfa:
+    s = Sayfa("Öneriler", [12, 44, 70, 80], dondur="A4")
+    s.yaz("A1", "Bulgular ve Öneriler", AFIS)
+    s.birlestir("A1:D1", 30)
+    s.yaz("A2", "Her bulgu listedeki bir sayıya dayanır. Öneriler deneyebileceğiniz adımlardır; kesin sonuç sözü değildir.", NOT)
+    s.birlestir("A2:D2", 22)
+    s.satir(3, ["Konu", "Başlık", "Bulgu", "Öneri"], SUTUN)
+    for no, o in enumerate(r.oneriler, 4):
+        s.satir(no, [o.tur, o.baslik, o.bulgu, o.oneri], [ETIKET, SARMA, SARMA, SARMA])
+    if not r.oneriler:
+        s.yaz("A4", "Bu listede kural eşiklerini aşan bir bulgu çıkmadı.", NOT)
+    return s
+
+
 def siparisler_sayfasi(siparisler: list[Siparis]) -> Sayfa:
-    s = Sayfa("Siparişler", [22, 22, 24, 16, 44, 12], dondur="A2")
-    s.satir(1, ["İl", "Bölge", "İlçe", "Tutar", "Ürün", "Durum"], SUTUN)
+    s = Sayfa("Siparişler", [22, 22, 24, 24, 16, 44, 12], dondur="A2")
+    s.satir(1, ["İl", "Bölge", "İlçe", "Mahalle", "Tutar", "Ürün", "Durum"], SUTUN)
     no = 2
     for x in siparisler:
         if x.iptal or not x.il:
             continue
-        s.satir(no, [x.il, IL_BOLGESI[x.il], baslik(x.ilce) if x.ilce else "", x.tutar, x.urun, "İade" if x.iade else ""],
-                [DUZ, DUZ, DUZ, TL, SARMA, DUZ])
+        s.satir(no, [x.il, IL_BOLGESI[x.il], baslik(x.ilce) if x.ilce else "", mahalle_adi(x.mahalle) if x.mahalle else "",
+                     x.tutar, x.urun, "İade" if x.iade else ""], [DUZ, DUZ, DUZ, DUZ, TL, SARMA, DUZ])
         no += 1
     return s
 
 
 def dosya(siparisler: list[Siparis], r: Rapor) -> bytes:
-    return kitap_yaz([ozet_sayfasi(r), liste_sayfasi("İller", "İl Bazında Satışlar", "İl", r.iller, r, True),
-                      liste_sayfasi("İlçeler", "En Çok Sipariş Gelen İlçeler", "İl / İlçe", r.ilceler, r, False),
-                      siparisler_sayfasi(siparisler)])
+    sayfalar = [ozet_sayfasi(r), oneriler_sayfasi(r), liste_sayfasi("İller", "İl Bazında Satışlar", "İl", r.iller, r, True),
+                liste_sayfasi("İlçeler", "İlçe Bazında Satışlar", "İl / İlçe", r.tum_ilceler or r.ilceler, r, False)]
+    if r.mahalleler:
+        sayfalar.append(liste_sayfasi("Mahalleler", f"Mahalle Bazında Satışlar (en az {MAHALLE_EN_AZ} sipariş)", "İl / İlçe / Mahalle",
+                                      r.mahalleler, r, False))
+    return kitap_yaz(sayfalar + [siparisler_sayfasi(siparisler)])

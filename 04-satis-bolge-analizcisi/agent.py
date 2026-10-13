@@ -1,11 +1,12 @@
 """Satış Bölge Analizcisi — komut satırı.
 
-Sipariş listenizden satışlarınızın nereye gittiğini çıkarır: il, bölge ve ilçe bazında.
+Sipariş listenizden satışlarınızın nereye gittiğini çıkarır: il, bölge, ilçe ve mahalle bazında;
+sayılara dayanan bulgu ve önerileri yazar.
 
     python agent.py analiz siparisler.csv
-    python agent.py analiz siparisler.csv --excel sonuc.xlsx
+    python agent.py analiz siparisler.csv --rapor rapor.html --excel sonuc.xlsx
 
-Dosyada yalnızca il sütunu zorunludur; ilçe, tutar, ürün, sipariş no ve durum isteğe bağlıdır.
+Dosyada yalnızca il sütunu zorunludur; ilçe, mahalle, tutar, ürün, sipariş no ve durum isteğe bağlıdır.
 Müşteri adı, telefon ve açık adres gerekmez; dosyada olsalar bile okunmaz.
 Araç hiçbir siteye bağlanmaz. Ek paket gerekmez (Python 3.10+).
 """
@@ -14,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import date
 from pathlib import Path
 
 # Araç hangi klasörden ve hangi Python ayarıyla çalıştırılırsa çalıştırılsın kendi dosyalarını bulsun
@@ -23,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analiz import Rapor, Satir, analiz_et
 from okuyucu import OkumaHatasi, oku
 from rapor import UYARI, dosya
+from rapor_html import sayfa
 
 
 def tl(tutar: float) -> str:
@@ -59,6 +62,19 @@ def yaz(r: Rapor) -> None:
         print("\nEN ÇOK SİPARİŞ GELEN İLÇELER")
         for x in r.ilceler[:10]:
             print(_satir(x, r, 30))
+    for il in r.iller[:3]:
+        ilceler = r.il_ilceleri.get(il.ad, [])
+        if not ilceler:
+            continue
+        print(f"\n{il.ad.replace('i', 'İ').upper()} İÇİNDE İLÇELER" + (" VE MAHALLELER" if r.mahalle_bilgisi_var else ""))
+        for x in ilceler[:6]:
+            mahalleler = r.ilce_mahalleleri.get(f"{il.ad} / {x.ad}", [])
+            ek = ("   mahalleler: " + ", ".join(f"{m.ad} {m.siparis}" for m in mahalleler[:4])) if mahalleler else ""
+            print(f"  {x.ad:<20} {x.siparis:>6} sipariş  ildeki payı {_yuzde(100 * x.siparis / il.siparis):>6}{ek}")
+    if r.mahalleler:
+        print("\nEN ÇOK SİPARİŞ GELEN MAHALLELER")
+        for x in r.mahalleler[:10]:
+            print(f"  {x.ad:<44} {x.siparis:>6} sipariş")
     if r.urun_bilgisi_var:
         print("\nİLK 5 İLDE EN ÇOK SATAN ÜRÜN")
         for x in r.iller[:5]:
@@ -66,6 +82,11 @@ def yaz(r: Rapor) -> None:
     if r.siparis_gelmeyen_iller:
         print(f"\nSİPARİŞ GELMEYEN İLLER ({len(r.siparis_gelmeyen_iller)})")
         print("  " + ", ".join(r.siparis_gelmeyen_iller))
+    print(f"\nBULGULAR VE ÖNERİLER ({len(r.oneriler)})")
+    for no, o in enumerate(r.oneriler, 1):
+        print(f"  {no}. [{o.tur}] {o.baslik}\n     Bulgu: {o.bulgu}\n     Öneri: {o.oneri}")
+    if not r.oneriler:
+        print("  Bu listede kural eşiklerini aşan bir bulgu çıkmadı.")
     for u in r.uyarilar:
         print(f"\nNot: {u}")
     print(f"\n{UYARI}")
@@ -85,11 +106,14 @@ def cikti_kodlamasini_ayarla() -> None:
 
 def main(argv: list[str] | None = None) -> int:
     cikti_kodlamasini_ayarla()
-    p = argparse.ArgumentParser(description="Sipariş listesinden il, bölge ve ilçe bazında satış dağılımı.")
+    p = argparse.ArgumentParser(description="Sipariş listesinden il, bölge, ilçe ve mahalle bazında satış dağılımı, bulgular ve öneriler.")
     alt = p.add_subparsers(dest="komut", required=True)
     q = alt.add_parser("analiz", help="Sipariş listesini analiz eder")
     q.add_argument("dosya", help="Sipariş listesi (.csv); zorunlu sütun: il")
     q.add_argument("--excel", metavar="DOSYA", help="Sonucu Excel dosyası olarak da kaydeder, ör. sonuc.xlsx")
+    q.add_argument("--rapor", metavar="DOSYA", help="Rapor sayfasını (HTML) kaydeder, ör. rapor.html")
+    q.add_argument("--baslik", default="", help="Rapor sayfasının başlığı, ör. \"Mağazam: Temmuz-Eylül satış bölge raporu\"")
+    q.add_argument("--tarih", metavar="YYYY-AA-GG", help="Rapor tarihi; verilmezse bugün")
     a = p.parse_args(argv)
     try:
         siparisler = oku(a.dosya)
@@ -97,7 +121,22 @@ def main(argv: list[str] | None = None) -> int:
     except (OkumaHatasi, ValueError) as hata:
         print(f"Hata: {hata}", file=sys.stderr)
         return 1
+    try:
+        bugun = date.fromisoformat(a.tarih) if a.tarih else date.today()
+    except ValueError:
+        print("Hata: --tarih YYYY-AA-GG biçiminde olmalı, ör. 2026-10-13", file=sys.stderr)
+        return 1
     yaz(r)
+    if a.rapor:
+        yol = Path(a.rapor).expanduser()
+        if yol.suffix.lower() not in (".html", ".htm"):
+            yol = yol.with_suffix(".html")
+        try:
+            yol.write_text(sayfa(r, bugun, a.baslik), encoding="utf-8")
+        except OSError as hata:
+            print(f"Hata: rapor sayfası yazılamadı: {hata}", file=sys.stderr)
+            return 1
+        print(f"\nRapor sayfası kaydedildi: {yol}")
     if a.excel:
         yol = Path(a.excel).expanduser()
         if yol.suffix.lower() != ".xlsx":
