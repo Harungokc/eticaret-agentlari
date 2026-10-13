@@ -1,7 +1,8 @@
 """Ürün Araştırma Agent'ı için hareketli akış şeması (GIF) üretir. Pillow gerekir.
 
 Akış yukarıdan aşağı ilerler: çizgi adım adım dolar, sırası gelen adım belirginleşir, sayılar sayarak gelir.
-Rakamlar 12 Ekim 2026 tarihli gerçek mutfak taramasından alınmıştır (RAKAM sözlüğü); değiştirirseniz
+Rakamlar ve örnek ürünler 13 Ekim 2026'da kaydedilen videodaki mutfak taramasından alınmıştır (RAKAM sözlüğü);
+Çin'de fiyatı bulunan ürün sayısı videoda görünmediği için o kartta sayı yerine fiyat vardır. Değiştirirseniz
 kaynağını da güncelleyin.
 
 Çalıştırmak için: python kilavuz/akis_urun_arastirma.py çıktı.gif
@@ -16,12 +17,12 @@ FON, KUTU, KOYU, ORTA, VURGU = "#F3EEE4", "#E6E4DF", "#2B2B2B", "#8A8782", "#C45
 IZ = "#D3D0C9"  # henüz dolmamış akış çizgisi
 SONUK = 0.30    # sırası gelmemiş adımın görünürlüğü
 
-RAKAM = {"urun": 193, "yukselen": 54, "cok_satan": 102, "cin_fiyatli": 157}
+RAKAM = {"urun": 135, "yukselen": 24, "cok_satan": 79, "cin_fiyat": "$1.90"}
 MESAJ = "Mutfak ürünleri satıyorum. Yurt dışında çok satan ve yükselen ürünleri tara."
 KAYNAKLAR = ("Yurt dışı satış raporları", "Video alışveriş listeleri", "Çin üretici dizini")
-KARTLAR = (("YÜKSELENLER", "yukselen", "ürün yükselişte", "Cam saklama kabı seti", ("satışı bir ayda 2 katı", "ayda yaklaşık 10.000 adet")),
-           ("ÇOK SATANLAR", "cok_satan", "ürün çok satıyor", "Dijital mutfak terazisi", ("ayda yaklaşık 50.000 adet", "175.500 yorum")),
-           ("ÇİN'DE TEDARİK", "cin_fiyatli", "üründe fabrika fiyatı", "Mutfak terazisi", (("Yurt dışı", "$5.99-29.99"), ("Çin fabrika", "$1.45-3.20"))))
+KARTLAR = (("YÜKSELENLER", "yukselen", "ürün yükselişte", "Işık geçirmez yağ spreyi", ("satışı %200 arttı", "ayda yaklaşık 6.000 adet")),
+           ("ÇOK SATANLAR", "cok_satan", "ürün çok satıyor", "Dijital et termometresi", ("ayda yaklaşık 60.000 adet", "yurt dışı fiyatı $13.97")),
+           ("ÇİN'DE TEDARİK", "cin_fiyat", "örnek fabrika liste fiyatı", "Titanyum kesme tahtası", (("Yurt dışı", "$29.99-69.99"), ("Çin fabrika", "$1.90-13.50"))))
 
 
 def karis(a, b, o):
@@ -77,7 +78,7 @@ while genislik(BASLIK, boyut, True) > 960: boyut -= 1
 yaz(d, 60, 80, BASLIK, boyut, KOYU, True)
 yaz(d, 60, 142, "Alanınızı yazarsınız; çok satanları, yükselenleri ve Çin'deki fabrika fiyatını raporlar.", 21, ORTA)
 yaz(d, 60, 1266, "Harun Gökce  ·  github.com/Harungokc/eticaret-agentlari", 18, ORTA)
-yaz(d, 1020, 1267, "12 Ekim 2026 mutfak taraması · satış adetleri tahmindir", 16, ORTA, hiza="sag")
+yaz(d, 1020, 1267, "13 Ekim 2026 mutfak taraması · satış adetleri tahmindir", 16, ORTA, hiza="sag")
 for yollar in hatlar.values():
     for yol in yollar:
         d.line([(x * K, y * K) for x, y in yol], fill=IZ, width=4 * K, joint="curve")
@@ -191,8 +192,12 @@ def kare_ciz(t):
     # sonuç kartları: sayılar sayarak gelir
     sp = yumusak(oran(t, *Z["say"]))
     for (a, b), (_, anahtar, *_r) in zip(KX, KARTLAR):
-        deger = round(RAKAM[anahtar] * sp) if t >= Z["kart"] else 0
-        yaz(cd, a + 20, KY0 + 40, binlik(deger), 56, soluk(VURGU if 0 < sp < 1 else KOYU, KUTU, gk), True)
+        hedef = RAKAM[anahtar]
+        if isinstance(hedef, str):  # sayılmayan değer (fiyat): sayım bitince görünür
+            metin = hedef if sp >= 1 else ""
+        else:
+            metin = binlik(round(hedef * sp) if t >= Z["kart"] else 0)
+        yaz(cd, a + 20, KY0 + 40, metin, 56, soluk(VURGU if 0 < sp < 1 else KOYU, KUTU, gk), True)
     return c.resize((EN, BOY), Image.LANCZOS)
 
 
