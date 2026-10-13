@@ -3,6 +3,8 @@
 Alanınızda yurt dışında şu an ne çok satıyor, ne yeni yükseliyor? Bu araç, Claude ya da ChatGPT'nin
 internette yaptığı taramayı kaynaklı ve tarihli bir **rapora** çevirir:
 
+![Akış: alanınızı yazarsınız, asistan internette tarar, agent puanlar ve raporu yazar, raporu alırsınız](../kilavuz/gorseller/05-urun-arastirma-akis.gif)
+
 | Soru | Rapor ne gösterir |
 |---|---|
 | **Ne yeni yükseliyor?** | Satışının büyük bölümü son 30 güne ait olan ürünler; ayrıca güncel yazılarda geçenlerin izleme listesi |
