@@ -15,9 +15,12 @@ On agent'lık seri ve seriye sonradan eklenen araçlar. Her biri kendi klasörü
 | 9 | Kârlılık Simülatörü | Maliyet, fiyat, kategori, desi | Senaryolara göre ürün başına net kâr, zarar çizgisi | Bekliyor |
 | 10 | Yeni Ürün Fırsat Agent'ı | İlgilenilen alan | Talebi yüksek, satıcısı az ürün türleri; ortalama fiyat ve rekabet düzeyi | Bekliyor |
 | + | Satış Bölge Analizcisi | Sipariş listesi (il, ilçe, tutar) | İl, bölge ve ilçe bazında sipariş, ciro, ortalama sepet, iade oranı | Yayımlandı: `04-satis-bolge-analizcisi/` |
+| + | Ürün Araştırma Agent'ı | İlgilenilen alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı | Yurt dışında çok satan ve yeni yükselen ürünlerin kaynaklı raporu: satış gücü ve yükseliş puanı, ürün türü başına Çin'de fabrika liste fiyatı ve tedarik aramaları, risk uyarısı; Türkiye'de rekabet, ürün başına kâr ve karar | Yayımlandı: `05-urun-arastirma-agenti/` |
 
 ## Veri notu
 
 - 1 ve 9 komisyon tablolarıyla ve satıcının girdiği rakamlarla çalışır.
 - Diğer sekizi pazaryerindeki ürün verisine ihtiyaç duyar. Araçlar pazaryerlerinden veri çekmez;
   ürün verisini satıcı sağlar (liste yapıştırma ya da dosya yükleme).
+- Ürün Araştırma Agent'ında aday ürünleri asistan internet aramasıyla toplar ve her rakamın kaynak
+  bağlantısını yazar; hesabı yine araç yapar. Araç kendisi internete bağlanmaz.

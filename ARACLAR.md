@@ -17,12 +17,13 @@ Claude'a ya da ChatGPT'ye yüklersiniz, sonra konuşur gibi sorarsınız. Kod bi
 | Ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre nerede gerideyim? | [Ürün, Fiyat ve Rakip Analizcisi](02-urun-fiyat-ve-rakip-analizcisi/) | Ürün listesi |
 | Müşteriler neden şikâyet ediyor, üründe ne istiyor? | [Yorum Analizcisi](03-yorum-analizcisi/) | Ürün yorumları |
 | Satışlarım hangi illere gidiyor? Nerede güçlüyüm? | [Satış Bölge Analizcisi](04-satis-bolge-analizcisi/) | Sipariş listesi (il, ilçe, tutar) |
+| Yurt dışında ne çok satıyor, ne yeni yükseliyor, Çin'den kaça gelir? | [Ürün Araştırma Agent'ı](05-urun-arastirma-agenti/) | İlgilendiğiniz alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
 Her araç sonucu sohbette özetler ve üzerinde oynayabileceğiniz bir **Excel dosyası** verir.
 
 ## Kurulum: tek dosya, üç adım
 
-**1. Paketi indirin:** [eticaret-analiz-araclari.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/eticaret-analiz-araclari.zip) — dört aracın hepsi içinde. ZIP'ten çıkarmayın.
+**1. Paketi indirin:** [eticaret-analiz-araclari.zip](https://github.com/Harungokc/eticaret-agentlari/releases/latest/download/eticaret-analiz-araclari.zip) — beş aracın hepsi içinde. ZIP'ten çıkarmayın.
 
 **2. Asistanınıza yükleyin:**
 
