@@ -16,6 +16,12 @@ internette yaptığı taramayı kaynaklı ve tarihli bir **rapora** çevirir:
 Sonucu **rapor sayfası** (tarayıcıda açılır, yazdırılır) ve **Excel dosyası** olarak verir. Ücretsiz,
 açık kaynak (MIT).
 
+## Videoda görün
+
+[Kullanım videosu (3 dakika, sessiz)](../kilavuz/gorseller/05-urun-arastirma-video.mp4): aracın Claude'a yüklenmesi, tek cümlelik
+istek, taramanın bitmesi, raporun ve Excel'in açılması, ürün ve Çin'de tedarik bağlantılarına tıklanması. Bekleme kısmı
+hızlandırılmıştır; gerçek tarama yaklaşık 7 dakika sürdü.
+
 ## Kim ne yapar
 
 - **Asistan (Claude ya da ChatGPT) tarar.** İnternette arama yapıp ürünleri, gördüğü rakamları ve
