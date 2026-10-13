@@ -4,6 +4,8 @@
 pazaryerinde elinize ne kalacak**. Bu araç ikisini birlikte hesaplar ve sonucu hem ekranda hem de
 üzerinde oynayabileceğiniz bir **Excel dosyası** olarak verir.
 
+![899 TL'lik ayakkabı üç pazaryerinde: komisyon kesilir, elinize geçen tutar ve kârınız kalır. Oranlar yaklaşıktır.](../kilavuz/gorseller/01-komisyon-grafik.gif)
+
 | | |
 |---|---|
 | **Kimin için** | Trendyol, Hepsiburada, n11 veya Amazon'da satış yapan ya da yapmayı düşünen herkes |
