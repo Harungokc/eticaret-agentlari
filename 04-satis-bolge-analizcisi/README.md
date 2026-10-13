@@ -2,6 +2,8 @@
 
 Satışlarınız nereye gidiyor? Bu araç sipariş listenizdeki il ve ilçe bilgisini sayar:
 
+![Sipariş listesi girer; il il, ilçe ilçe dağılım çıkar. Rakamlar örnek veridir.](../kilavuz/gorseller/04-satis-bolge-grafik.gif)
+
 | Soru | Araç ne gösterir |
 |---|---|
 | **En çok nereye satıyorum?** | İl, bölge ve ilçe bazında sipariş sayısı, pay, ciro ve ortalama sepet |
