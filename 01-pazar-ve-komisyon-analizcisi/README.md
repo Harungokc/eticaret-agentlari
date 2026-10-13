@@ -1,5 +1,11 @@
 # Pazar ve Komisyon Analizcisi
 
+
+
+https://github.com/user-attachments/assets/d24a3cbd-f913-4809-98b9-00dba8fd1bad
+
+
+
 Ürününüzü satmadan önce iki şeyi bilmek istersiniz: **pazar nasıl görünüyor** ve **hangi
 pazaryerinde elinize ne kalacak**. Bu araç ikisini birlikte hesaplar ve sonucu hem ekranda hem de
 üzerinde oynayabileceğiniz bir **Excel dosyası** olarak verir.
