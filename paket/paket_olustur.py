@@ -24,12 +24,16 @@ PAKETLER = {
     "urun-arastirma-agenti": ("05-urun-arastirma-agenti", [
         "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py",
         "ornek/ornek_adaylar.csv", "ornek/sablon.csv"]),
+    "reklam-analizcisi": ("06-reklam-analizcisi", [
+        "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py",
+        "ornek/ornek_urun_reklami.csv", "ornek/ornek_arama_terimleri.csv", "ornek/ornek_maliyetler.csv",
+        "ornek/sablon.csv", "ornek/sablon_maliyet.csv"]),
 }
 # Bütün araçları içeren tek paket: her araç kendi alt klasöründe, talimatları TALIMATLAR.md adıyla durur.
 TEK_PAKET = "eticaret-analiz-araclari"
 ALT_KLASOR = {"pazar-komisyon-analizcisi": "komisyon", "urun-fiyat-rakip-analizcisi": "urun",
               "satis-bolge-analizcisi": "bolge",
-              "urun-arastirma-agenti": "arastirma"}
+              "urun-arastirma-agenti": "arastirma", "reklam-analizcisi": "reklam"}
 SABIT_TARIH = (2026, 1, 1, 0, 0, 0)  # aynı içerik her seferinde aynı ZIP'i üretsin
 
 

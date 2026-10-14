@@ -1,16 +1,16 @@
 ---
 name: eticaret-analiz-araclari
-description: Türkiye'deki e-ticaret satıcıları (Trendyol, Hepsiburada, n11, Amazon) için dört analiz aracı. Pazaryeri komisyonu ve ele geçen tutar karşılaştırması; ürün listesinden pazar ortalamaları, fiyat konumu ve rakip karşılaştırması; sipariş listesinden il ve bölge bazında satış dağılımı; yurt dışında viral olan ürünleri araştırıp Türkiye'de satılabilirliğini değerlendirme. Kullanıcı "hangi pazaryerinde elime ne kalır", "fiyatım pazarda nerede", "rakiplerime göre neredeyim", "satışlarım hangi illere gidiyor", "yurt dışında hangi ürünler tutuyor, ne satsam" gibi sorular sorduğunda ya da ürün listesi ya da sipariş dökümü verdiğinde kullan.
+description: Türkiye'deki e-ticaret satıcıları (Trendyol, Hepsiburada, n11, Amazon) için beş analiz aracı. Pazaryeri komisyonu ve ele geçen tutar karşılaştırması; ürün listesinden pazar ortalamaları, fiyat konumu ve rakip karşılaştırması; sipariş listesinden il ve bölge bazında satış dağılımı; yurt dışında viral olan ürünleri araştırıp Türkiye'de satılabilirliğini değerlendirme; reklam raporundan harcama, satış ve reklam sonrası kâr. Kullanıcı "hangi pazaryerinde elime ne kalır", "fiyatım pazarda nerede", "rakiplerime göre neredeyim", "satışlarım hangi illere gidiyor", "yurt dışında hangi ürünler tutuyor, ne satsam", "reklamım kâr ettiriyor mu" gibi sorular sorduğunda ya da ürün listesi, sipariş dökümü ya da reklam raporu verdiğinde kullan.
 ---
 
 # E-ticaret Analiz Araçları
 
-Bu pakette dört bağımsız Python aracı var. Hepsi ek paket ve internet gerektirmez (Python 3.10+).
+Bu pakette beş bağımsız Python aracı var. Hepsi ek paket ve internet gerektirmez (Python 3.10+).
 Sen kullanıcının e-ticaret analiz asistanısın: **sayıları araçlar üretir, yorumu sen yaparsın.**
 
 Bu klasör sana bir ZIP dosyası olarak verildiyse (ör. ChatGPT): ZIP'i aç ve bu dosyayı oku. Kullanıcı
 belirli bir şey istediyse soru sormadan doğrudan o işi yap. Yalnızca "kur" ya da "ne yapabiliyorsun"
-dediyse dört aracı birer cümleyle tanıt ve hangisiyle başlamak istediğini sor. Araç talimatlarındaki
+dediyse beş aracı birer cümleyle tanıt ve hangisiyle başlamak istediğini sor. Araç talimatlarındaki
 "örnek veriyle çalıştığını göster" adımı da yalnızca kullanıcı kendi verisini vermediyse geçerlidir.
 
 ## Hangi soru hangi araca gider
@@ -22,6 +22,7 @@ dediyse dört aracı birer cümleyle tanıt ve hangisiyle başlamak istediğini 
 | Hangi pazaryerinde elime ne kalır? Komisyon ne kadar? Bu kategoride pazar nasıl? | `ARAC/komisyon/` | Kategori ve satış fiyatı (pazar analizi için ürün listesi) |
 | Bu ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre neredeyim? | `ARAC/urun/` | Ürün listesi (ad, fiyat, puan, yorum) |
 | Satışlarım hangi illere gidiyor? Nerede güçlüyüm, nereye satamıyorum? | `ARAC/bolge/` | Sipariş listesi (yalnızca il, ilçe, mahalle, tutar) |
+| Reklamım kâr ettiriyor mu? Bütçem nereye gidiyor? Hangi reklam ya da arama terimi para yakıyor? | `ARAC/reklam/` | Reklam raporu (.csv/.xlsx); kâr için ürün maliyeti, komisyon, kargo |
 | Yurt dışında ne çok satıyor, ne yeni yükseliyor (viral)? Ne satsam? Bu ürünü getirsem kâr eder miyim? | `ARAC/arastirma/` | İlgilendiği alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
 **Bir aracı ilk kez kullanmadan önce o klasördeki `TALIMATLAR.md` dosyasını oku** ve oradaki
