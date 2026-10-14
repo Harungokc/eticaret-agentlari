@@ -1,7 +1,7 @@
 """Satış Bölge Analizcisi için hareketli görsel (GIF) üretir. Pillow gerekir.
 
 Üstte sipariş listesi akar ve sayılır (yalnızca il ve ilçe sütunları öne çıkar); altta aynı siparişler
-il il, her ilin altında ilçe ilçe çubuklara dönüşür.
+il il, her ilin altında ilçe ilçe çubuklara dönüşür; en altta aracın bir önerisi belirir.
 Satırlar ve rakamlar aracın örnek dosyasından (04-satis-bolge-analizcisi/ornek/ornek_siparisler.csv,
 400 uydurma sipariş) ve o dosyadaki çıktısından alınmıştır; değiştirirseniz kaynağını da güncelleyin.
 
@@ -27,7 +27,8 @@ SATIRLAR = (("S100001", "İzmir", "Karşıyaka", "Çelik Termos 750 ml", "459,90
 ILLER = (("İstanbul", 118, "%30,0", (("Ümraniye", 33), ("Bağcılar", 20), ("Esenyurt", 19))),
          ("Ankara", 65, "%16,5", (("Yenimahalle", 20), ("Mamak", 17), ("Çankaya", 16))),
          ("İzmir", 44, "%11,2", (("Karşıyaka", 15), ("Konak", 11), ("Bornova", 9))))
-ALT = (("55", "ile hiç satış yok"), ("%5,6", "Marmara'da iade oranı"), ("%1,1", "İç Anadolu'da iade oranı"))
+# Aracın örnek dosyadaki ilk önerisinin kısaltılmışı (agent.py analiz ornek/ornek_siparisler.csv, 1. madde)
+ONERI = ("İlk üç ilin payı %57,8.", "Reklam bütçesinin ana bölümünü bu üç ile ayırın.")
 KOLON = (96, 262, 432, 610, 990)      # sipariş no, il, ilçe, ürün, tutar (sağa yaslı)
 X0, OLCEK = 270, 500 / 118            # çubukların başlangıcı ve sipariş başına genişlik
 BLOK_Y, BLOK = 566, 158
@@ -54,8 +55,8 @@ def numara(d, x, y, no):
 taban = Image.new("RGB", (EN * K, BOY * K), FON)
 d = ImageDraw.Draw(taban)
 yaz(d, 60, 50, "SATIŞ BÖLGE ANALİZCİSİ", 16, ORTA, True)
-yaz(d, 60, 80, "Sipariş listeniz girer,", 50, KOYU, True)
-yaz(d, 60, 138, "il il, ilçe ilçe dağılım çıkar.", 50, VURGU, True)
+yaz(d, 60, 80, "Sipariş listenizi verin,", 50, KOYU, True)
+yaz(d, 60, 138, "analizi ve önerileri alın.", 50, VURGU, True)
 d.rounded_rectangle(k(60, 212, 1020, 470), radius=20 * K, fill=KUTU)
 numara(d, 100, 248, 1); yaz(d, 130, 233, "Sipariş listeniz", 25, KOYU, True)
 d.rounded_rectangle(k(246, 276, 596, 428), radius=12 * K, fill=FON)     # okunan iki sütun
@@ -65,7 +66,7 @@ yaz(d, 96, 438, "Araç yalnızca il ve ilçeyi sayar; müşteri adı, telefon ve
 numara(d, 100, 536, 2); yaz(d, 130, 521, "İl ve ilçe dağılımı", 25, KOYU, True)
 yaz(d, 1020, 527, "sipariş sayısı", 17, ORTA, hiza="sag")
 d.rounded_rectangle(k(60, 1052, 1020, 1146), radius=20 * K, fill=KUTU)
-yaz(d, 60, 1168, "Sonuç Excel dosyası olarak gelir: iller, bölgeler, ilçeler, her ilde en çok satan ürün.", 17, ORTA)
+yaz(d, 60, 1168, "Rapor sayfası ve Excel: iller, ilçeler, mahalleler, iade, bulgular ve öneriler.", 17, ORTA)
 yaz(d, 60, 1266, "Harun Gökce  ·  github.com/Harungokc/eticaret-agentlari", 18, ORTA)
 yaz(d, 1020, 1267, "Örnek veri: 400 uydurma sipariş", 16, ORTA, hiza="sag")
 
@@ -112,12 +113,11 @@ def kare_ciz(t):
             if q >= 1:
                 yaz(cd, X0 + n * OLCEK + 12, yy, str(n), 20, VURGU, True)
 
-    # alt şerit
+    # alt kutu: aracın önerisi
     ap = yumusak(oran(t, *Z["alt"]))
-    for j, (sayi, ad) in enumerate(ALT):
-        x = 84 + j * 310
-        w = yaz(cd, x, 1078, sayi, 36, karis(KOYU, KUTU, ap), True)
-        yaz(cd, x + w + 10, 1094, ad, 18, karis(ORTA, KUTU, ap))
+    yaz(cd, 84, 1066, "ÖNERİ", 18, karis(VURGU, KUTU, ap), True)
+    w = yaz(cd, 84, 1100, ONERI[0] + " ", 23, karis(KOYU, KUTU, ap), True)
+    yaz(cd, 84 + w, 1100, ONERI[1], 23, karis(KOYU, KUTU, ap))
     return c.resize((EN, BOY), Image.LANCZOS)
 
 
