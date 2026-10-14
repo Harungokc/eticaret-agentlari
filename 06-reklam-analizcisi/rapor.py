@@ -6,7 +6,10 @@ Oranlar formülle yazılır; satıcı bir hücreyi değiştirince (ör. sipariş
 from __future__ import annotations
 
 from analiz import EN_AZ_SIPARIS, EN_AZ_TIKLAMA, Kalem, Rapor
-from xlsx import AFIS, DUZ, ETIKET, GIRDI_TL, NOT, ONDALIK, SARMA, SUTUN, TAM, TL, YUZDE, Formul, Sayfa, kitap_yaz
+from xlsx import AFIS, DUZ, ETIKET, GIRDI_METIN, GIRDI_TL, NOT, ONDALIK, SARMA, SUTUN, TAM, TL, YUZDE, Formul, Sayfa, kitap_yaz
+from yonetim import Yonetim, is_adi
+
+ONCELIK = {1: "Hemen", 2: "Bu hafta", 3: "İzle"}
 
 UYARI = ("Bu analiz yalnızca verilen reklam raporunu kapsar. Panelin gösterdiği reklam satışı, reklam olmasa da gelecek "
          "satışları ayırmaz; reklam getirisi gerçek etkiden yüksek görünebilir. Araç herhangi bir pazaryeriyle bağlantılı değildir.")
@@ -87,8 +90,47 @@ def kalem_sayfasi(ad: str, baslik: str, kalemler: list[Kalem], r: Rapor, kar: bo
     return s
 
 
-def dosya(r: Rapor) -> bytes:
-    sayfalar = [ozet_sayfasi(r), oneriler_sayfasi(r)]
+def yapilacaklar_sayfasi(y: Yonetim) -> Sayfa:
+    s = Sayfa("Yapılacaklar", [36, 14, 10, 22, 14, 14, 13, 60, 60, 12], dondur="A2")
+    s.satir(1, ["Reklam", "Tür", "Öncelik", "İş", "Dönem harcaması", "Önerilen harcama", "Günlük bütçe", "Neden", "Beklenen",
+                "Yapıldı mı?"], SUTUN)
+    for no, x in enumerate(y.eylemler, 2):
+        yeni = x.harcama if x.yeni_harcama is None else x.yeni_harcama
+        gun = Formul(f"F{no}/{y.gun}", yeni / y.gun) if y.gun else ""
+        s.satir(no, [x.hedef, x.tur, ONCELIK[x.oncelik], is_adi(x), x.harcama, yeni, gun, x.neden, x.beklenen, ""],
+                [SARMA, DUZ, DUZ, DUZ, TL, TL, TL, SARMA, SARMA, GIRDI_METIN])
+    son = len(y.eylemler) + 1
+    alt = son + 2
+    s.satir(alt, ["Toplam", "", "", "", Formul(f"SUM(E2:E{son})", y.harcama), Formul(f"SUM(F2:F{son})", y.yeni_harcama)],
+            [ETIKET, DUZ, DUZ, DUZ, TL, TL])
+    s.yaz(f"A{alt + 2}", "Araç hiçbir ayarı değiştirmez; işleri panelde siz yaparsınız. Yaptığınız işin karşısına \"Evet\" yazın. "
+                         "Önerilen harcama aynı uzunlukta bir dönem içindir"
+                         + (f"; günlük bütçe = önerilen harcama ÷ {y.gun} gün." if y.gun else ".")
+                         + " Arama terimi raporunda toplam terimlerden hesaplanır.", NOT)
+    s.birlestir(f"A{alt + 2}:J{alt + 2}", 30)
+    return s
+
+
+def takip_sayfasi(y: Yonetim) -> Sayfa:
+    s = Sayfa("Takip", [36, 14, 22, 20, 12, 44, 44, 70], dondur="A2")
+    s.satir(1, ["Reklam", "Tür", "Geçen dönemin işi", "Yapıldı mı", "Sonuç", "Geçen dönem", "Bu dönem", "Ayrıntı"], SUTUN)
+    for no, t in enumerate(y.takip, 2):
+        s.satir(no, [t.hedef, t.tur, t.is_, t.yapildi, t.sonuc, t.once, t.simdi, t.yorum],
+                [SARMA, DUZ, DUZ, DUZ, DUZ, SARMA, SARMA, SARMA])
+    alt = len(y.takip) + 3
+    s.yaz(f"A{alt}", "\"Yapıldı mı\" rapordaki rakamlardan çıkarılır; araç panel ayarlarını görmez. İki rapor aynı uzunlukta dönemi "
+                     "kapsamalıdır.", NOT)
+    s.birlestir(f"A{alt}:H{alt}", 30)
+    return s
+
+
+def dosya(r: Rapor, y: Yonetim | None = None) -> bytes:
+    sayfalar = [ozet_sayfasi(r)]
+    if y is not None:
+        sayfalar.append(yapilacaklar_sayfasi(y))
+        if y.takip:
+            sayfalar.append(takip_sayfasi(y))
+    sayfalar.append(oneriler_sayfasi(r))
     if r.kalemler:
         ad = "Ürünler" if r.birim == "Ürün" else "Kampanyalar"
         sayfalar.append(kalem_sayfasi(ad, r.birim, r.kalemler, r, kar=r.maliyet_var))

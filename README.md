@@ -48,7 +48,7 @@ denenmedi).
 | Hangi pazaryerinde elime ne kalır? | [Pazar ve Komisyon Analizcisi](01-pazar-ve-komisyon-analizcisi/) | Kategori ve satış fiyatı |
 | Fiyatım nerede duruyor? Rakiplerime göre nerede gerideyim? | [Ürün, Fiyat ve Rakip Analizcisi](02-urun-fiyat-ve-rakip-analizcisi/) | Ürün listesi |
 | Satışlarım hangi il, ilçe ve mahalleye gidiyor? | [Satış Bölge Analizcisi](04-satis-bolge-analizcisi/) | Sipariş listesi (il, ilçe, mahalle, tutar) |
-| Reklamım kâr ettiriyor mu? Hangi reklam para yakıyor? | [Reklam Analizcisi](06-reklam-analizcisi/) | Panelden indirilen reklam raporu; kâr için ürün maliyeti |
+| Reklamım kâr ettiriyor mu? Bu hafta reklamlarımda ne yapmalıyım? | [Reklam Analizcisi](06-reklam-analizcisi/) | Panelden indirilen reklam raporu; kâr için ürün maliyeti |
 | Yurt dışında ne çok satıyor, ne yeni yükseliyor, Çin'den kaça gelir? | [Ürün Araştırma Agent'ı](05-urun-arastirma-agenti/) | İlgilendiğiniz alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
 **Kurulum: tek dosya, üç adım**

@@ -1,6 +1,6 @@
 ---
 name: reklam-analizcisi
-description: Türkiye'deki e-ticaret satıcıları için reklam raporundan (Trendyol, Hepsiburada, Amazon, Meta, Google ya da başka bir panelden indirilen) hangi reklamın satış getirdiğini, hangisinin bütçeyi boşa harcadığını çıkarır; ürün maliyeti verilirse reklamdan sonra elde kalan kârı ve başa baş noktasını hesaplar; sayılara dayanan bulgular ve öneriler. Kullanıcı "reklam kâr ettiriyor mu", "reklam bütçem nereye gidiyor", "hangi ürüne reklam vermeliyim", "ROAS'ım iyi mi", "hangi arama terimleri para yakıyor" gibi sorular sorduğunda ya da reklam raporu yüklediğinde kullan. Sonucu rapor sayfası (HTML) ve Excel dosyası olarak verir.
+description: Türkiye'deki e-ticaret satıcıları için reklam raporundan (Trendyol, Hepsiburada, Amazon, Meta, Google ya da başka bir panelden indirilen) hangi reklamın satış getirdiğini, hangisinin bütçeyi boşa harcadığını çıkarır; ürün maliyeti verilirse reklamdan sonra elde kalan kârı ve başa baş noktasını hesaplar; her reklam için panelde yapılacak tek işi (durdur, teklifi düşür, bütçeyi artır, negatif kelime ekle) önerilen bütçesiyle yazar; geçen dönemin raporu da verilirse geçen dönemin işlerinin yapılıp yapılmadığını ve sonucunu gösterir. Kullanıcı "reklam kâr ettiriyor mu", "reklam bütçem nereye gidiyor", "hangi ürüne reklam vermeliyim", "reklamlarımı nasıl yöneteyim", "bu hafta ne yapmalıyım", "ROAS'ım iyi mi", "hangi arama terimleri para yakıyor" gibi sorular sorduğunda ya da reklam raporu yüklediğinde kullan. Sonucu rapor sayfası (HTML) ve Excel dosyası olarak verir.
 ---
 
 # Reklam Analizcisi
@@ -8,7 +8,8 @@ description: Türkiye'deki e-ticaret satıcıları için reklam raporundan (Tren
 Bu klasördeki Python aracı, kullanıcının reklam raporunu ürün (ya da kampanya) ve arama terimi bazında toplar
 ve bir **rapor** üretir: harcama, reklamdan gelen satış, reklam getirisi (ROAS), reklam maliyet oranı, tıklama
 oranı, dönüşüm; maliyet bilgisi verilirse **reklamdan sonra elde kalan** ve **başa baş oranı**; bu sayılara
-dayanan **bulgular ve öneriler**. Ek paket ve internet gerektirmez (Python 3.10+ yeterli). Sayıları ve önerileri
+dayanan **bulgular ve öneriler**; her reklam için panelde yapılacak tek işi içeren **yapılacaklar listesi** ve geçen
+dönemin raporu verilirse **takip** (geçen dönemin işleri yapıldı mı, sonuç ne oldu). Ek paket ve internet gerektirmez (Python 3.10+ yeterli). Sayıları ve önerileri
 araç üretir; sen aktarır ve açıklarsın.
 
 Bu klasör sana bir ZIP dosyası olarak verildiyse (ör. ChatGPT): ZIP'i aç, bu dosyayı sonuna kadar oku ve aşağıdaki
@@ -36,9 +37,12 @@ Kullanıcı yalnızca aracın nasıl çalıştığını görmek isterse örnek d
    genel bir oran verirse `--kar-marji 25` kullan.
 3. **Önerileri aracın çıktısından al.** "BULGULAR VE ÖNERİLER" bölümündeki her maddeyi dayandığı sayıyla birlikte
    aktar. Kendi yorumunu eklersen bunun aracın değil senin yorumun olduğunu söyle.
-4. Araç reklam hesabına bağlanmaz ve hiçbir değişiklik yapmaz. Kullanıcı "reklamı durdur, teklifi değiştir"
-   derse bunu panelden kendisinin yapması gerektiğini söyle.
-5. Her sonuçta şunu belirt: panelin gösterdiği reklam satışı, reklam olmasa da gelecek satışları ayırmaz; reklam
+4. Araç reklam hesabına bağlanmaz ve hiçbir değişiklik yapmaz. Yapılacaklar listesindeki işleri kullanıcı panelde
+   kendisi yapar. Kullanıcı "reklamı sen durdur" derse bunu yapamayacağını, panelden kendisinin yapması gerektiğini
+   söyle.
+5. **Yapılacaklar listesini değiştirme.** İşi, yüzdeyi ve önerilen harcamayı araçtan olduğu gibi aktar. Önerilen
+   harcama, raporla aynı uzunlukta bir dönem içindir; günlük bütçe yalnızca `--gun` verildiyse hesaplanır.
+6. Her sonuçta şunu belirt: panelin gösterdiği reklam satışı, reklam olmasa da gelecek satışları ayırmaz; reklam
    getirisi gerçek etkiden yüksek görünebilir.
 
 ## Sütunları denetleme (her yeni dosyada önce bunu yap)
@@ -92,6 +96,20 @@ python3 ARAC/agent.py analiz ARAC/ornek/ornek_urun_reklami.csv --maliyet ARAC/or
   --rapor CIKTI/ornek-rapor.html
 ```
 
+**Panelde günlük bütçe girildiği için** raporun kaç günlük olduğunu sor ya da dosyadaki tarihlerden oku ve
+`--gun 7` gibi ver; araç önerilen günlük bütçeyi yazar. Bilmiyorsan `--gun` verme; gün sayısı uydurma.
+
+**Takip:** kullanıcı geçen dönemin raporunu da eklediyse (aynı uzunlukta dönem) `--onceki` ile ver:
+
+```bash
+python3 ARAC/agent.py analiz BU_DONEM.xlsx --onceki GECEN_DONEM.xlsx --maliyet CIKTI/maliyetler.csv --gun 7 \
+  --rapor CIKTI/reklam-raporu.html --excel CIKTI/reklam-analizi.xlsx
+```
+
+Araç geçen dönemin yapılacaklar listesini yeniden çıkarır ve her işin bu dönemin raporunda yapılıp yapılmadığını
+rakamlardan anlar (ör. harcama sıfırsa durdurulmuş, tıklama başı maliyet düştüyse teklif düşürülmüş). Panel
+ayarlarını görmediği için bu bir çıkarımdır; "Yapılmamış görünüyor" diye aktar, "yapmamışsınız" deme.
+
 `--baslik "..."` ile rapor sayfasına başlık verebilirsin (ör. mağaza adı ve dönem); `--tarih YYYY-AA-GG` rapor
 tarihini belirler.
 
@@ -106,9 +124,11 @@ Dosyaları sunduktan sonra sohbette kısa bir özet yaz:
 
 1. **Genel tablo:** harcama, reklamdan gelen satış, ROAS; maliyet verildiyse **reklam sonrası kalan**. Panel ROAS'ı
    iyi görünüp reklam sonrası kalan eksiyse bunu açıkça söyle; raporun asıl bulgusu budur.
-2. **Bulgular ve öneriler:** aracın yazdığı her maddeyi sırasıyla aktar: konu, dayandığı sayı, öneri. Madde
-   atlamak ya da sayısını değiştirmek yok.
-3. **Sınır:** analiz yalnızca bu raporu kapsar; reklam satışı reklamsız gelecek satışı ayırmaz; kâr, verilen
+2. **Takip** (`--onceki` verildiyse): yapılmamış görünen işler ve kötüleşenler önce.
+3. **Yapılacaklar:** "Hemen" ve "Bu hafta" önceliğindeki her işi sırasıyla aktar: reklam, iş, önerilen harcama,
+   neden. "İzle" olanları tek cümleyle topla. Planın bütçe etkisini (kesilen, eklenen) söyle.
+4. **Bulgular:** aracın yazdığı maddeleri kısaca aktar; madde atlamak ya da sayısını değiştirmek yok.
+5. **Sınır:** analiz yalnızca bu raporu kapsar; reklam satışı reklamsız gelecek satışı ayırmaz; kâr, verilen
    maliyet bilgisi kadar doğrudur.
 
 ## Araç ne hesaplar
@@ -122,6 +142,11 @@ Dosyaları sunduktan sonra sohbette kısa bir özet yaz:
   payı satış payını aşan yoğunlaşma, zarar ettiren ve rahat kâr ettiren reklamlar, reklamsız da zarar eden
   ürünler, tıklanmayan ve tıklanıp satmayan kalemler, satış getirmeyen, pahalı ve verimli arama terimleri.
   Kârlılık en az 3 siparişli kalemde, tıklama oranı en az 1.000 gösterimde yorumlanır.
+
+- **Yapılacaklar** her reklam için tek iş seçer: satış getirmeyen ya da reklamsız da zarar eden → durdur; zarar
+  ettiren → teklifi başa baş noktasına inecek kadar düşür (gereken düşüş yarıdan fazlaysa durdur); rahat kâr ettiren →
+  bütçeyi %20 artır; az veri → dokunma. Arama terimlerinde: satış getirmeyen → negatif kelime, pahalı → teklifi düşür,
+  verimli → ayrı kampanyaya al. Maliyet verilmediyse kâr vaadi yoktur; öneriler genel orana göredir.
 
 ## Sınırlar
 

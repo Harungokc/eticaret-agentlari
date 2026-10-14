@@ -1,6 +1,6 @@
 ---
 name: eticaret-analiz-araclari
-description: Türkiye'deki e-ticaret satıcıları (Trendyol, Hepsiburada, n11, Amazon) için beş analiz aracı. Pazaryeri komisyonu ve ele geçen tutar karşılaştırması; ürün listesinden pazar ortalamaları, fiyat konumu ve rakip karşılaştırması; sipariş listesinden il ve bölge bazında satış dağılımı; yurt dışında viral olan ürünleri araştırıp Türkiye'de satılabilirliğini değerlendirme; reklam raporundan harcama, satış ve reklam sonrası kâr. Kullanıcı "hangi pazaryerinde elime ne kalır", "fiyatım pazarda nerede", "rakiplerime göre neredeyim", "satışlarım hangi illere gidiyor", "yurt dışında hangi ürünler tutuyor, ne satsam", "reklamım kâr ettiriyor mu" gibi sorular sorduğunda ya da ürün listesi, sipariş dökümü ya da reklam raporu verdiğinde kullan.
+description: Türkiye'deki e-ticaret satıcıları (Trendyol, Hepsiburada, n11, Amazon) için beş analiz aracı. Pazaryeri komisyonu ve ele geçen tutar karşılaştırması; ürün listesinden pazar ortalamaları, fiyat konumu ve rakip karşılaştırması; sipariş listesinden il ve bölge bazında satış dağılımı; yurt dışında viral olan ürünleri araştırıp Türkiye'de satılabilirliğini değerlendirme; reklam raporundan harcama, satış, reklam sonrası kâr ve her reklam için haftalık yapılacaklar. Kullanıcı "hangi pazaryerinde elime ne kalır", "fiyatım pazarda nerede", "rakiplerime göre neredeyim", "satışlarım hangi illere gidiyor", "yurt dışında hangi ürünler tutuyor, ne satsam", "reklamım kâr ettiriyor mu" gibi sorular sorduğunda ya da ürün listesi, sipariş dökümü ya da reklam raporu verdiğinde kullan.
 ---
 
 # E-ticaret Analiz Araçları
@@ -22,7 +22,7 @@ dediyse beş aracı birer cümleyle tanıt ve hangisiyle başlamak istediğini s
 | Hangi pazaryerinde elime ne kalır? Komisyon ne kadar? Bu kategoride pazar nasıl? | `ARAC/komisyon/` | Kategori ve satış fiyatı (pazar analizi için ürün listesi) |
 | Bu ürünün pazar ortalaması ne? Fiyatım nerede duruyor? Rakiplerime göre neredeyim? | `ARAC/urun/` | Ürün listesi (ad, fiyat, puan, yorum) |
 | Satışlarım hangi illere gidiyor? Nerede güçlüyüm, nereye satamıyorum? | `ARAC/bolge/` | Sipariş listesi (yalnızca il, ilçe, mahalle, tutar) |
-| Reklamım kâr ettiriyor mu? Bütçem nereye gidiyor? Hangi reklam ya da arama terimi para yakıyor? | `ARAC/reklam/` | Reklam raporu (.csv/.xlsx); kâr için ürün maliyeti, komisyon, kargo |
+| Reklamım kâr ettiriyor mu? Bütçem nereye gidiyor? Hangi reklam ya da arama terimi para yakıyor? Bu hafta reklamlarımda ne yapmalıyım, geçen haftaki değişiklikler işe yaradı mı? | `ARAC/reklam/` | Reklam raporu (.csv/.xlsx); kâr için ürün maliyeti, komisyon, kargo |
 | Yurt dışında ne çok satıyor, ne yeni yükseliyor (viral)? Ne satsam? Bu ürünü getirsem kâr eder miyim? | `ARAC/arastirma/` | İlgilendiği alan; kâr için Türkiye'deki ilan sayısı, maliyet ve satış fiyatı |
 
 **Bir aracı ilk kez kullanmadan önce o klasördeki `TALIMATLAR.md` dosyasını oku** ve oradaki

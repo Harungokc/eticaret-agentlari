@@ -25,8 +25,9 @@ PAKETLER = {
         "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py",
         "ornek/ornek_adaylar.csv", "ornek/sablon.csv"]),
     "reklam-analizcisi": ("06-reklam-analizcisi", [
-        "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py",
-        "ornek/ornek_urun_reklami.csv", "ornek/ornek_arama_terimleri.csv", "ornek/ornek_maliyetler.csv",
+        "SKILL.md", "agent.py", "analiz.py", "okuyucu.py", "rapor.py", "rapor_html.py", "xlsx.py", "yonetim.py",
+        "ornek/ornek_urun_reklami.csv", "ornek/ornek_urun_reklami_sonraki_donem.csv", "ornek/ornek_arama_terimleri.csv",
+        "ornek/ornek_maliyetler.csv",
         "ornek/sablon.csv", "ornek/sablon_maliyet.csv"]),
 }
 # Bütün araçları içeren tek paket: her araç kendi alt klasöründe, talimatları TALIMATLAR.md adıyla durur.

@@ -15,6 +15,7 @@ from okuyucu import OkumaHatasi, maliyet_oku, oku, sade, sayi, sutunlari_goster
 from rapor import dosya
 from rapor_html import sayfa
 from xlsx import Sayfa, kitap_yaz
+from yonetim import ARTIR, AYIR, DOKUNMA, DURDUR, NEGATIF, TEKLIF, gunluk, yonet
 
 KLASOR = Path(__file__).parent / "ornek"
 URUN = str(KLASOR / "ornek_urun_reklami.csv")
@@ -75,6 +76,14 @@ class Okuma(unittest.TestCase):
     def test_toplam_satiri_atlanir(self):
         s = oku(yaz("Ürün;Harcama;Satış\nA;100;300\nB;50;0\nToplam;150;300\n"))
         self.assertEqual(len(s), 2)
+
+    def test_platform_sutunlari(self):
+        # Meta: bağlantı tıklaması, tüm tıklamalardan önce alınır
+        _, e = sutunlari_goster(yaz("Reklam Adı;Harcanan Tutar;Tıklamalar (Tümü);Bağlantı Tıklamaları;Gösterimler;Alışverişler\nA;1;9;4;100;1\n"))
+        self.assertEqual((e["tiklama"], e["harcama"], e["siparis"]), ("Bağlantı Tıklamaları", "Harcanan Tutar", "Alışverişler"))
+        # Google/TikTok Türkçe: "Maliyet" harcamadır, "Görüntülemeler" gösterimdir
+        _, e = sutunlari_goster(yaz("Kampanya;Maliyet;Görüntülemeler;Tıklamalar;Dönüşümler;Dönüşüm değeri\nA;1;100;5;1;50\n"))
+        self.assertEqual((e["harcama"], e["gosterim"], e["siparis"], e["ciro"]), ("Maliyet", "Görüntülemeler", "Dönüşümler", "Dönüşüm değeri"))
 
     def test_elle_esleme(self):
         yol = yaz("Ürün;Harcanan Para;Reklamdan Kazanç\nA;100;300\n")
@@ -235,6 +244,115 @@ class Cikti(unittest.TestCase):
         self.assertIn("'=HYPERLINK", icerik)
         self.assertNotIn("<f>HYPERLINK", icerik)
 
+
+SONRAKI = str(KLASOR / "ornek_urun_reklami_sonraki_donem.csv")
+
+
+class Yonetim(unittest.TestCase):
+    def plan(self, yol=URUN, maliyet=MALIYET, gun=None):
+        r = analiz_et(oku(yol), maliyet_oku(maliyet) if maliyet else None)
+        return r, yonet(r, gun=gun)
+
+    def isler(self, y):
+        return {e.hedef: e for e in y.eylemler}
+
+    def test_her_urune_tek_is(self):
+        r, y = self.plan()
+        self.assertEqual(len(y.eylemler), len(r.kalemler))
+        self.assertEqual(len({e.hedef for e in y.eylemler}), len(y.eylemler))
+
+    def test_isler_ve_oranlar(self):
+        _, y = self.plan()
+        i = self.isler(y)
+        self.assertEqual(i["Kamp Termosu 1,2 L"].is_, DURDUR)             # 310 tıklama, satış yok
+        self.assertEqual(i["Kamp Termosu 1,2 L"].yeni_harcama, 0)
+        self.assertEqual(i["Termos Kupa 350 ml"].is_, DURDUR)             # başa baş için yarıdan fazla düşüş gerekir
+        e = i["Çelik Termos 500 ml"]                                      # oran %35,1, başa baş %19,7 → %45
+        self.assertEqual((e.is_, e.degisim, e.oncelik), (TEKLIF, -45, 1))
+        self.assertAlmostEqual(e.yeni_harcama, 2870 * 0.55)
+        self.assertEqual((i["Kahve Termosu 450 ml"].is_, i["Kahve Termosu 450 ml"].degisim), (ARTIR, 20))
+        self.assertEqual(i["Çelik Termos 750 ml"].is_, DOKUNMA)           # kârlı ama "büyüt" eşiğinde değil
+        self.assertEqual(i["Termos Çanta"].is_, DOKUNMA)                  # az veri
+        self.assertEqual([e.oncelik for e in y.eylemler], sorted(e.oncelik for e in y.eylemler))
+
+    def test_butce_toplami(self):
+        _, y = self.plan(gun=7)
+        self.assertAlmostEqual(y.harcama, sum(e.harcama for e in y.eylemler))
+        self.assertAlmostEqual(y.yeni_harcama, y.harcama - y.kesilen + y.eklenen)
+        self.assertIn("günde", gunluk(y, y.yeni_harcama))
+
+    def test_maliyetsiz_kar_vaadi_yok(self):
+        _, y = self.plan(maliyet=None)
+        for e in y.eylemler:
+            self.assertNotIn("Kârlı", e.neden)
+            if e.is_ == ARTIR:
+                self.assertEqual(e.oncelik, 3)
+                self.assertIn("kesin değil", e.beklenen)
+
+    def test_arama_terimi_plani(self):
+        r, y = self.plan(TERIM, None)
+        i = self.isler(y)
+        self.assertEqual(i["kamp ocağı"].is_, NEGATIF)
+        self.assertEqual(i["çelik termos"].is_, AYIR)
+        self.assertEqual(i["stanley termos"].is_, TEKLIF)
+        self.assertNotIn("Termoslar - Manuel", i)                         # işler terimlerde, kampanyaya "dokunma" yok
+        self.assertAlmostEqual(y.harcama, r.harcama)
+
+    def test_takip(self):
+        m = maliyet_oku(MALIYET)
+        onceki, simdi = analiz_et(oku(URUN), m), analiz_et(oku(SONRAKI), m)
+        y = yonet(simdi, onceki)
+        t = {x.hedef: x for x in y.takip}
+        self.assertEqual(t["Kamp Termosu 1,2 L"].yapildi, "Yapıldı")
+        self.assertEqual(t["Termos Kupa 350 ml"].yapildi, "Yapıldı")       # bu dönemin raporunda yok
+        self.assertEqual(t["Sallama Çay Termos Seti"].yapildi, "Yapılmamış görünüyor")
+        self.assertEqual(t["Çelik Termos 500 ml"].yapildi, "Yapıldı")
+        self.assertIn("Hâlâ zarar", t["Çelik Termos 500 ml"].yorum)
+        self.assertEqual(t["Kahve Termosu 450 ml"].yapildi, "Yapıldı")
+        self.assertNotIn("Çelik Termos 750 ml", t)                        # "dokunma" işi izlenmez
+        self.assertNotIn("Kamp Termosu 1,2 L", self.isler(y))             # harcaması sıfır, yeni işi yok
+
+    def test_takip_artis_bozulursa_geri_al(self):
+        m = [Maliyet("A", birim_maliyet=50, fiyat=100)]
+        once = analiz_et([ReklamSatiri(urun="A", harcama=100, ciro=1000, siparis=10, tiklama=100)], m)
+        simdi = analiz_et([ReklamSatiri(urun="A", harcama=400, ciro=1000, siparis=10, tiklama=300)], m)
+        t = yonet(simdi, once).takip[0]
+        self.assertEqual((t.yapildi, t.sonuc), ("Yapıldı", "Kötüleşti"))
+        self.assertIn("geri alın", t.yorum)
+
+    def test_komut_satiri_ve_ciktilar(self):
+        d = Path(tempfile.mkdtemp())
+        kod, cikti, _ = main(["analiz", SONRAKI, "--onceki", URUN, "--maliyet", MALIYET, "--gun", "7",
+                              "--rapor", str(d / "r.html"), "--excel", str(d / "s.xlsx")])
+        self.assertEqual(kod, 0)
+        self.assertIn("YAPILACAKLAR", cikti)
+        self.assertIn("GEÇEN DÖNEMİN İŞLERİ", cikti)
+        h = (d / "r.html").read_text(encoding="utf-8")
+        self.assertIn("Yapılacaklar", h)
+        self.assertIn("Yapılmamış görünüyor", h)
+        with zipfile.ZipFile(d / "s.xlsx") as z:
+            kitap = z.read("xl/workbook.xml").decode()
+            for ad in z.namelist():
+                if ad.endswith(".xml"):
+                    minidom.parseString(z.read(ad))
+        self.assertIn("Yapılacaklar", kitap)
+        self.assertIn("Takip", kitap)
+        kod, _, hata = main(["analiz", URUN, "--gun", "0"])
+        self.assertEqual(kod, 1)
+        self.assertIn("--gun", hata)
+
+    def test_kotu_ad_yeni_bolumlerde(self):
+        kotu = '=HYPERLINK("http://x")<script>alert(1)</script>'
+        satir = lambda h: [ReklamSatiri(urun=kotu, harcama=h, ciro=0, siparis=0, tiklama=50)]  # noqa: E731
+        once, simdi = analiz_et(satir(100)), analiz_et(satir(80))
+        y = yonet(simdi, once)
+        h = sayfa(simdi, date(2026, 10, 14), "", y)
+        self.assertNotIn("<script>", h)
+        with zipfile.ZipFile(io.BytesIO(dosya(simdi, y))) as z:
+            for ad in ("xl/worksheets/sheet2.xml", "xl/worksheets/sheet3.xml"):
+                icerik = z.read(ad).decode()
+                self.assertIn("'=HYPERLINK", icerik)
+                self.assertNotIn("<f>HYPERLINK", icerik)
 
 if __name__ == "__main__":
     unittest.main()

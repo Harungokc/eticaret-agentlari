@@ -7,9 +7,13 @@ bütçeyi boşa harcadığını çıkarır; maliyet bilgisi verirseniz reklamdan
     python agent.py analiz reklam_raporu.xlsx
     python agent.py analiz reklam_raporu.csv --maliyet maliyetler.csv --rapor rapor.html --excel sonuc.xlsx
     python agent.py analiz reklam_raporu.csv --kar-marji 25
+    python agent.py analiz bu_hafta.csv --onceki gecen_hafta.csv --maliyet maliyetler.csv --gun 7
     python agent.py analiz reklam_raporu.csv --sutun harcama="Harcanan Tutar" --sutun ciro="Reklam Satışı"
 
 Rapor .csv ya da .xlsx olabilir. Zorunlu: harcama sütunu ve ürün, kampanya ya da arama terimi sütunlarından biri.
+Sonuçta "yapılacaklar" listesi çıkar: her reklam için panelde yapılacak tek iş (durdur, teklifi düşür, bütçeyi artır,
+negatif kelime ekle). --onceki ile geçen dönemin raporu verilirse geçen dönemin işlerinin yapılıp yapılmadığı ve
+sonucu gösterilir.
 Araç hiçbir siteye bağlanmaz ve reklam hesabında değişiklik yapmaz. Ek paket gerekmez (Python 3.10+).
 """
 
@@ -26,6 +30,7 @@ from analiz import Kalem, Rapor, analiz_et
 from okuyucu import ALAN_ADLARI, OkumaHatasi, maliyet_oku, oku, sutunlari_goster
 from rapor import UYARI, dosya
 from rapor_html import sayfa
+from yonetim import Yonetim, gunluk, is_adi, yonet
 
 
 def tl(x: float | None) -> str:
@@ -51,6 +56,25 @@ def _satir(k: Kalem, genislik: int, kar: bool) -> str:
     if kar:
         metin += f"  başa baş {yz(k.basa_bas_acos):>7}  reklam sonrası {tl(k.net):>14}"
     return metin + (f"  [{k.durum}]" if k.durum else "")
+
+
+def yaz_yonetim(y: Yonetim) -> None:
+    if y.takip:
+        o = y.onceki
+        print(f"\nGEÇEN DÖNEMİN İŞLERİ NE OLDU ({len(y.takip)})")
+        print(f"  Harcama {tl(o.harcama)} → bu dönem {tl(y.harcama_simdi)} · ROAS {kat(o.roas)} → {kat(y.roas_simdi)}"
+              + (f" · reklam sonrası kalan {tl(o.net)} → {tl(y.net_simdi)}" if o.net is not None and y.net_simdi is not None else ""))
+        for t in y.takip:
+            print(f"  - {t.is_}: {t.hedef} → {t.yapildi}" + (f" · sonuç: {t.sonuc}" if t.sonuc else "") + f"\n    {t.yorum}")
+    print(f"\nYAPILACAKLAR (panelde sizin yapacağınız işler; araç hiçbir ayarı değiştirmez)")
+    oncelik = {1: "HEMEN", 2: "BU HAFTA", 3: "İZLE"}
+    for e in y.eylemler:
+        yeni = "" if e.yeni_harcama is None or e.degisim in (0, None) else f" · önerilen harcama {tl(e.yeni_harcama)}"
+        gun = gunluk(y, e.yeni_harcama) if e.degisim not in (0, None, -100) else ""
+        print(f"  [{oncelik[e.oncelik]}] {is_adi(e)}: {e.hedef} ({e.tur.lower()}, harcama {tl(e.harcama)}{yeni}"
+              + (f", {gun}" if gun else "") + f")\n    Neden: {e.neden}" + (f"\n    Beklenen: {e.beklenen}" if e.beklenen else ""))
+    print(f"  Bütçe: dönem harcaması {tl(y.harcama)} → plan uygulanırsa {tl(y.yeni_harcama)} "
+          f"(kesilen {tl(y.kesilen)}, eklenen {tl(y.eklenen)})" + (f"; {gunluk(y, y.yeni_harcama)}" if y.gun else ""))
 
 
 def yaz(r: Rapor) -> None:
@@ -120,6 +144,9 @@ def main(argv: list[str] | None = None) -> int:
                    help="Maliyet dosyası yoksa reklam öncesi kâr payınız (satış fiyatının yüzdesi), ör. 25")
     q.add_argument("--sutun", action="append", metavar="ALAN=SÜTUN",
                    help="Tanınmayan sütunu elle eşler; alanlar: " + ", ".join(ALAN_ADLARI))
+    q.add_argument("--onceki", metavar="DOSYA",
+                   help="Geçen dönemin reklam raporu (aynı uzunlukta dönem); geçen dönemin işlerinin sonucunu gösterir")
+    q.add_argument("--gun", type=int, metavar="GÜN", help="Raporun kapsadığı gün sayısı, ör. 7; önerilen günlük bütçeyi hesaplar")
     q.add_argument("--excel", metavar="DOSYA", help="Sonucu Excel dosyası olarak da kaydeder, ör. sonuc.xlsx")
     q.add_argument("--rapor", metavar="DOSYA", help="Rapor sayfasını (HTML) kaydeder, ör. rapor.html")
     q.add_argument("--baslik", default="", help="Rapor sayfasının başlığı, ör. \"Mağazam: Eylül reklam raporu\"")
@@ -145,6 +172,8 @@ def main(argv: list[str] | None = None) -> int:
         satirlar = oku(a.dosya, _elle(a.sutun))
         maliyetler = maliyet_oku(a.maliyet) if a.maliyet else None
         r = analiz_et(satirlar, maliyetler, a.kar_marji)
+        onceki = analiz_et(oku(a.onceki, _elle(a.sutun)), maliyetler, a.kar_marji) if a.onceki else None
+        y = yonet(r, onceki, a.gun)
     except (OkumaHatasi, ValueError) as hata:
         print(f"Hata: {hata}", file=sys.stderr)
         return 1
@@ -154,12 +183,13 @@ def main(argv: list[str] | None = None) -> int:
         print("Hata: --tarih YYYY-AA-GG biçiminde olmalı, ör. 2026-10-14", file=sys.stderr)
         return 1
     yaz(r)
+    yaz_yonetim(y)
     if a.rapor:
         yol = Path(a.rapor).expanduser()
         if yol.suffix.lower() not in (".html", ".htm"):
             yol = yol.with_suffix(".html")
         try:
-            yol.write_text(sayfa(r, bugun, a.baslik), encoding="utf-8")
+            yol.write_text(sayfa(r, bugun, a.baslik, y), encoding="utf-8")
         except OSError as hata:
             print(f"Hata: rapor sayfası yazılamadı: {hata}", file=sys.stderr)
             return 1
@@ -169,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
         if yol.suffix.lower() != ".xlsx":
             yol = yol.with_suffix(".xlsx")
         try:
-            yol.write_bytes(dosya(r))
+            yol.write_bytes(dosya(r, y))
         except OSError as hata:
             print(f"Hata: Excel dosyası yazılamadı: {hata}", file=sys.stderr)
             return 1

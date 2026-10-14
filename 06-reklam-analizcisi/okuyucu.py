@@ -43,16 +43,21 @@ REKLAM_SUTUNLARI: dict[str, tuple[str, ...]] = {
     "terim": ("musteri arama terimi", "arama terimi", "customer search term", "search term", "anahtar kelime", "keyword",
               "hedefleme", "targeting", "kelime"),
     "harcama": ("harcama", "reklam harcamasi", "toplam harcama", "harcanan tutar", "harcanan butce", "reklam maliyeti",
-                "toplam maliyet", "reklam gideri", "tuketilen butce", "spend", "cost", "amount spent", "spend amount"),
+                "toplam maliyet", "reklam gideri", "tuketilen butce", "spend", "cost", "amount spent", "spend amount", "maliyet"),
     "ciro": ("reklamdan gelen satis", "reklam satis tutari", "reklam cirosu", "reklamli satis", "7 gunluk toplam satis",
              "14 gunluk toplam satis", "7 day total sales", "14 day total sales", "toplam satis", "satis tutari", "satis", "satislar",
-             "ciro", "gelir", "sales", "revenue", "attributed sales", "purchases conversion value"),
+             "ciro", "gelir", "sales", "revenue", "attributed sales", "purchases conversion value", "alisveris donusum degeri",
+             "donusum degeri", "tum donusum degeri", "conversion value", "total purchase value"),
     "siparis": ("7 gunluk toplam siparis", "7 gunluk toplam siparisler", "14 gunluk toplam siparis", "7 day total orders",
                 "14 day total orders", "siparis", "siparisler", "siparis sayisi", "siparis adedi", "satis adedi", "satilan adet",
-                "toplam siparis", "donusumler", "orders", "purchases", "conversions", "7 gunluk toplam birim",
+                "toplam siparis", "alisverisler", "donusumler", "orders", "purchases", "conversions", "7 gunluk toplam birim",
                 "7 day total units", "units"),
-    "tiklama": ("tiklama", "tiklamalar", "tiklanma", "tiklanma sayisi", "tiklama sayisi", "clicks", "link clicks"),
-    "gosterim": ("gosterim", "gosterimler", "gosterim sayisi", "goruntulenme", "goruntulenme sayisi", "impressions", "impr"),
+    # Meta raporunda hem "Bağlantı Tıklamaları" hem "Tıklamalar (Tümü)" bulunur; ürüne giden tıklama önce aranır.
+    "tiklama": ("baglanti tiklamalari", "link clicks", "clicks destination", "tiklama", "tiklamalar", "tiklanma", "tiklanma sayisi",
+                "tiklama sayisi", "clicks"),
+    # TikTok'un Türkçe arayüzünde "Görüntülemeler" gösterim demektir; video izlenmesi "Video görüntülemeleri"dir.
+    "gosterim": ("gosterim", "gosterimler", "gosterim sayisi", "goruntulemeler", "goruntulenme", "goruntulenme sayisi", "impressions",
+                 "impr"),
 }
 MALIYET_SUTUNLARI: dict[str, tuple[str, ...]] = {
     "urun": REKLAM_SUTUNLARI["urun"],
